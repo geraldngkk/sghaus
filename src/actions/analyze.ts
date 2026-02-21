@@ -8,6 +8,7 @@ import { calculateOffers, calculateMarketContext } from "@/lib/offer-calculator"
 import { calculateCostBreakdown } from "@/lib/cost-calculator";
 import { assessRisks, generateChecklist } from "@/lib/risk-assessment";
 import { assessRenovation, type RenovationAnswer } from "@/lib/renovation";
+import { logAnalysis } from "@/actions/log-analysis";
 import { SQM_TO_SQFT } from "@/lib/constants";
 import { HDB_TOWNS, FLAT_TYPES, STOREY_RANGES } from "@/lib/constants";
 import { getBlockDetails } from "@/actions/block-info";
@@ -178,7 +179,7 @@ export async function analyzeProperty(
     }
   }
 
-  return {
+  const analysisResult: AnalysisResult = {
     input,
     generatedAt: new Date().toISOString(),
     comps: {
@@ -195,4 +196,9 @@ export async function analyzeProperty(
     checklist,
     marketContext,
   };
+
+  // Fire-and-forget: log to Google Sheets (never blocks the response)
+  logAnalysis(analysisResult).catch(() => {});
+
+  return analysisResult;
 }
