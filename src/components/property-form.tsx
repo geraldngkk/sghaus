@@ -32,10 +32,9 @@ export default function PropertyForm({ onResult, onError, onAnalyzing }: Propert
   const [areaAutoFilled, setAreaAutoFilled] = useState(false);
   const [renovationAnswers, setRenovationAnswers] = useState<RenovationAnswer[] | null>(null);
 
-  // Street name autocomplete
+  // Street dropdown
   const [availableStreets, setAvailableStreets] = useState<string[]>([]);
   const [loadingStreets, setLoadingStreets] = useState(false);
-  const [showStreetDropdown, setShowStreetDropdown] = useState(false);
 
   // Block dropdown
   const [availableBlocks, setAvailableBlocks] = useState<string[]>([]);
@@ -125,10 +124,6 @@ export default function PropertyForm({ onResult, onError, onAnalyzing }: Propert
       .finally(() => setLoadingBlockDetails(false));
   }, [town, flatType, streetName, block]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const filteredStreets = availableStreets.filter((s) =>
-    s.toLowerCase().includes(streetName.toLowerCase()),
-  );
-
   // Determine which storey ranges to show
   const storeyOptions =
     availableStoreys.length > 0
@@ -208,48 +203,29 @@ export default function PropertyForm({ onResult, onError, onAnalyzing }: Propert
       </div>
 
       {/* Street Name */}
-      <div className="relative">
+      <div>
         <label htmlFor="streetName" className={labelClasses}>Street Name</label>
-        <input
+        <select
           id="streetName"
-          type="text"
           value={streetName}
-          onChange={(e) => {
-            setStreetName(e.target.value);
-            setShowStreetDropdown(true);
-          }}
-          onFocus={() => setShowStreetDropdown(true)}
-          onBlur={() => setTimeout(() => setShowStreetDropdown(false), 200)}
-          placeholder={
-            loadingStreets
-              ? "Loading streets..."
-              : town && flatType
-                ? "Type to search streets"
-                : "Select town and flat type first"
-          }
+          onChange={(e) => setStreetName(e.target.value)}
+          className={selectClasses}
           disabled={!town || !flatType || loadingStreets}
-          className={inputClasses}
           required
-          autoComplete="off"
-        />
-        {showStreetDropdown && filteredStreets.length > 0 && (
-          <ul className="absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-xl border border-border bg-white shadow-[var(--shadow-sm)]">
-            {filteredStreets.slice(0, 20).map((s) => (
-              <li key={s}>
-                <button
-                  type="button"
-                  className="w-full px-3 py-2 text-left text-sm text-charcoal hover:bg-mist"
-                  onMouseDown={() => {
-                    setStreetName(s);
-                    setShowStreetDropdown(false);
-                  }}
-                >
-                  {s}
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
+        >
+          <option value="">
+            {!town || !flatType
+              ? "Select town and flat type first"
+              : loadingStreets
+                ? "Loading streets..."
+                : availableStreets.length === 0
+                  ? "No streets found"
+                  : `Select street (${availableStreets.length})`}
+          </option>
+          {availableStreets.map((s) => (
+            <option key={s} value={s}>{s}</option>
+          ))}
+        </select>
       </div>
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">

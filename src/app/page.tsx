@@ -118,6 +118,12 @@ export default function HomePage() {
             >
               About
             </Link>
+            <Link
+              href="/contact"
+              className="text-sm font-medium text-slate transition-colors hover:text-charcoal"
+            >
+              Contact
+            </Link>
             <span className="rounded-full bg-mist px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-forest">
               Beta
             </span>
@@ -210,7 +216,7 @@ export default function HomePage() {
             <div className="bg-white border-b border-border">
               <div className="mx-auto max-w-[1200px] px-5 py-10 sm:px-10 sm:py-14">
                 <OfferStrategyDisplay
-                  offer={result.offer}
+                  offer={result.offerWithReno ?? result.offer}
                   compCount={
                     result.comps.tier1.length +
                     result.comps.tier2.length +
@@ -219,39 +225,23 @@ export default function HomePage() {
                   town={result.input.town}
                 />
 
-                {/* Renovation-adjusted offer */}
+                {/* Renovation adjustment note */}
                 {result.offerWithReno && result.renovation && (
-                  <div className="mt-6 rounded-xl border border-amber/30 bg-amber-light/20 p-4">
+                  <div className="mt-4 rounded-xl border border-amber/30 bg-amber-light/20 p-4">
                     <div className="flex items-center gap-2">
                       <span className="rounded-full bg-amber px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
                         Renovation Adjusted
                       </span>
                       <span className="text-xs text-slate">
-                        {result.renovation.condition} &middot;{" "}
+                        Condition: {result.renovation.condition} &middot;{" "}
                         {result.renovation.priceAdjustmentPercent > 0 ? "+" : ""}
-                        {(result.renovation.priceAdjustmentPercent * 100).toFixed(1)}% adjustment
+                        {(result.renovation.priceAdjustmentPercent * 100).toFixed(1)}% &middot;{" "}
+                        Est. renovation cost: ${result.renovation.estimatedCost.low.toLocaleString("en-SG")} &ndash; ${result.renovation.estimatedCost.high.toLocaleString("en-SG")}
                       </span>
                     </div>
-                    <div className="mt-3 grid grid-cols-3 gap-4 text-center">
-                      <div>
-                        <div className="text-[10px] font-semibold uppercase tracking-wider text-slate">Adj. Low</div>
-                        <div className="font-display text-lg text-charcoal">
-                          ${result.offerWithReno.low.toLocaleString("en-SG")}
-                        </div>
-                      </div>
-                      <div>
-                        <div className="text-[10px] font-semibold uppercase tracking-wider text-forest">Adj. Target</div>
-                        <div className="font-display text-lg text-forest">
-                          ${result.offerWithReno.mid.toLocaleString("en-SG")}
-                        </div>
-                      </div>
-                      <div>
-                        <div className="text-[10px] font-semibold uppercase tracking-wider text-amber">Adj. Ceiling</div>
-                        <div className="font-display text-lg text-charcoal">
-                          ${result.offerWithReno.max.toLocaleString("en-SG")}
-                        </div>
-                      </div>
-                    </div>
+                    <p className="mt-2 text-xs text-slate">
+                      Offers above are adjusted for the flat&apos;s condition. Without renovation adjustment: Low ${result.offer.low.toLocaleString("en-SG")} / Target ${result.offer.mid.toLocaleString("en-SG")} / Ceiling ${result.offer.max.toLocaleString("en-SG")}
+                    </p>
                   </div>
                 )}
 
@@ -348,6 +338,9 @@ export default function HomePage() {
               </button>
               <Link href="/about" className="transition-colors hover:text-white">
                 About
+              </Link>
+              <Link href="/contact" className="transition-colors hover:text-white">
+                Contact
               </Link>
             </div>
             <p className="text-xs text-white/40">

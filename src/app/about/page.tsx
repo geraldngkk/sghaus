@@ -25,7 +25,12 @@ export default function AboutPage() {
             <Link href="/" className="text-sm font-medium text-forest transition-colors hover:text-forest/80">
               Home
             </Link>
-            <span className="text-xs font-medium text-slate">Beta</span>
+            <Link href="/contact" className="text-sm font-medium text-slate transition-colors hover:text-charcoal">
+              Contact
+            </Link>
+            <span className="rounded-full bg-mist px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-forest">
+              Beta
+            </span>
           </nav>
         </div>
       </header>
@@ -114,6 +119,7 @@ export default function AboutPage() {
             <div className="flex items-center gap-6 text-sm text-white/60">
               <Link href="/" className="transition-colors hover:text-white">Home</Link>
               <Link href="/about" className="transition-colors hover:text-white">About</Link>
+              <Link href="/contact" className="transition-colors hover:text-white">Contact</Link>
             </div>
             <p className="text-xs text-white/40">
               Data source: data.gov.sg
