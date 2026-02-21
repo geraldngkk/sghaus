@@ -160,13 +160,26 @@ export const fetchResaleData = unstable_cache(
 );
 
 /**
- * Get the unique street names for a town+flatType combo (for form autocomplete).
- * Derives from the same cached fetchResaleData to avoid extra API calls.
- * Also pre-warms the transaction cache for the analysis pipeline.
+ * Fetch ALL-TIME HDB resale transactions for a given town and flat type.
+ * Used for building attributes (storey ranges, lease year, floor area) that
+ * don't change over time. 24-month window is too narrow for block-level lookups
+ * where a specific storey range may not have had a recent sale.
+ */
+export const fetchResaleDataAllTime = unstable_cache(
+  async (town: string, flatType: string): Promise<ParsedTransaction[]> => {
+    return fetchResaleDataUncached(town, flatType, 999);
+  },
+  ["hdb-resale-data-alltime"],
+  { revalidate: DATA_GOV_SG.cacheTtlSeconds, tags: ["hdb-data"] },
+);
+
+/**
+ * Get the unique street names for a town+flatType combo (for street dropdown).
+ * Uses all-time data so streets without recent sales still appear.
  */
 export const fetchStreetNames = unstable_cache(
   async (town: string, flatType: string): Promise<string[]> => {
-    const transactions = await fetchResaleDataUncached(town, flatType, 24);
+    const transactions = await fetchResaleDataUncached(town, flatType, 999);
     const streets = new Set(transactions.map((t) => t.streetName));
     return Array.from(streets).sort();
   },

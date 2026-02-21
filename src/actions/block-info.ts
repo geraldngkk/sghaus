@@ -1,7 +1,7 @@
 "use server";
 
 import { unstable_cache } from "next/cache";
-import { fetchResaleData } from "@/lib/hdb-api";
+import { fetchResaleData, fetchResaleDataAllTime } from "@/lib/hdb-api";
 import { DATA_GOV_SG } from "@/lib/constants";
 
 interface BlockInfo {
@@ -16,12 +16,12 @@ const CACHE_TTL = DATA_GOV_SG.cacheTtlSeconds;
 /**
  * Get available blocks for a street.
  * Called when user selects a street name — populates block dropdown.
- * Derives from cached transaction data (no separate API call).
+ * Uses all-time data so blocks without recent sales still appear.
  */
 export const getBlocks = unstable_cache(
   async (town: string, flatType: string, streetName: string): Promise<string[]> => {
     try {
-      const transactions = await fetchResaleData(town, flatType);
+      const transactions = await fetchResaleDataAllTime(town, flatType);
       const blocks = new Set<string>();
 
       for (const t of transactions) {
@@ -50,7 +50,9 @@ export const getBlocks = unstable_cache(
  * Get block-level details: available storey ranges, lease commence year, typical floor area.
  * Called when user selects a block — filters storey dropdown and provides lease year.
  *
- * Block is required — returns exact data for the specific block.
+ * Uses ALL-TIME transaction data (not 24-month window) because building attributes
+ * like storey ranges, lease year, and floor area don't change over time. A block may
+ * not have had a sale on every floor in the last 24 months, but the storeys still exist.
  */
 export const getBlockDetails = unstable_cache(
   async (
@@ -60,7 +62,7 @@ export const getBlockDetails = unstable_cache(
     block?: string,
   ): Promise<Omit<BlockInfo, "blocks">> => {
     try {
-      const transactions = await fetchResaleData(town, flatType);
+      const transactions = await fetchResaleDataAllTime(town, flatType);
 
       // Filter to matching records
       const matching = transactions.filter((t) => {
