@@ -12,6 +12,7 @@ import { logAnalysis } from "@/actions/log-analysis";
 import { SQM_TO_SQFT } from "@/lib/constants";
 import { HDB_TOWNS, FLAT_TYPES, STOREY_RANGES } from "@/lib/constants";
 import { getBlockDetails } from "@/actions/block-info";
+import { geocodeBlock } from "@/lib/onemap";
 
 // ---------------------------------------------------------------------------
 // Input validation
@@ -119,16 +120,21 @@ export async function analyzeProperty(
     atMax: calculateCostBreakdown(offer.max, input.flatType),
   };
 
-  // 8. Assess risks
+  // 8. Geocode user's block for distance-based BTO proximity detection
+  // Gracefully returns null if OneMap credentials are not configured
+  const geocoded = await geocodeBlock(input.block, input.streetName);
+  const userCoords = geocoded ? { lat: geocoded.lat, lng: geocoded.lng } : null;
+
+  // 9. Assess risks (with distance-based BTO proximity if geocoded)
   const comps = {
     tier1: adjustedTier1,
     tier2: adjustedTier2,
     tier3: adjustedTier3,
   };
-  const risks = assessRisks(input, comps, marketContext);
+  const risks = assessRisks(input, comps, marketContext, userCoords);
 
-  // 9. Generate checklist
-  const checklist = generateChecklist(input, risks, marketContext);
+  // 10. Generate checklist
+  const checklist = generateChecklist(input, risks, marketContext, userCoords);
 
   // 10. Optional: Renovation-adjusted offers
   let renovation: AnalysisResult["renovation"];

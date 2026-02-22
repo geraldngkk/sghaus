@@ -9,9 +9,10 @@ import {
   LEASE_FULL_ELIGIBILITY_YEARS,
   LEASE_WARNING_YEARS,
   LEASE_CRITICAL_YEARS,
-  BTO_HEAVY_TOWNS,
+  BTO_SUPPLY_MAP,
 } from "./constants";
 import { calculateRemainingLease } from "./adjustments";
+import { detectBtoProximity } from "./bto-estates";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -38,6 +39,7 @@ export function assessRisks(
     tier3: TieredComparable[];
   },
   marketContext: MarketContext,
+  userCoords?: { lat: number; lng: number } | null,
 ): RiskFlag[] {
   const flags: RiskFlag[] = [];
   const remainingLease = calculateRemainingLease(input.leaseCommenceDate);
@@ -94,17 +96,53 @@ export function assessRisks(
     });
   }
 
-  // 3. BTO supply pressure
-  if (BTO_HEAVY_TOWNS.includes(input.town)) {
+  // 3. BTO supply pressure (town-specific)
+  const btoData = BTO_SUPPLY_MAP[input.town];
+  if (btoData && btoData.pressure !== "low") {
     flags.push({
       id: "bto-supply",
-      title: "BTO Supply Pressure",
-      severity: "medium",
-      description: `${input.town} has significant upcoming BTO supply (2025–2027).`,
-      detail:
-        "Over 55,000 BTO flats are launching 2025–2027 across Singapore. " +
-        "Towns with heavy BTO supply may see resale price pressure as new flats reach MOP in 4–5 years. " +
-        "This could limit your appreciation potential.",
+      title: btoData.riskTitle,
+      severity: btoData.pressure === "high" ? "high" : "medium",
+      description: btoData.riskDescription,
+      detail: btoData.riskDetail,
+    });
+  }
+
+  // 3b. MOP estate proximity (distance-based)
+  // userCoords is optionally passed in; falls back to block-number heuristic
+  const proximity = detectBtoProximity(
+    input.block, input.streetName, input.town, userCoords,
+  );
+  if (proximity.proximity !== "none" && proximity.estate) {
+    const distLabel = proximity.distanceMeters != null && proximity.distanceMeters > 0
+      ? proximity.distanceMeters < 1000
+        ? `~${proximity.distanceMeters}m away`
+        : `~${(proximity.distanceMeters / 1000).toFixed(1)}km away`
+      : "";
+
+    const severityByProximity =
+      proximity.proximity === "same-estate" || proximity.proximity === "immediate"
+        ? "high" as const
+        : proximity.proximity === "nearby"
+          ? "medium" as const
+          : "low" as const;
+
+    flags.push({
+      id: "mop-proximity",
+      title:
+        proximity.proximity === "same-estate"
+          ? "You Are in a MOP-ing Estate"
+          : proximity.proximity === "immediate"
+            ? "MOP Estate Within 500m"
+            : proximity.proximity === "nearby"
+              ? "MOP Estate Within 1km"
+              : "MOP Estate in Your Area",
+      severity: severityByProximity,
+      description:
+        proximity.proximity === "same-estate"
+          ? `Your block is part of ${proximity.estate.name} (${proximity.estate.units} units reaching MOP ${proximity.estate.mopYear}).`
+          : `${proximity.estate.name} (${proximity.estate.units} units) is ${distLabel}, reaching MOP ${proximity.estate.mopYear}.`,
+      detail: proximity.message,
     });
   }
 
@@ -152,6 +190,7 @@ export function generateChecklist(
   input: PropertyInput,
   risks: RiskFlag[],
   marketContext: MarketContext,
+  userCoords?: { lat: number; lng: number } | null,
 ): ChecklistItem[] {
   const items: ChecklistItem[] = [];
   const remainingLease = calculateRemainingLease(input.leaseCommenceDate);
@@ -228,20 +267,63 @@ export function generateChecklist(
     });
   }
 
-  // BTO pressure
-  if (BTO_HEAVY_TOWNS.includes(input.town)) {
+  // BTO pressure (town-specific)
+  const btoChecklist = BTO_SUPPLY_MAP[input.town];
+  if (btoChecklist && btoChecklist.pressure === "high") {
     items.push({
       category: "Supply",
       question: "Is there upcoming BTO supply that could affect prices?",
       assessment: "negative",
-      detail: `${input.town} has significant BTO launches planned for 2025–2027. Future supply may cap appreciation.`,
+      detail: btoChecklist.checklistDetail,
+    });
+  } else if (btoChecklist && btoChecklist.pressure === "moderate") {
+    items.push({
+      category: "Supply",
+      question: "Is there upcoming BTO supply that could affect prices?",
+      assessment: "neutral",
+      detail: btoChecklist.checklistDetail,
     });
   } else {
     items.push({
       category: "Supply",
       question: "Is there upcoming BTO supply that could affect prices?",
       assessment: "positive",
-      detail: `No major BTO supply pressure in ${input.town} — limited new supply supports resale values.`,
+      detail: btoChecklist
+        ? btoChecklist.checklistDetail
+        : `No major BTO supply pressure in ${input.town} — limited new supply supports resale values.`,
+    });
+  }
+
+  // MOP estate proximity (distance-based)
+  const checklistProximity = detectBtoProximity(
+    input.block, input.streetName, input.town, userCoords,
+  );
+  if (checklistProximity.proximity !== "none" && checklistProximity.estate) {
+    const distStr = checklistProximity.distanceMeters != null && checklistProximity.distanceMeters > 0
+      ? checklistProximity.distanceMeters < 1000
+        ? `${checklistProximity.distanceMeters}m away`
+        : `${(checklistProximity.distanceMeters / 1000).toFixed(1)}km away`
+      : "nearby";
+
+    items.push({
+      category: "Supply",
+      question: "Is your block near a BTO estate reaching MOP?",
+      assessment:
+        checklistProximity.proximity === "same-estate" || checklistProximity.proximity === "immediate"
+          ? "negative"
+          : checklistProximity.proximity === "nearby"
+            ? "neutral"
+            : "positive",
+      detail:
+        checklistProximity.proximity === "same-estate"
+          ? `Your block is part of ${checklistProximity.estate.name} (${checklistProximity.estate.units} units). Significant resale supply expected as owners sell post-MOP.`
+          : `${checklistProximity.estate.name} (${checklistProximity.estate.units} units, ${distStr}) reaches MOP in ${checklistProximity.estate.mopYear}. ${
+              checklistProximity.proximity === "immediate"
+                ? "At this distance, MOP supply directly competes for your buyer pool."
+                : checklistProximity.proximity === "nearby"
+                  ? "Nearby MOP supply may increase buyer options in your neighbourhood."
+                  : "Some supply pressure expected in the broader area."
+            }`,
     });
   }
 
