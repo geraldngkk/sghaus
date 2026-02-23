@@ -31,10 +31,10 @@ function parseRecord(raw: HdbResaleRecord): ParsedTransaction {
   return {
     id: raw._id,
     month: raw.month,
-    town: raw.town,
-    flatType: raw.flat_type,
+    town: raw.town.toUpperCase(),
+    flatType: raw.flat_type.toUpperCase(),
     block: raw.block,
-    streetName: raw.street_name,
+    streetName: raw.street_name.toUpperCase(),
     storeyRange: raw.storey_range,
     storeyMidpoint: parseStoreyMidpoint(raw.storey_range),
     floorAreaSqm,
@@ -175,14 +175,10 @@ export const fetchResaleDataAllTime = unstable_cache(
 
 /**
  * Get the unique street names for a town+flatType combo (for street dropdown).
- * Uses all-time data so streets without recent sales still appear.
+ * Reuses fetchResaleDataAllTime to share the cache and avoid duplicate API calls.
  */
-export const fetchStreetNames = unstable_cache(
-  async (town: string, flatType: string): Promise<string[]> => {
-    const transactions = await fetchResaleDataUncached(town, flatType, 999);
-    const streets = new Set(transactions.map((t) => t.streetName));
-    return Array.from(streets).sort();
-  },
-  ["hdb-street-names"],
-  { revalidate: DATA_GOV_SG.cacheTtlSeconds, tags: ["hdb-data"] },
-);
+export async function fetchStreetNames(town: string, flatType: string): Promise<string[]> {
+  const transactions = await fetchResaleDataAllTime(town, flatType);
+  const streets = new Set(transactions.map((t) => t.streetName));
+  return Array.from(streets).sort();
+}

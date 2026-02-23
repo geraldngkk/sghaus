@@ -14,6 +14,7 @@ interface RenovationFormProps {
 export default function RenovationForm({ onComplete, onSkip }: RenovationFormProps) {
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [expanded, setExpanded] = useState(false);
+  const [applied, setApplied] = useState(false);
 
   const answeredCount = Object.keys(answers).length;
   const totalCount = RENOVATION_QUESTIONS.length;
@@ -34,27 +35,28 @@ export default function RenovationForm({ onComplete, onSkip }: RenovationFormPro
         selectedCostHigh: option.costImpact.high,
       };
     });
+    setApplied(true);
     onComplete(result);
   }
 
   if (!expanded) {
     return (
-      <div className="rounded-xl border border-border bg-fog/50 p-4">
-        <div className="flex items-center justify-between">
-          <div>
+      <div className="group rounded-xl border border-forest/15 bg-gradient-to-r from-mist/20 to-fog/40 p-4 transition-all hover:border-forest/25 hover:from-mist/30">
+        <div className="flex items-center justify-between gap-4">
+          <div className="min-w-0">
             <h4 className="text-sm font-semibold text-charcoal">
-              Flat condition assessment
+              Your offer could be off by $10,000+
             </h4>
-            <p className="mt-0.5 text-xs text-slate">
-              Optional — 8 quick questions to adjust your offer for renovation needs
+            <p className="mt-1 text-xs leading-relaxed text-slate">
+              Right now, your numbers assume average condition. A 2-minute check based on what you saw during viewing adjusts your offer for renovation reality.
             </p>
           </div>
           <button
             type="button"
             onClick={() => setExpanded(true)}
-            className="rounded-lg border border-forest/20 px-3 py-1.5 text-xs font-semibold text-forest transition-colors hover:bg-mist/30"
+            className="shrink-0 rounded-lg bg-forest px-4 py-2 text-xs font-semibold text-white shadow-sm transition-all hover:bg-forest/90 hover:shadow-md"
           >
-            Add Assessment
+            Refine Offer
           </button>
         </div>
       </div>
@@ -123,16 +125,24 @@ export default function RenovationForm({ onComplete, onSkip }: RenovationFormPro
         <button
           type="button"
           onClick={handleSubmit}
-          disabled={!allAnswered}
-          className="rounded-[10px] bg-forest px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-forest/90 disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={!allAnswered || applied}
+          className={`rounded-[10px] px-5 py-2.5 text-sm font-semibold transition-colors ${
+            applied
+              ? "bg-slate/30 text-slate cursor-not-allowed"
+              : "bg-forest text-white hover:bg-forest/90 disabled:opacity-50 disabled:cursor-not-allowed"
+          }`}
         >
-          Apply Condition Assessment
+          {applied ? "Assessment Applied" : "Apply Condition Assessment"}
         </button>
-        {!allAnswered && (
+        {applied ? (
+          <span className="text-xs font-medium text-emerald-600">
+            Condition factored into your offer prices
+          </span>
+        ) : !allAnswered ? (
           <span className="text-xs text-slate">
             Answer all {totalCount} questions to continue
           </span>
-        )}
+        ) : null}
       </div>
     </div>
   );

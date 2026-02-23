@@ -129,6 +129,7 @@ export function calculateOffers(
   tier3: TieredComparable[],
   input: PropertyInput,
   marketContext: MarketContext,
+  askingPrice?: number | null,
 ): OfferStrategy {
   const subjectSqft = input.floorAreaSqm * SQM_TO_SQFT;
   const subjectBlockNum = parseBlockNumber(input.block);
@@ -257,9 +258,33 @@ export function calculateOffers(
     lowPsf = midPsf * 0.85;
   }
 
+  // --- Step 8: Cap MAX at asking price ---
+  // If the seller's asking price is below our calculated ceiling, there's no
+  // reason to offer more than they're asking. Cap MAX at the asking price.
+  let maxCappedByAsking = false;
+  if (askingPrice && askingPrice > 0) {
+    const askingPsf = askingPrice / subjectSqft;
+    if (askingPsf < maxPsf) {
+      maxPsf = askingPsf;
+      maxCappedByAsking = true;
+    }
+    // If asking is even below MID, cap MID too — the seller is already below market
+    if (askingPsf < midPsf) {
+      midPsf = askingPsf;
+      // Also pull LOW down proportionally so tiers stay spaced
+      lowPsf = Math.min(lowPsf, midPsf * 0.93);
+    }
+  }
+
   const low = roundToNearest(lowPsf * subjectSqft, 1000);
   const mid = roundToNearest(midPsf * subjectSqft, 1000);
   const max = roundToNearest(maxPsf * subjectSqft, 1000);
+
+  const maxRationale = maxCappedByAsking
+    ? `Hard ceiling capped at the listing price ($${maxPsf.toFixed(0)} psf). ` +
+      `Your calculated ceiling was higher, but there's no reason to offer above what the seller is asking. ` +
+      `Negotiate down from here — start at LOW and work toward MID.`
+    : buildMaxRationale(benchmarkLabel, benchmarkComps.length, maxPsf, midPsf, avgCov);
 
   return {
     low,
@@ -270,7 +295,7 @@ export function calculateOffers(
     maxPsf,
     lowRationale: buildLowRationale(benchmarkLabel, benchmarkComps.length, lowPsf, midPsf),
     midRationale: buildMidRationale(benchmarkLabel, benchmarkComps.length, midPsf),
-    maxRationale: buildMaxRationale(benchmarkLabel, benchmarkComps.length, maxPsf, midPsf, avgCov),
+    maxRationale,
     walkAwayTriggers: generateWalkAwayTriggers(input, tier1, marketContext),
   };
 }

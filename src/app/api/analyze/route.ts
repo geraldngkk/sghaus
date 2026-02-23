@@ -9,6 +9,7 @@ import { assessRisks, generateChecklist } from "@/lib/risk-assessment";
 import { SQM_TO_SQFT } from "@/lib/constants";
 import { assessRenovation, RENOVATION_QUESTIONS, type RenovationAnswer, type RenovationAssessment } from "@/lib/renovation";
 import { getBlockDetails } from "@/actions/block-info";
+import { geocodeBlock } from "@/lib/onemap";
 
 // ---------------------------------------------------------------------------
 // Shared pipeline logic
@@ -125,15 +126,20 @@ async function runPipeline(rawInput: PropertyInput, askingPrice: number | null, 
   const adjTier3 = applyAdjustments(tier3.map((t) => ({ ...t, tier: 3 as const })), input);
 
   const marketContext = calculateMarketContext(transactions, input);
-  const offer = calculateOffers(adjTier1, adjTier2, adjTier3, input, marketContext);
+  const offer = calculateOffers(adjTier1, adjTier2, adjTier3, input, marketContext, askingPrice);
   const costs = {
     atLow: calculateCostBreakdown(offer.low, input.flatType),
     atMid: calculateCostBreakdown(offer.mid, input.flatType),
     atMax: calculateCostBreakdown(offer.max, input.flatType),
   };
+
+  // Geocode user's block for distance-based BTO proximity detection
+  const geocoded = await geocodeBlock(input.block, input.streetName);
+  const userCoords = geocoded ? { lat: geocoded.lat, lng: geocoded.lng } : null;
+
   const comps = { tier1: adjTier1, tier2: adjTier2, tier3: adjTier3 };
-  const risks = assessRisks(input, comps, marketContext);
-  const checklist = generateChecklist(input, risks, marketContext);
+  const risks = assessRisks(input, comps, marketContext, userCoords);
+  const checklist = generateChecklist(input, risks, marketContext, userCoords);
 
   // Asking price comparison
   let askingPriceAnalysis = null;

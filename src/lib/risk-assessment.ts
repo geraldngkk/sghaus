@@ -147,7 +147,19 @@ export function assessRisks(
   }
 
   // 4. Comp scarcity
-  if (comps.tier1.length < 3 && comps.tier2.length < 5) {
+  if (comps.tier1.length === 0) {
+    flags.push({
+      id: "no-street-comps",
+      title: "No Direct Street Comparables",
+      severity: "medium",
+      description: `No recent transactions found on ${input.streetName}. Pricing is based on ${comps.tier2.length > 0 ? `${comps.tier2.length} town-wide` : "area-wide"} comparables.`,
+      detail:
+        "Without transactions on the same street, the offer calculation relies on broader area data. " +
+        "This means wider pricing uncertainty — the actual market value for your specific block could be higher or lower " +
+        "than the town-wide median suggests. Consider requesting recent transaction records from the seller's agent " +
+        "or checking if similar blocks nearby have recent sales.",
+    });
+  } else if (comps.tier1.length < 3 && comps.tier2.length < 5) {
     flags.push({
       id: "comp-scarcity",
       title: "Limited Comparable Data",

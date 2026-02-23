@@ -81,24 +81,39 @@ export async function analyzeProperty(
   const input: PropertyInput = { ...rawInput, leaseCommenceDate };
   validateInput(input);
 
+  // 1b. Resolve max storey range for storey premium top-tier bonus
+  const blockDetails = await getBlockDetails(
+    input.town,
+    input.flatType,
+    input.streetName,
+    input.block,
+  );
+  const maxStoreyRange =
+    blockDetails.storeyRanges.length > 0
+      ? blockDetails.storeyRanges[blockDetails.storeyRanges.length - 1]
+      : undefined;
+
   // 2. Fetch transaction data (cached 24h)
   const allTransactions = await fetchResaleData(input.town, input.flatType);
 
   // 3. Tier the comps
   const { tier1, tier2, tier3 } = tierComparables(allTransactions, input);
 
-  // 4. Apply price adjustments
+  // 4. Apply price adjustments (with max storey range for top-tier bonus)
   const adjustedTier1 = applyAdjustments(
     tier1.map((t) => ({ ...t, tier: 1 as const })),
     input,
+    maxStoreyRange,
   );
   const adjustedTier2 = applyAdjustments(
     tier2.map((t) => ({ ...t, tier: 2 as const })),
     input,
+    maxStoreyRange,
   );
   const adjustedTier3 = applyAdjustments(
     tier3.map((t) => ({ ...t, tier: 3 as const })),
     input,
+    maxStoreyRange,
   );
 
   // 5. Calculate market context (trends)

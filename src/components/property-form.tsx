@@ -35,6 +35,7 @@ export default function PropertyForm({ onResult, onError, onAnalyzing }: Propert
   // Street dropdown
   const [availableStreets, setAvailableStreets] = useState<string[]>([]);
   const [loadingStreets, setLoadingStreets] = useState(false);
+  const [streetError, setStreetError] = useState<string | null>(null);
 
   // Block dropdown
   const [availableBlocks, setAvailableBlocks] = useState<string[]>([]);
@@ -60,9 +61,16 @@ export default function PropertyForm({ onResult, onError, onAnalyzing }: Propert
     setBlock("");
     setAvailableBlocks([]);
     setAvailableStoreys([]);
+    setStreetError(null);
     getStreetNames(town, flatType)
-      .then((streets) => setAvailableStreets(streets))
-      .catch(() => setAvailableStreets([]))
+      .then((result) => {
+        setAvailableStreets(result.streets);
+        setStreetError(result.error ?? null);
+      })
+      .catch(() => {
+        setAvailableStreets([]);
+        setStreetError("Could not load streets. Please try again.");
+      })
       .finally(() => setLoadingStreets(false));
   }, [town, flatType]);
 
@@ -226,6 +234,9 @@ export default function PropertyForm({ onResult, onError, onAnalyzing }: Propert
             <option key={s} value={s}>{s}</option>
           ))}
         </select>
+        {streetError && (
+          <p className="mt-1.5 text-xs text-red-600">{streetError}</p>
+        )}
       </div>
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">

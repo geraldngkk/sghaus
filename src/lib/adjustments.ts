@@ -1,7 +1,11 @@
 import type { TieredComparable, PropertyInput } from "@/types";
 import {
   STOREY_RANGES,
-  STOREY_PREMIUM_PER_BAND,
+  STOREY_PREMIUM_PER_LEVEL_LOW_RISE,
+  STOREY_PREMIUM_PER_LEVEL_HIGH_RISE,
+  STOREY_LOW_RISE_CUTOFF,
+  STOREY_TOP_TIER_BONUS_LOW_RISE,
+  STOREY_TOP_TIER_BONUS_HIGH_RISE,
   LEASE_DISCOUNT_PER_YEAR_BELOW_70,
   LEASE_FULL_ELIGIBILITY_YEARS,
   SQM_TO_SQFT,
@@ -16,6 +20,20 @@ function getStoreyBandIndex(range: string): number {
   return idx >= 0 ? idx : 0;
 }
 
+/** Extract the midpoint level from a storey range string like "04 TO 06" → 5 */
+function getStoreyMidpoint(range: string): number {
+  const match = range.match(/(\d+)\s*TO\s*(\d+)/i);
+  if (!match) return 2; // fallback to low floor
+  return (parseInt(match[1], 10) + parseInt(match[2], 10)) / 2;
+}
+
+/** Extract the upper bound from a storey range string like "04 TO 06" → 6 */
+function getStoreyUpper(range: string): number {
+  const match = range.match(/(\d+)\s*TO\s*(\d+)/i);
+  if (!match) return 3;
+  return parseInt(match[2], 10);
+}
+
 /** Calculate remaining lease from lease commence year */
 export function calculateRemainingLease(leaseCommenceDate: number): number {
   const now = new Date();
@@ -28,19 +46,47 @@ export function calculateRemainingLease(leaseCommenceDate: number): number {
 // ---------------------------------------------------------------------------
 
 /**
- * Storey adjustment: how much to adjust a comp's PSF when comparing to the
- * subject's storey range.
+ * Storey adjustment: absolute dollar amount to adjust a comp's price when
+ * comparing to the subject's storey range.
  *
- * If the subject is HIGHER than the comp, the comp's effective value at the
- * subject's floor is higher (positive adjustment).
+ * Returns a dollar amount (positive = subject is higher, comp worth more
+ * at subject's floor).
+ *
+ * Rate: $5k/level for buildings ≤15 storeys, $4k/level for ≥16 storeys.
+ * Top-tier bonus: extra $5k/$4k if subject is on the top floor band.
+ *
+ * @param maxStoreyRange - highest storey range in the building (for top-tier detection)
  */
-export function calculateStoreyAdjustment(
+export function calculateStoreyAdjustmentDollar(
   compStoreyRange: string,
   subjectStoreyRange: string,
+  maxStoreyRange?: string,
 ): number {
-  const compIdx = getStoreyBandIndex(compStoreyRange);
-  const subjectIdx = getStoreyBandIndex(subjectStoreyRange);
-  return (subjectIdx - compIdx) * STOREY_PREMIUM_PER_BAND;
+  const compMid = getStoreyMidpoint(compStoreyRange);
+  const subjectMid = getStoreyMidpoint(subjectStoreyRange);
+  const levelDiff = subjectMid - compMid;
+
+  // Determine building height from the highest storey range we know about
+  const buildingTopLevel = maxStoreyRange
+    ? getStoreyUpper(maxStoreyRange)
+    : Math.max(getStoreyUpper(compStoreyRange), getStoreyUpper(subjectStoreyRange));
+
+  const isHighRise = buildingTopLevel > STOREY_LOW_RISE_CUTOFF;
+  const ratePerLevel = isHighRise
+    ? STOREY_PREMIUM_PER_LEVEL_HIGH_RISE
+    : STOREY_PREMIUM_PER_LEVEL_LOW_RISE;
+
+  let adjustment = levelDiff * ratePerLevel;
+
+  // Top-tier bonus: if the subject is in the highest storey band of the building
+  if (maxStoreyRange && subjectStoreyRange === maxStoreyRange) {
+    const bonus = isHighRise
+      ? STOREY_TOP_TIER_BONUS_HIGH_RISE
+      : STOREY_TOP_TIER_BONUS_LOW_RISE;
+    adjustment += bonus;
+  }
+
+  return adjustment;
 }
 
 /**
@@ -77,30 +123,48 @@ export function calculateSizeAdjustment(
 /**
  * Adjust a comparable's PSF to make it directly comparable to the subject.
  * Returns the adjusted PSF value.
+ *
+ * Storey adjustment is applied as an absolute dollar offset (converted to PSF),
+ * while lease and size adjustments remain percentage-based multipliers.
+ *
+ * @param maxStoreyRange - highest storey range available in the building (for top-tier bonus)
  */
 export function adjustComparablePsf(
   comp: TieredComparable,
   input: PropertyInput,
+  maxStoreyRange?: string,
 ): number {
   const subjectLeaseYears = calculateRemainingLease(input.leaseCommenceDate);
+  const subjectSqft = input.floorAreaSqm * SQM_TO_SQFT;
 
-  const storeyAdj = calculateStoreyAdjustment(comp.storeyRange, input.storeyRange);
+  // Storey: absolute dollar adjustment, converted to PSF offset
+  const storeyDollar = calculateStoreyAdjustmentDollar(
+    comp.storeyRange,
+    input.storeyRange,
+    maxStoreyRange,
+  );
+  const storeyPsfOffset = subjectSqft > 0 ? storeyDollar / subjectSqft : 0;
+
+  // Lease & size: percentage-based multipliers (unchanged)
   const leaseAdj = calculateLeaseAdjustment(comp.remainingLeaseYears, subjectLeaseYears);
   const sizeAdj = calculateSizeAdjustment(comp.floorAreaSqm, input.floorAreaSqm);
 
-  const totalMultiplier = 1 + storeyAdj + leaseAdj + sizeAdj;
-  return comp.pricePsf * totalMultiplier;
+  const percentMultiplier = 1 + leaseAdj + sizeAdj;
+  return comp.pricePsf * percentMultiplier + storeyPsfOffset;
 }
 
 /**
  * Apply adjustments to an array of tiered comparables in-place and return them.
+ *
+ * @param maxStoreyRange - highest storey range in the subject building (for top-tier bonus)
  */
 export function applyAdjustments(
   comps: TieredComparable[],
   input: PropertyInput,
+  maxStoreyRange?: string,
 ): TieredComparable[] {
   return comps.map((c) => ({
     ...c,
-    adjustedPricePsf: adjustComparablePsf(c, input),
+    adjustedPricePsf: adjustComparablePsf(c, input, maxStoreyRange),
   }));
 }

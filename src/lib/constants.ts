@@ -75,8 +75,16 @@ export const BSD_BRACKETS = [
 
 // ----- Adjustment Factors -----
 
-/** Storey premium: +1.5% per 3-floor band above "01 TO 03" */
-export const STOREY_PREMIUM_PER_BAND = 0.015;
+/** Storey premium per LEVEL (not per band).
+ *  Low-rise (≤15 storeys): $5,000/level
+ *  High-rise (≥16 storeys): $4,000/level
+ *  Top-tier bonus: extra $5k (low-rise) or $4k (high-rise) for the highest band
+ */
+export const STOREY_PREMIUM_PER_LEVEL_LOW_RISE = 5_000; // buildings ≤15 storeys
+export const STOREY_PREMIUM_PER_LEVEL_HIGH_RISE = 4_000; // buildings ≥16 storeys
+export const STOREY_LOW_RISE_CUTOFF = 15; // ≤ this = low-rise rate
+export const STOREY_TOP_TIER_BONUS_LOW_RISE = 5_000;
+export const STOREY_TOP_TIER_BONUS_HIGH_RISE = 4_000;
 
 /** Lease discount: -1% per year below 70 years remaining */
 export const LEASE_DISCOUNT_PER_YEAR_BELOW_70 = 0.01;
