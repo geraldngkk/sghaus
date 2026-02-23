@@ -1,7 +1,8 @@
 "use server";
 
 import { unstable_cache } from "next/cache";
-import { fetchResaleData, fetchResaleDataAllTime } from "@/lib/hdb-api";
+import { fetchResaleDataAllTime } from "@/lib/hdb-api";
+import { getFallbackBlocks, getFallbackBlockDetails } from "@/lib/fallback-data";
 import { DATA_GOV_SG } from "@/lib/constants";
 
 interface BlockInfo {
@@ -17,6 +18,7 @@ const CACHE_TTL = DATA_GOV_SG.cacheTtlSeconds;
  * Get available blocks for a street.
  * Called when user selects a street name — populates block dropdown.
  * Uses all-time data so blocks without recent sales still appear.
+ * Falls back to pre-generated index if live API fails.
  */
 export const getBlocks = unstable_cache(
   async (town: string, flatType: string, streetName: string): Promise<string[]> => {
@@ -38,8 +40,8 @@ export const getBlocks = unstable_cache(
         return a.localeCompare(b);
       });
     } catch (err) {
-      console.log("[block-info] Failed to fetch blocks:", err);
-      return [];
+      console.warn("[block-info] Live API failed for blocks, trying fallback:", err);
+      return getFallbackBlocks(town, flatType, streetName);
     }
   },
   ["hdb-blocks"],
@@ -53,6 +55,7 @@ export const getBlocks = unstable_cache(
  * Uses ALL-TIME transaction data (not 24-month window) because building attributes
  * like storey ranges, lease year, and floor area don't change over time. A block may
  * not have had a sale on every floor in the last 24 months, but the storeys still exist.
+ * Falls back to pre-generated index if live API fails.
  */
 export const getBlockDetails = unstable_cache(
   async (
@@ -109,8 +112,8 @@ export const getBlockDetails = unstable_cache(
 
       return { storeyRanges, leaseCommenceDate, floorAreaSqm };
     } catch (err) {
-      console.log("[block-info] Failed to fetch block details:", err);
-      return { storeyRanges: [], leaseCommenceDate: null, floorAreaSqm: null };
+      console.warn("[block-info] Live API failed for block details, trying fallback:", err);
+      return getFallbackBlockDetails(town, flatType, streetName, block);
     }
   },
   ["hdb-block-details"],

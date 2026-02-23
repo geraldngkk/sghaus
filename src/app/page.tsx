@@ -212,6 +212,25 @@ export default function HomePage() {
             {/* Email capture popup — triggers on scroll to analysis or 8s timer */}
             <EmailCapture scrollTargetId="results" delayMs={8000} />
 
+            {/* Fallback data banner */}
+            {result.dataSource?.type === "fallback" && (
+              <div className="border-b border-amber-200 bg-amber-50">
+                <div className="mx-auto max-w-[1200px] px-5 py-3 sm:px-10">
+                  <p className="text-sm text-amber-800">
+                    <span className="font-semibold">Using cached data</span>
+                    {" "}from{" "}
+                    {new Date(result.dataSource.asOf).toLocaleDateString("en-SG", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                    })}
+                    . Live data from data.gov.sg was temporarily unavailable.
+                    Results may not reflect the very latest transactions.
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* Offer Range */}
             <div className="bg-white border-b border-border">
               <div className="mx-auto max-w-[1200px] px-5 py-10 sm:px-10 sm:py-14">

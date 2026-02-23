@@ -1,6 +1,12 @@
 import { unstable_cache } from "next/cache";
 import type { DataGovResponse, HdbResaleRecord, ParsedTransaction } from "@/types";
+import type { DataSourceInfo } from "@/types/fallback";
 import { DATA_GOV_SG, SQM_TO_SQFT } from "./constants";
+import {
+  getFallbackPricing,
+  getFallbackStreetNames,
+  getFallbackDataSource,
+} from "./fallback-data";
 
 // ---------------------------------------------------------------------------
 // Parsing helpers
@@ -67,10 +73,18 @@ function getMonthCutoff(monthsAgo: number): string {
 const DELAY_MS = 500; // delay between paginated requests
 const MAX_RETRIES = 3;
 
+/** Build fetch headers, including API key if configured */
+function apiHeaders(): HeadersInit {
+  const headers: HeadersInit = {};
+  const apiKey = process.env.DATA_GOV_SG_API_KEY;
+  if (apiKey) headers["x-api-key"] = apiKey;
+  return headers;
+}
+
 /** Fetch a single page with exponential backoff on 429/5xx */
 async function fetchWithRetry(url: string): Promise<Response> {
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-    const res = await fetch(url);
+    const res = await fetch(url, { headers: apiHeaders() });
 
     if (res.ok) return res;
 
@@ -181,4 +195,56 @@ export async function fetchStreetNames(town: string, flatType: string): Promise<
   const transactions = await fetchResaleDataAllTime(town, flatType);
   const streets = new Set(transactions.map((t) => t.streetName));
   return Array.from(streets).sort();
+}
+
+// ---------------------------------------------------------------------------
+// Fallback-aware wrappers
+// ---------------------------------------------------------------------------
+
+export interface WithFallback<T> {
+  data: T;
+  dataSource: DataSourceInfo;
+}
+
+/**
+ * Fetch resale data with automatic fallback to pre-generated snapshot.
+ * Try live API first; on any error, load from fallback files.
+ */
+export async function fetchResaleDataWithFallback(
+  town: string,
+  flatType: string,
+): Promise<WithFallback<ParsedTransaction[]>> {
+  try {
+    const data = await fetchResaleData(town, flatType);
+    return { data, dataSource: { type: "live", asOf: new Date().toISOString() } };
+  } catch (err) {
+    console.warn("[hdb-api] Live API failed, falling back to cached data:", err);
+    const data = await getFallbackPricing(town, flatType);
+    const source = await getFallbackDataSource();
+    return {
+      data,
+      dataSource: source ?? { type: "fallback", asOf: "unknown" },
+    };
+  }
+}
+
+/**
+ * Fetch street names with automatic fallback to pre-generated snapshot.
+ */
+export async function fetchStreetNamesWithFallback(
+  town: string,
+  flatType: string,
+): Promise<WithFallback<string[]>> {
+  try {
+    const data = await fetchStreetNames(town, flatType);
+    return { data, dataSource: { type: "live", asOf: new Date().toISOString() } };
+  } catch (err) {
+    console.warn("[hdb-api] Live API failed for streets, falling back:", err);
+    const data = await getFallbackStreetNames(town, flatType);
+    const source = await getFallbackDataSource();
+    return {
+      data,
+      dataSource: source ?? { type: "fallback", asOf: "unknown" },
+    };
+  }
 }

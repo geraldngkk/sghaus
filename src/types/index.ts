@@ -1,3 +1,5 @@
+import type { DataSourceInfo } from "@/types/fallback";
+
 /** Raw record from data.gov.sg HDB Resale Flat Prices API */
 export interface HdbResaleRecord {
   _id: number;
@@ -156,4 +158,5 @@ export interface AnalysisResult {
   risks: RiskFlag[];
   checklist: ChecklistItem[];
   marketContext: MarketContext;
+  dataSource?: DataSourceInfo;
 }

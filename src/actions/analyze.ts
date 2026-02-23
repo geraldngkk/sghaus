@@ -1,7 +1,7 @@
 "use server";
 
 import type { AnalysisResult, PropertyInput } from "@/types";
-import { fetchResaleData } from "@/lib/hdb-api";
+import { fetchResaleDataWithFallback } from "@/lib/hdb-api";
 import { tierComparables } from "@/lib/comparables";
 import { applyAdjustments } from "@/lib/adjustments";
 import { calculateOffers, calculateMarketContext } from "@/lib/offer-calculator";
@@ -93,8 +93,8 @@ export async function analyzeProperty(
       ? blockDetails.storeyRanges[blockDetails.storeyRanges.length - 1]
       : undefined;
 
-  // 2. Fetch transaction data (cached 24h)
-  const allTransactions = await fetchResaleData(input.town, input.flatType);
+  // 2. Fetch transaction data (cached 24h, with fallback)
+  const { data: allTransactions, dataSource } = await fetchResaleDataWithFallback(input.town, input.flatType);
 
   // 3. Tier the comps
   const { tier1, tier2, tier3 } = tierComparables(allTransactions, input);
@@ -216,6 +216,7 @@ export async function analyzeProperty(
     risks,
     checklist,
     marketContext,
+    dataSource,
   };
 
   // Fire-and-forget: log to Google Sheets (never blocks the response)

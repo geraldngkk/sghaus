@@ -1,16 +1,19 @@
 "use server";
 
-import { fetchStreetNames } from "@/lib/hdb-api";
+import { fetchStreetNamesWithFallback } from "@/lib/hdb-api";
 import { HDB_TOWNS, FLAT_TYPES } from "@/lib/constants";
+import type { DataSourceInfo } from "@/types/fallback";
 
 export interface StreetNamesResult {
   streets: string[];
   error?: string;
+  dataSource?: DataSourceInfo;
 }
 
 /**
  * Server action to get street names for a given town + flat type.
  * Returns a result object with streets and an optional error message.
+ * Falls back to pre-generated data if data.gov.sg is unavailable.
  */
 export async function getStreetNames(
   town: string,
@@ -24,14 +27,14 @@ export async function getStreetNames(
   }
 
   try {
-    const streets = await fetchStreetNames(town, flatType);
+    const { data: streets, dataSource } = await fetchStreetNamesWithFallback(town, flatType);
     if (streets.length === 0) {
       return {
         streets: [],
         error: `No streets found for ${flatType} flats in ${town}. This town may not have this flat type.`,
       };
     }
-    return { streets };
+    return { streets, dataSource };
   } catch (err) {
     console.error("[streets] Failed to fetch street names:", err);
     return {

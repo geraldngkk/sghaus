@@ -2,6 +2,7 @@
 
 import { useState, useTransition, useEffect } from "react";
 import type { AnalysisResult, PropertyInput } from "@/types";
+import type { DataSourceInfo } from "@/types/fallback";
 import { HDB_TOWNS, FLAT_TYPES, STOREY_RANGES, SQM_TO_SQFT } from "@/lib/constants";
 import { analyzeProperty } from "@/actions/analyze";
 import { getStreetNames } from "@/actions/streets";
@@ -36,6 +37,7 @@ export default function PropertyForm({ onResult, onError, onAnalyzing }: Propert
   const [availableStreets, setAvailableStreets] = useState<string[]>([]);
   const [loadingStreets, setLoadingStreets] = useState(false);
   const [streetError, setStreetError] = useState<string | null>(null);
+  const [streetDataSource, setStreetDataSource] = useState<DataSourceInfo | undefined>();
 
   // Block dropdown
   const [availableBlocks, setAvailableBlocks] = useState<string[]>([]);
@@ -62,10 +64,12 @@ export default function PropertyForm({ onResult, onError, onAnalyzing }: Propert
     setAvailableBlocks([]);
     setAvailableStoreys([]);
     setStreetError(null);
+    setStreetDataSource(undefined);
     getStreetNames(town, flatType)
       .then((result) => {
         setAvailableStreets(result.streets);
         setStreetError(result.error ?? null);
+        setStreetDataSource(result.dataSource);
       })
       .catch(() => {
         setAvailableStreets([]);
@@ -236,6 +240,17 @@ export default function PropertyForm({ onResult, onError, onAnalyzing }: Propert
         </select>
         {streetError && (
           <p className="mt-1.5 text-xs text-red-600">{streetError}</p>
+        )}
+        {streetDataSource?.type === "fallback" && availableStreets.length > 0 && (
+          <p className="mt-1.5 text-xs text-amber-600">
+            Using cached data from{" "}
+            {new Date(streetDataSource.asOf).toLocaleDateString("en-SG", {
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+            })}
+            {" "}(data.gov.sg temporarily unavailable)
+          </p>
         )}
       </div>
 
