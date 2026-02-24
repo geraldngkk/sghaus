@@ -64,6 +64,9 @@ export async function sendReportEmail(
 
     if (!sendFollowUps) return { success: true };
 
+    // Brief delay to avoid Resend rate limit (2 req/s on free tier)
+    await new Promise((r) => setTimeout(r, 600));
+
     // Email 2 — 48 hours later
     const email2 = build48hReminderEmail(result);
     const scheduledAt48h = new Date(
@@ -87,6 +90,8 @@ export async function sendReportEmail(
         `[send-report-email] Email 2 (48h) scheduled for ${scheduledAt48h}`,
       );
     }
+
+    await new Promise((r) => setTimeout(r, 600));
 
     // Email 3 — 14 days later
     // Requires Resend paid plan (free tier only supports up to 72h scheduling)

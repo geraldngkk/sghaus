@@ -278,6 +278,8 @@ export function build14dOutcomeEmail(result: AnalysisResult): {
 
   const subject = `How did your offer on Blk ${input.block} ${input.streetName} go?`;
 
+  const outcomeUrl = `https://sghaus.com/outcome?block=${encodeURIComponent(input.block)}&street=${encodeURIComponent(input.streetName)}`;
+
   const html = layout(`
 <h1 style="font-family:${FONT_DISPLAY};font-size:24px;margin:0 0 4px;color:${BRAND.charcoal};">
   How did it go?
@@ -287,7 +289,7 @@ export function build14dOutcomeEmail(result: AnalysisResult): {
   We'd love to know what happened.
 </p>
 
-<!-- Outcome questions -->
+<!-- Outcome questions preview -->
 <div style="background:${BRAND.fog};border:1px solid ${BRAND.border};border-radius:12px;padding:24px;margin:0 0 24px;">
   <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:${BRAND.forest};margin-bottom:16px;">
     Quick Questions
@@ -319,7 +321,7 @@ export function build14dOutcomeEmail(result: AnalysisResult): {
 
 <!-- CTA -->
 <div style="text-align:center;margin:0 0 20px;">
-  <a href="https://sghaus.com/contact" style="display:inline-block;background:${BRAND.forest};color:${BRAND.white};font-size:14px;font-weight:600;text-decoration:none;padding:12px 28px;border-radius:10px;">
+  <a href="${outcomeUrl}" style="display:inline-block;background:${BRAND.forest};color:${BRAND.white};font-size:14px;font-weight:600;text-decoration:none;padding:12px 28px;border-radius:10px;">
     Share Your Result
   </a>
   <p style="font-size:12px;color:${BRAND.slate};margin:12px 0 0;">
