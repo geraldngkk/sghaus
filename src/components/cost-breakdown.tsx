@@ -1,4 +1,7 @@
-import type { CostBreakdown } from "@/types";
+"use client";
+
+import { useState } from "react";
+import type { CostBreakdown, LoanType } from "@/types";
 
 function formatPrice(value: number): string {
   return `$${value.toLocaleString("en-SG")}`;
@@ -19,6 +22,10 @@ export default function CostBreakdownDisplay({
   atMid,
   atMax,
 }: CostBreakdownDisplayProps) {
+  const [loanType, setLoanType] = useState<LoanType>("bankLoan");
+
+  const legalFee = (cb: CostBreakdown) => cb.legalFees[loanType];
+
   const transactionRows = [
     {
       label: "Purchase Price",
@@ -34,28 +41,62 @@ export default function CostBreakdownDisplay({
     },
     {
       label: "Legal & Conveyancing",
-      low: formatRange(atLow.legalFees.low, atLow.legalFees.high),
-      mid: formatRange(atMid.legalFees.low, atMid.legalFees.high),
-      max: formatRange(atMax.legalFees.low, atMax.legalFees.high),
+      low: formatPrice(legalFee(atLow)),
+      mid: formatPrice(legalFee(atMid)),
+      max: formatPrice(legalFee(atMax)),
     },
   ];
 
-  const transactionTotalLow = atLow.purchasePrice + atLow.bsd + atLow.legalFees.low;
-  const transactionTotalMid = atMid.purchasePrice + atMid.bsd + atMid.legalFees.low;
-  const transactionTotalMax = atMax.purchasePrice + atMax.bsd + atMax.legalFees.low;
+  const transactionTotalLow = atLow.purchasePrice + atLow.bsd + legalFee(atLow);
+  const transactionTotalMid = atMid.purchasePrice + atMid.bsd + legalFee(atMid);
+  const transactionTotalMax = atMax.purchasePrice + atMax.bsd + legalFee(atMax);
 
-  const transactionTotalHighLow = atLow.purchasePrice + atLow.bsd + atLow.legalFees.high;
-  const transactionTotalHighMid = atMid.purchasePrice + atMid.bsd + atMid.legalFees.high;
-  const transactionTotalHighMax = atMax.purchasePrice + atMax.bsd + atMax.legalFees.high;
+  const allInLowAtMid = transactionTotalMid + atMid.renovationEstimate.low;
+  const allInHighAtMid = transactionTotalMid + atMid.renovationEstimate.high;
 
   return (
     <div className="rounded-2xl border border-border bg-white p-5 sm:p-6">
-      <h3 className="font-display text-xl text-charcoal">Cost Breakdown</h3>
-      <p className="mt-1 text-sm text-slate">
-        Transaction costs at each offer level (excluding agent commission)
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h3 className="font-display text-xl text-charcoal">Cost Breakdown</h3>
+          <p className="mt-1 text-sm text-slate">
+            Transaction costs at each offer level (excluding agent commission)
+          </p>
+        </div>
+
+        {/* Loan Type Toggle */}
+        <div className="flex items-center gap-1 rounded-lg border border-border bg-fog p-0.5">
+          <button
+            onClick={() => setLoanType("hdbLoan")}
+            className={`rounded-md px-3 py-1.5 text-xs font-medium transition-all ${
+              loanType === "hdbLoan"
+                ? "bg-white text-forest shadow-sm"
+                : "text-slate hover:text-charcoal"
+            }`}
+          >
+            HDB Loan
+          </button>
+          <button
+            onClick={() => setLoanType("bankLoan")}
+            className={`rounded-md px-3 py-1.5 text-xs font-medium transition-all ${
+              loanType === "bankLoan"
+                ? "bg-white text-forest shadow-sm"
+                : "text-slate hover:text-charcoal"
+            }`}
+          >
+            Bank Loan
+          </button>
+        </div>
+      </div>
+
+      <p className="mt-2 text-xs text-slate/70">
+        Legal fees:{" "}
+        {loanType === "hdbLoan"
+          ? "$1,000 (HDB handles conveyancing in-house)"
+          : "$2,000 (external solicitor required)"}
       </p>
 
-      <div className="mt-5 overflow-x-auto">
+      <div className="mt-4 overflow-x-auto">
         <table className="w-full text-sm tabular-nums">
           <thead>
             <tr className="border-b border-border">
@@ -85,13 +126,13 @@ export default function CostBreakdownDisplay({
             <tr className="border-b border-border bg-fog/50">
               <td className="px-3 py-2.5 font-semibold text-charcoal">Transaction Total</td>
               <td className="px-3 py-2.5 text-right font-semibold text-charcoal">
-                {formatRange(transactionTotalLow, transactionTotalHighLow)}
+                {formatPrice(transactionTotalLow)}
               </td>
               <td className="px-3 py-2.5 text-right font-semibold text-charcoal">
-                {formatRange(transactionTotalMid, transactionTotalHighMid)}
+                {formatPrice(transactionTotalMid)}
               </td>
               <td className="px-3 py-2.5 text-right font-semibold text-charcoal">
-                {formatRange(transactionTotalMax, transactionTotalHighMax)}
+                {formatPrice(transactionTotalMax)}
               </td>
             </tr>
           </tbody>
@@ -126,7 +167,7 @@ export default function CostBreakdownDisplay({
           </div>
           <div className="text-right">
             <div className="price-display text-xl text-forest sm:text-2xl">
-              {formatRange(atMid.totalLow, atMid.totalHigh)}
+              {formatRange(allInLowAtMid, allInHighAtMid)}
             </div>
           </div>
         </div>

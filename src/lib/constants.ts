@@ -109,8 +109,14 @@ export const MIN_TIER1_COMPS = 3;
 
 // ----- Cost Estimates -----
 
-/** Legal/conveyancing fees (SGD) */
-export const LEGAL_FEES = { low: 2_000, high: 3_500 };
+/** Legal/conveyancing fees (SGD) by loan type.
+ *  HDB loan: HDB handles conveyancing in-house → ~$1,000
+ *  Bank loan: requires external solicitor → ~$2,000
+ */
+export const LEGAL_FEES = {
+  hdbLoan: 1_000,
+  bankLoan: 2_000,
+};
 
 /**
  * Renovation estimates by flat type (SGD, resale flats, 2025-2026 data).

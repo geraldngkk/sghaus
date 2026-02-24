@@ -13,6 +13,7 @@ import SavedReports from "@/components/saved-reports";
 import PropertyComparison from "@/components/property-comparison";
 import ShareReport from "@/components/share-report";
 import AnalysisSkeleton from "@/components/analysis-skeleton";
+import NegotiationPanel from "@/components/negotiation-panel";
 import EmailCapture from "@/components/email-capture";
 import { saveAnalysis, getAnalysis, type SavedAnalysis } from "@/lib/storage";
 
@@ -210,7 +211,7 @@ export default function HomePage() {
         {result && view === "results" && (
           <section id="results">
             {/* Email capture popup — triggers on scroll to analysis or 8s timer */}
-            <EmailCapture scrollTargetId="results" delayMs={8000} />
+            <EmailCapture delayMs={12000} />
 
             {/* Fallback data banner */}
             {result.dataSource?.type === "fallback" && (
@@ -289,6 +290,9 @@ export default function HomePage() {
                     Analyse Another
                   </button>
                 </div>
+
+                {/* Negotiation Scripts — collapsed by default */}
+                <NegotiationPanel result={result} />
               </div>
             </div>
 

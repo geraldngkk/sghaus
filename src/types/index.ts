@@ -82,11 +82,14 @@ export interface OfferStrategy {
   walkAwayTriggers: string[];
 }
 
+/** Loan type for legal fee calculation */
+export type LoanType = "hdbLoan" | "bankLoan";
+
 /** Cost breakdown at a specific price point */
 export interface CostBreakdown {
   purchasePrice: number;
   bsd: number;
-  legalFees: { low: number; high: number };
+  legalFees: { hdbLoan: number; bankLoan: number };
   renovationEstimate: { low: number; high: number };
   agentCommission: number;
   totalLow: number;

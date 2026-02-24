@@ -45,13 +45,14 @@ export function calculateCostBreakdown(
     ? Math.round(price * AGENT_COMMISSION_RATE)
     : 0;
 
+  // totalLow/totalHigh use hdbLoan (cheaper) and bankLoan (more expensive) respectively
   return {
     purchasePrice: price,
     bsd,
     legalFees: legal,
     renovationEstimate: reno,
     agentCommission: agent,
-    totalLow: price + bsd + legal.low + reno.low + agent,
-    totalHigh: price + bsd + legal.high + reno.high + agent,
+    totalLow: price + bsd + legal.hdbLoan + reno.low + agent,
+    totalHigh: price + bsd + legal.bankLoan + reno.high + agent,
   };
 }
