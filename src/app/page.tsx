@@ -211,7 +211,7 @@ export default function HomePage() {
         {result && view === "results" && (
           <section id="results">
             {/* Email capture popup — triggers on scroll to analysis or 8s timer */}
-            <EmailCapture delayMs={12000} />
+            <EmailCapture delayMs={12000} result={result} />
 
             {/* Fallback data banner */}
             {result.dataSource?.type === "fallback" && (

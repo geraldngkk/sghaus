@@ -1,13 +1,17 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import type { AnalysisResult } from "@/types";
 import { subscribeEmail } from "@/actions/subscribe";
+import { sendReportEmail } from "@/actions/send-report-email";
 
 const STORAGE_KEY = "sghaus-email-captured";
 
 interface EmailCaptureProps {
   /** Delay in ms before showing the gate after mount */
   delayMs?: number;
+  /** Analysis result to send via email on capture */
+  result?: AnalysisResult | null;
 }
 
 /**
@@ -20,7 +24,7 @@ interface EmailCaptureProps {
  * - Skipped entirely if user already submitted email (localStorage)
  * - On success, blur lifts and reading continues
  */
-export default function EmailCapture({ delayMs = 12_000 }: EmailCaptureProps) {
+export default function EmailCapture({ delayMs = 12_000, result }: EmailCaptureProps) {
   const [show, setShow] = useState(false);
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
@@ -64,17 +68,22 @@ export default function EmailCapture({ delayMs = 12_000 }: EmailCaptureProps) {
     setStatus("loading");
     setErrorMsg("");
 
-    const result = await subscribeEmail(email.trim());
+    const subResult = await subscribeEmail(email.trim());
 
-    if (result.success) {
+    if (subResult.success) {
       setStatus("success");
       try {
         localStorage.setItem(STORAGE_KEY, email.trim());
       } catch {}
       alreadyCaptured.current = true;
+
+      // Fire-and-forget: send the report email sequence via Resend
+      if (result) {
+        sendReportEmail(email.trim(), result).catch(() => {});
+      }
     } else {
       setStatus("error");
-      setErrorMsg(result.error ?? "Something went wrong. Please try again.");
+      setErrorMsg(subResult.error ?? "Something went wrong. Please try again.");
     }
   }
 
