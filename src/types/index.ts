@@ -162,6 +162,34 @@ export interface MrtProximityResult {
   premiumPercent: number;
 }
 
+/** School tier — A (elite) through E (baseline) */
+export type SchoolTier = "A" | "B" | "C" | "D" | "E";
+
+/** Primary school static data */
+export interface PrimarySchool {
+  name: string;
+  postalCode: string;
+  lat: number;
+  lng: number;
+  area: string;
+  zone: string;
+  sap: boolean;
+  gep: boolean;
+  affiliated: boolean;
+  missionSchool: boolean;
+  desirabilityScore: number;
+  tier: SchoolTier;
+}
+
+/** School proximity result for a given property location */
+export interface SchoolProximityResult {
+  school: PrimarySchool;
+  distanceMeters: number;
+  walkingMinutes: number;
+  distanceBand: "within1km" | "within2km";
+  premiumPercent: { min: number; max: number };
+}
+
 /** Complete analysis result returned by the server action */
 export interface AnalysisResult {
   input: PropertyInput;
