@@ -24,7 +24,12 @@ export default function CostBreakdownDisplay({
 }: CostBreakdownDisplayProps) {
   const [loanType, setLoanType] = useState<LoanType>("bankLoan");
 
-  const legalFee = (cb: CostBreakdown) => cb.legalFees[loanType];
+  // Old saved reports stored legalFees as { low, high } instead of { hdbLoan, bankLoan }
+  const legalFee = (cb: CostBreakdown) => {
+    const fees = cb.legalFees as Record<string, number>;
+    if (loanType === "hdbLoan") return fees.hdbLoan ?? fees.low ?? 1_000;
+    return fees.bankLoan ?? fees.high ?? 2_000;
+  };
 
   const transactionRows = [
     {
