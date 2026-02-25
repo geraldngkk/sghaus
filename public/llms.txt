@@ -1,0 +1,58 @@
+# SGHaus — HDB Resale Offer Intelligence
+
+> https://sghaus.com
+
+## What is SGHaus?
+
+SGHaus is a free property intelligence tool for Singapore homebuyers. It calculates data-driven offer prices for HDB resale flats using official government transaction data from data.gov.sg.
+
+## What does it do?
+
+Given a specific HDB block, flat type, and storey range, SGHaus returns:
+
+- **Three-tier offer strategy**: Opening Bid (low), Target Price (mid), Hard Ceiling (max) — each with data rationale
+- **Comparable sales analysis**: Tiered comps from same block, same street, same town, and area-wide, with price adjustments for storey, lease, size, and MRT proximity
+- **Cost breakdown**: Purchase price + Buyer's Stamp Duty + legal fees + renovation estimate + agent commission
+- **Risk flags**: Lease decay, BTO supply pressure, MRT distance, price trends, comp scarcity — with severity ratings
+- **Decision checklist**: Buy / don't-buy signals across financial, location, and market dimensions
+- **Negotiation scripts**: Stage-by-stage messaging templates (opening bid, counter-offer, final offer) personalised with the user's data
+- **MRT proximity analysis**: Nearest MRT station with distance, walking time, and premium tier (8-15% for <200m, 5-8% for <500m, 2-5% for <1km)
+
+## How does it work?
+
+1. User selects town, flat type, street, block, and storey range (cascading dropdowns populated from real transaction data)
+2. Server fetches 24 months of HDB resale transactions from data.gov.sg (with fallback to pre-generated snapshots if API is down)
+3. Comparables are tiered: Tier 1 (same block ±2), Tier 2 (same street), Tier 3 (town-wide)
+4. Prices are normalised to PSF (per square foot) and adjusted for storey level, remaining lease, unit size, and MRT proximity differential
+5. Offer prices are calculated using a COV-anchored formula: MAX = street median + average COV, MID = street median, LOW = ~6% below with 15% floor vs last sold
+6. Risk assessment checks lease eligibility (CPF/loan), BTO/MOP supply pressure (distance-based), market trend direction, and comp liquidity
+7. Results are delivered instantly with a branded report the user can save, share, or use to generate negotiation messages
+
+## Data sources
+
+- **HDB Resale Flat Prices**: data.gov.sg (official Singapore government open data, free, no auth required)
+- **Geocoding**: OneMap API (Singapore's authoritative map service)
+- **MRT stations**: Complete dataset of ~200 MRT/LRT stations with coordinates, including under-construction stations
+
+## Coverage
+
+- All 27 HDB towns in Singapore
+- Flat types: 2-Room Flexi, 3-Room, 4-Room, 5-Room, Executive, Multi-Generation
+- Transaction data: Rolling 24-month window, refreshed on each request (or 24h cache)
+
+## Who is it for?
+
+- First-time HDB resale buyers who want to know what to offer
+- Homebuyers comparing multiple properties
+- Anyone negotiating an HDB resale purchase
+
+## Technology
+
+- Next.js 15 (App Router), TypeScript, Tailwind CSS
+- Deployed on Vercel
+- Server-side API calls (no CORS issues, no client-side API keys)
+
+## Contact
+
+- Website: https://sghaus.com
+- Contact form: https://sghaus.com/contact
