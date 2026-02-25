@@ -1,6 +1,6 @@
 "use server";
 
-import type { AnalysisResult, PropertyInput, MrtProximityResult } from "@/types";
+import type { AnalysisResult, PropertyInput, MrtProximityResult, SchoolProximityResult } from "@/types";
 import { fetchResaleDataWithFallback } from "@/lib/hdb-api";
 import { tierComparables } from "@/lib/comparables";
 import { applyAdjustments } from "@/lib/adjustments";
@@ -14,6 +14,7 @@ import { HDB_TOWNS, FLAT_TYPES, STOREY_RANGES } from "@/lib/constants";
 import { getBlockDetails } from "@/actions/block-info";
 import { geocodeBlock } from "@/lib/onemap";
 import { findNearestMrt, getMrtPremiumPercent } from "@/lib/mrt-stations";
+import { findNearbySchools, getSchoolPremiumPercent } from "@/lib/primary-schools";
 
 // ---------------------------------------------------------------------------
 // Input validation
@@ -139,6 +140,24 @@ export async function analyzeProperty(
     }
   }
 
+  // 3d. Compute school proximity for subject + all comp blocks
+  console.log("[SCHOOL DEBUG] userCoords:", userCoords);
+  const subjectSchools = userCoords
+    ? findNearbySchools(userCoords.lat, userCoords.lng)
+    : [];
+  console.log("[SCHOOL DEBUG] subjectSchools count:", subjectSchools.length, subjectSchools.slice(0, 3).map(s => `${s.school.name} (${s.distanceMeters}m)`));
+  const subjectSchoolPremium = getSchoolPremiumPercent(subjectSchools);
+
+  const compSchoolPremiumMap = new Map<string, { min: number; max: number } | null>();
+  for (const [key, geo] of geocodeMap) {
+    if (geo) {
+      const schools = findNearbySchools(geo.lat, geo.lng);
+      compSchoolPremiumMap.set(key, getSchoolPremiumPercent(schools));
+    } else {
+      compSchoolPremiumMap.set(key, null);
+    }
+  }
+
   // 4. Apply price adjustments (with max storey range for top-tier bonus)
   const adjustedTier1 = applyAdjustments(
     tier1.map((t) => ({ ...t, tier: 1 as const })),
@@ -146,6 +165,8 @@ export async function analyzeProperty(
     maxStoreyRange,
     subjectMrt,
     compMrtMap,
+    subjectSchoolPremium,
+    compSchoolPremiumMap,
   );
   const adjustedTier2 = applyAdjustments(
     tier2.map((t) => ({ ...t, tier: 2 as const })),
@@ -153,6 +174,8 @@ export async function analyzeProperty(
     maxStoreyRange,
     subjectMrt,
     compMrtMap,
+    subjectSchoolPremium,
+    compSchoolPremiumMap,
   );
   const adjustedTier3 = applyAdjustments(
     tier3.map((t) => ({ ...t, tier: 3 as const })),
@@ -160,6 +183,8 @@ export async function analyzeProperty(
     maxStoreyRange,
     subjectMrt,
     compMrtMap,
+    subjectSchoolPremium,
+    compSchoolPremiumMap,
   );
 
   // 5. Calculate market context (trends)
@@ -200,6 +225,24 @@ export async function analyzeProperty(
     }
   }
 
+  // 6c. Enrich offer rationales with school context if adjustment is material
+  if (subjectSchools.length > 0) {
+    const desirableSchools = subjectSchools.filter(
+      (s) => s.school.tier === "A" || s.school.tier === "B" || s.school.tier === "C",
+    );
+    const within1km = desirableSchools.filter((s) => s.distanceBand === "within1km");
+
+    if (within1km.length > 0 && subjectSchoolPremium.max >= 0.02) {
+      const topSchool = within1km[0];
+      const schoolNote = within1km.length === 1
+        ? ` School premium: within 1 km of ${topSchool.school.name} (tier ${topSchool.school.tier}, ${topSchool.distanceMeters}m).`
+        : ` School premium: ${within1km.length} desirable schools within 1 km (nearest: ${topSchool.school.name}, ${topSchool.distanceMeters}m).`;
+      offer.lowRationale += schoolNote;
+      offer.midRationale += schoolNote;
+      offer.maxRationale += schoolNote;
+    }
+  }
+
   // 7. Calculate costs at each offer level
   const costs = {
     atLow: calculateCostBreakdown(offer.low, input.flatType),
@@ -213,10 +256,10 @@ export async function analyzeProperty(
     tier2: adjustedTier2,
     tier3: adjustedTier3,
   };
-  const risks = assessRisks(input, comps, marketContext, userCoords, subjectMrt);
+  const risks = assessRisks(input, comps, marketContext, userCoords, subjectMrt, subjectSchools);
 
   // 10. Generate checklist
-  const checklist = generateChecklist(input, risks, marketContext, userCoords, subjectMrt);
+  const checklist = generateChecklist(input, risks, marketContext, userCoords, subjectMrt, subjectSchools);
 
   // 10. Optional: Renovation-adjusted offers
   let renovation: AnalysisResult["renovation"];
@@ -285,6 +328,7 @@ export async function analyzeProperty(
     marketContext,
     dataSource,
     mrtProximity: subjectMrt ?? undefined,
+    schoolProximity: subjectSchools.length > 0 ? subjectSchools : undefined,
   };
 
   // Fire-and-forget: log to Google Sheets (never blocks the response)

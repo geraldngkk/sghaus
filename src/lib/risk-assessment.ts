@@ -5,6 +5,7 @@ import type {
   RiskFlag,
   ChecklistItem,
   MrtProximityResult,
+  SchoolProximityResult,
 } from "@/types";
 import {
   LEASE_FULL_ELIGIBILITY_YEARS,
@@ -42,6 +43,7 @@ export function assessRisks(
   marketContext: MarketContext,
   userCoords?: { lat: number; lng: number } | null,
   subjectMrt?: MrtProximityResult | null,
+  nearbySchools?: SchoolProximityResult[] | null,
 ): RiskFlag[] {
   const flags: RiskFlag[] = [];
   const remainingLease = calculateRemainingLease(input.leaseCommenceDate);
@@ -230,6 +232,35 @@ export function assessRisks(
     }
   }
 
+  // 7. School proximity
+  if (nearbySchools && nearbySchools.length > 0) {
+    const within1km = nearbySchools.filter((s) => s.distanceBand === "within1km");
+    const eliteWithin1km = within1km.filter((s) => s.school.tier === "A");
+
+    if (eliteWithin1km.length > 0) {
+      const names = eliteWithin1km.map((s) => s.school.name).join(", ");
+      flags.push({
+        id: "school-elite-nearby",
+        title: "Near Elite Primary School",
+        severity: "low",
+        description: `Within 1 km of ${eliteWithin1km.length === 1 ? "elite school" : `${eliteWithin1km.length} elite schools`}: ${names}.`,
+        detail:
+          "Properties within 1 km of elite primary schools (tier A) command a 5-10% price premium due to MOE P1 registration priority. " +
+          "This premium is well-established and supports resale value. Factor this into your valuation.",
+      });
+    }
+  } else if (nearbySchools && nearbySchools.length === 0) {
+    flags.push({
+      id: "school-none-nearby",
+      title: "No Notable Schools Within 2 km",
+      severity: "low",
+      description: "No primary schools with strong demand signals found within 2 km.",
+      detail:
+        "The absence of popular schools nearby means no school premium is priced in. " +
+        "This is neutral for most buyers but may limit resale appeal to families prioritising P1 registration.",
+    });
+  }
+
   return flags;
 }
 
@@ -243,6 +274,7 @@ export function generateChecklist(
   marketContext: MarketContext,
   userCoords?: { lat: number; lng: number } | null,
   subjectMrt?: MrtProximityResult | null,
+  nearbySchools?: SchoolProximityResult[] | null,
 ): ChecklistItem[] {
   const items: ChecklistItem[] = [];
   const remainingLease = calculateRemainingLease(input.leaseCommenceDate);
@@ -381,12 +413,16 @@ export function generateChecklist(
 
   // MRT proximity
   if (subjectMrt) {
-    if (subjectMrt.distanceMeters <= 200 && subjectMrt.station.status === "operational") {
+    if (subjectMrt.distanceMeters <= 500) {
       items.push({
         category: "Location",
         question: "Is the property near an MRT station?",
         assessment: "positive",
-        detail: `Immediate proximity to ${subjectMrt.station.name} MRT (${subjectMrt.station.codes.join("/")}) at ${subjectMrt.distanceMeters}m (~${subjectMrt.walkingMinutes} min walk). Strong location premium of 8-15%.`,
+        detail: `Within walking distance of ${subjectMrt.station.name} MRT (${subjectMrt.station.codes.join("/")}) at ${subjectMrt.distanceMeters}m (~${subjectMrt.walkingMinutes} min walk).${
+          subjectMrt.station.status === "under-construction"
+            ? ` Under construction, expected ${subjectMrt.station.expectedYear ?? "TBC"}.`
+            : " Strong location premium of 5-15%."
+        }`,
       });
     } else if (subjectMrt.distanceMeters <= 1000) {
       items.push({
@@ -396,7 +432,7 @@ export function generateChecklist(
         detail: `${subjectMrt.station.name} MRT (${subjectMrt.station.codes.join("/")}) is ${subjectMrt.distanceMeters}m away (~${subjectMrt.walkingMinutes} min walk). ${
           subjectMrt.station.status === "under-construction"
             ? `Under construction, expected ${subjectMrt.station.expectedYear ?? "TBC"}.`
-            : "Walkable but not immediate proximity."
+            : "Walkable but outside the immediate 500m premium zone."
         }`,
       });
     } else {
@@ -407,6 +443,56 @@ export function generateChecklist(
         detail: `Nearest MRT is ${subjectMrt.station.name} (${subjectMrt.station.codes.join("/")}) at ${(subjectMrt.distanceMeters / 1000).toFixed(1)}km (~${subjectMrt.walkingMinutes} min walk). Not within convenient walking distance.`,
       });
     }
+  }
+
+  // School proximity
+  if (nearbySchools && nearbySchools.length > 0) {
+    const within1km = nearbySchools.filter((s) => s.distanceBand === "within1km");
+    const desirableWithin1km = within1km.filter(
+      (s) => s.school.tier === "A" || s.school.tier === "B" || s.school.tier === "C",
+    );
+    const bestSchool = nearbySchools[0]; // sorted by distance
+
+    if (desirableWithin1km.length >= 2) {
+      const names = desirableWithin1km
+        .slice(0, 3)
+        .map((s) => s.school.name)
+        .join(", ");
+      items.push({
+        category: "Location",
+        question: "Is the property near desirable primary schools?",
+        assessment: "positive",
+        detail: `${desirableWithin1km.length} desirable school(s) within 1 km: ${names}. Strong P1 registration advantage and school premium.`,
+      });
+    } else if (desirableWithin1km.length === 1) {
+      items.push({
+        category: "Location",
+        question: "Is the property near desirable primary schools?",
+        assessment: "positive",
+        detail: `Within 1 km of ${desirableWithin1km[0].school.name} (tier ${desirableWithin1km[0].school.tier}, ${desirableWithin1km[0].distanceMeters}m). P1 registration priority applies.`,
+      });
+    } else if (within1km.length > 0) {
+      items.push({
+        category: "Location",
+        question: "Is the property near desirable primary schools?",
+        assessment: "neutral",
+        detail: `${within1km.length} school(s) within 1 km but none in the top tiers (A/B/C). P1 registration priority applies but no significant school premium.`,
+      });
+    } else {
+      items.push({
+        category: "Location",
+        question: "Is the property near desirable primary schools?",
+        assessment: "neutral",
+        detail: `Nearest school is ${bestSchool.school.name} at ${bestSchool.distanceMeters}m (1-2 km band). Secondary P1 registration priority only.`,
+      });
+    }
+  } else if (nearbySchools) {
+    items.push({
+      category: "Location",
+      question: "Is the property near desirable primary schools?",
+      assessment: "negative",
+      detail: "No primary schools found within 2 km. No P1 registration distance advantage.",
+    });
   }
 
   // Risk summary

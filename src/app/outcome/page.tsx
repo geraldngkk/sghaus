@@ -353,7 +353,7 @@ function OutcomePageInner() {
                 Contact
               </Link>
             </div>
-            <p className="text-xs text-white/40">Data source: data.gov.sg</p>
+            <p className="text-xs text-white/40">Powered by official Singapore government data</p>
           </div>
         </div>
       </footer>

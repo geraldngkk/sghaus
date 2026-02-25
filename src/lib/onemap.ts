@@ -2,13 +2,13 @@
 // OneMap API Client — Geocoding for HDB blocks
 // ---------------------------------------------------------------------------
 // Uses Singapore's official OneMap API to convert HDB block + street into
-// lat/lng coordinates. Required for distance-based BTO proximity detection.
+// lat/lng coordinates. Required for distance-based proximity detection.
 //
 // Setup: Set ONEMAP_EMAIL and ONEMAP_PASSWORD in .env.local
 //        Register free at https://www.onemap.gov.sg/apidocs/register
 //
-// If credentials are not configured, geocoding silently returns null and
-// the risk assessment falls back to block-number proximity logic.
+// Auth provides higher concurrency limits. If auth fails, falls back to
+// unauthenticated search (lower rate limits but still functional).
 // ---------------------------------------------------------------------------
 
 const ONEMAP_BASE = "https://www.onemap.gov.sg/api";
@@ -72,7 +72,8 @@ export interface GeocodedBlock {
 
 /**
  * Geocode an HDB block + street to lat/lng coordinates.
- * Returns null if OneMap credentials are not configured or the API fails.
+ * Tries authenticated request first (higher rate limits), falls back to
+ * unauthenticated if auth fails.
  *
  * Results are cached in memory — HDB block locations never change.
  */
@@ -87,15 +88,22 @@ export async function geocodeBlock(
     return { lat: cached.lat, lng: cached.lng, block, street, postal: "" };
   }
 
+  const query = encodeURIComponent(`${block} ${street}`);
+  const url = `${ONEMAP_BASE}/common/elastic/search?searchVal=${query}&returnGeom=Y&getAddrDetails=Y&pageNum=1`;
+
+  // Try with auth first (higher concurrency), fall back to no-auth
   const token = await getToken();
-  if (!token) return null;
+  const headers: Record<string, string> = token
+    ? { Authorization: `Bearer ${token}` }
+    : {};
 
   try {
-    const query = encodeURIComponent(`${block} ${street}`);
-    const res = await fetch(
-      `${ONEMAP_BASE}/common/elastic/search?searchVal=${query}&returnGeom=Y&getAddrDetails=Y&pageNum=1`,
-      { headers: { Authorization: `Bearer ${token}` } },
-    );
+    let res = await fetch(url, { headers });
+
+    // If authenticated request fails with 401/403, retry without auth
+    if (token && (res.status === 401 || res.status === 403)) {
+      res = await fetch(url);
+    }
 
     if (!res.ok) return null;
 
@@ -131,6 +139,44 @@ export async function geocodeBlock(
 
     return result;
   } catch {
+    // Last resort: try unauthenticated if we haven't already
+    if (token) {
+      try {
+        const res = await fetch(url);
+        if (!res.ok) return null;
+
+        const data = (await res.json()) as {
+          found: number;
+          results: Array<{
+            BLK_NO: string;
+            ROAD_NAME: string;
+            LATITUDE: string;
+            LONGITUDE: string;
+            POSTAL: string;
+          }>;
+        };
+
+        if (data.found === 0 || data.results.length === 0) return null;
+
+        const blockUpper = block.toUpperCase();
+        const match =
+          data.results.find((r) => r.BLK_NO.toUpperCase() === blockUpper) ??
+          data.results[0];
+
+        const result: GeocodedBlock = {
+          lat: parseFloat(match.LATITUDE),
+          lng: parseFloat(match.LONGITUDE),
+          block: match.BLK_NO,
+          street: match.ROAD_NAME,
+          postal: match.POSTAL,
+        };
+
+        geocodeCache.set(cacheKey, { lat: result.lat, lng: result.lng });
+        return result;
+      } catch {
+        return null;
+      }
+    }
     return null;
   }
 }

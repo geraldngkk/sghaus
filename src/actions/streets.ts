@@ -39,7 +39,7 @@ export async function getStreetNames(
     console.error("[streets] Failed to fetch street names:", err);
     return {
       streets: [],
-      error: "Could not load streets — data.gov.sg may be temporarily unavailable. Please try again.",
+      error: "Could not load streets — our data source may be temporarily unavailable. Please try again.",
     };
   }
 }

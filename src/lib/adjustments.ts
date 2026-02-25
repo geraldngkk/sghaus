@@ -1,4 +1,4 @@
-import type { TieredComparable, PropertyInput, MrtProximityResult } from "@/types";
+import type { TieredComparable, PropertyInput, MrtProximityResult, SchoolProximityResult } from "@/types";
 import {
   STOREY_RANGES,
   STOREY_PREMIUM_PER_LEVEL_LOW_RISE,
@@ -131,6 +131,26 @@ export function calculateMrtAdjustment(
   return subjectMrt.premiumPercent - compMrt.premiumPercent;
 }
 
+/**
+ * School proximity adjustment: accounts for the difference in school proximity
+ * premium between subject and comparable. Uses the midpoint of the min/max
+ * premium range for each side.
+ *
+ * Returns a percentage adjustment (e.g., +0.04 means comp PSF goes up 4%).
+ */
+export function calculateSchoolAdjustment(
+  subjectSchoolPremium: { min: number; max: number } | null,
+  compSchoolPremium: { min: number; max: number } | null,
+): number {
+  const subjectMid = subjectSchoolPremium
+    ? (subjectSchoolPremium.min + subjectSchoolPremium.max) / 2
+    : 0;
+  const compMid = compSchoolPremium
+    ? (compSchoolPremium.min + compSchoolPremium.max) / 2
+    : 0;
+  return subjectMid - compMid;
+}
+
 // ---------------------------------------------------------------------------
 // Combined adjustment
 // ---------------------------------------------------------------------------
@@ -149,6 +169,7 @@ export function adjustComparablePsf(
   input: PropertyInput,
   maxStoreyRange?: string,
   mrtAdjustment?: number,
+  schoolAdjustment?: number,
 ): number {
   const subjectLeaseYears = calculateRemainingLease(input.leaseCommenceDate);
   const subjectSqft = input.floorAreaSqm * SQM_TO_SQFT;
@@ -165,7 +186,7 @@ export function adjustComparablePsf(
   const leaseAdj = calculateLeaseAdjustment(comp.remainingLeaseYears, subjectLeaseYears);
   const sizeAdj = calculateSizeAdjustment(comp.floorAreaSqm, input.floorAreaSqm);
 
-  const percentMultiplier = 1 + leaseAdj + sizeAdj + (mrtAdjustment ?? 0);
+  const percentMultiplier = 1 + leaseAdj + sizeAdj + (mrtAdjustment ?? 0) + (schoolAdjustment ?? 0);
   return comp.pricePsf * percentMultiplier + storeyPsfOffset;
 }
 
@@ -180,13 +201,17 @@ export function applyAdjustments(
   maxStoreyRange?: string,
   subjectMrt?: MrtProximityResult | null,
   compMrtMap?: Map<string, MrtProximityResult | null>,
+  subjectSchoolPremium?: { min: number; max: number } | null,
+  compSchoolPremiumMap?: Map<string, { min: number; max: number } | null>,
 ): TieredComparable[] {
   return comps.map((c) => {
     const compMrt = compMrtMap?.get(`${c.block}|${c.streetName}`) ?? null;
     const mrtAdj = calculateMrtAdjustment(subjectMrt ?? null, compMrt);
+    const compSchoolPremium = compSchoolPremiumMap?.get(`${c.block}|${c.streetName}`) ?? null;
+    const schoolAdj = calculateSchoolAdjustment(subjectSchoolPremium ?? null, compSchoolPremium);
     return {
       ...c,
-      adjustedPricePsf: adjustComparablePsf(c, input, maxStoreyRange, mrtAdj),
+      adjustedPricePsf: adjustComparablePsf(c, input, maxStoreyRange, mrtAdj, schoolAdj),
     };
   });
 }

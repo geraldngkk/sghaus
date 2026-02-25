@@ -225,7 +225,7 @@ export default function HomePage() {
                       month: "short",
                       year: "numeric",
                     })}
-                    . Live data from data.gov.sg was temporarily unavailable.
+                    . Live data was temporarily unavailable.
                     Results may not reflect the very latest transactions.
                   </p>
                 </div>
@@ -323,8 +323,8 @@ export default function HomePage() {
                 <div className="rounded-xl border border-border bg-white p-5">
                   <p className="text-xs text-slate leading-relaxed">
                     <strong className="text-charcoal">Disclaimer:</strong> This
-                    tool provides estimates based on publicly available HDB resale
-                    transaction data from data.gov.sg. It is not financial advice.
+                    tool provides estimates based on official HDB resale
+                    transaction records. It is not financial advice.
                     Actual prices depend on many factors not captured here,
                     including unit condition, renovation, facing, view, and
                     negotiation dynamics. Always conduct your own due diligence and
@@ -333,7 +333,7 @@ export default function HomePage() {
                 </div>
 
                 <p className="text-center text-xs text-slate/60">
-                  Data source: data.gov.sg (HDB Resale Flat Prices) | Generated{" "}
+                  Powered by official Singapore government data | Generated{" "}
                   {new Date(result.generatedAt).toLocaleString("en-SG")}
                 </p>
               </div>
@@ -367,7 +367,7 @@ export default function HomePage() {
               </Link>
             </div>
             <p className="text-xs text-white/40">
-              Data source: data.gov.sg
+              Powered by official Singapore government data
             </p>
           </div>
         </div>

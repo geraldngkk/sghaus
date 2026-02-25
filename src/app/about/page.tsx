@@ -4,7 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "About — SGHaus",
   description:
-    "SGHaus helps Singapore homebuyers make data-driven offers on HDB resale flats using real government transaction data.",
+    "SGHaus helps Singapore homebuyers make data-driven offers on HDB resale flats using official transaction records and market intelligence.",
 };
 
 export default function AboutPage() {
@@ -53,13 +53,11 @@ export default function AboutPage() {
           </p>
 
           <p>
-            We use publicly available HDB resale transaction data from{" "}
-            <a href="https://data.gov.sg" target="_blank" rel="noopener noreferrer" className="text-forest underline underline-offset-2 hover:text-forest/80">
-              data.gov.sg
-            </a>{" "}
-            to generate personalised offer strategies. For every property you&apos;re
-            considering, SGHaus gives you three numbers: an opening bid, a target price,
-            and a hard ceiling you should never cross.
+            We collect data from various data sources and analyse them with our
+            unique calculation formula to generate personalised offer strategies.
+            For every property you&apos;re considering, SGHaus gives you three
+            numbers: an opening bid, a target price, and a hard ceiling you
+            should never cross.
           </p>
 
           <h2 className="font-display text-xl text-charcoal pt-4">How it works</h2>
@@ -98,7 +96,7 @@ export default function AboutPage() {
           <div className="mt-8 rounded-xl border border-border bg-white p-5">
             <p className="text-xs text-slate leading-relaxed">
               <strong className="text-charcoal">Disclaimer:</strong> SGHaus provides
-              estimates based on publicly available transaction data. This is not
+              estimates based on official transaction records. This is not
               financial advice. Always conduct your own due diligence and consider
               consulting a licensed property agent before making purchase decisions.
             </p>
@@ -122,7 +120,7 @@ export default function AboutPage() {
               <Link href="/contact" className="transition-colors hover:text-white">Contact</Link>
             </div>
             <p className="text-xs text-white/40">
-              Data source: data.gov.sg
+              Powered by official Singapore government data
             </p>
           </div>
         </div>

@@ -213,4 +213,5 @@ export interface AnalysisResult {
   marketContext: MarketContext;
   dataSource?: DataSourceInfo;
   mrtProximity?: MrtProximityResult;
+  schoolProximity?: SchoolProximityResult[];
 }

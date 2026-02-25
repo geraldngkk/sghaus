@@ -249,7 +249,7 @@ export default function PropertyForm({ onResult, onError, onAnalyzing }: Propert
               month: "short",
               year: "numeric",
             })}
-            {" "}(data.gov.sg temporarily unavailable)
+            {" "}(live data temporarily unavailable)
           </p>
         )}
       </div>

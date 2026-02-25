@@ -166,7 +166,7 @@ export default function ContactPage() {
               <Link href="/contact" className="transition-colors hover:text-white">Contact</Link>
             </div>
             <p className="text-xs text-white/40">
-              Data source: data.gov.sg
+              Powered by official Singapore government data
             </p>
           </div>
         </div>
