@@ -1,6 +1,6 @@
 "use server";
 
-import type { AnalysisResult, PropertyInput } from "@/types";
+import type { AnalysisResult, PropertyInput, MrtProximityResult } from "@/types";
 import { fetchResaleDataWithFallback } from "@/lib/hdb-api";
 import { tierComparables } from "@/lib/comparables";
 import { applyAdjustments } from "@/lib/adjustments";
@@ -13,6 +13,7 @@ import { SQM_TO_SQFT } from "@/lib/constants";
 import { HDB_TOWNS, FLAT_TYPES, STOREY_RANGES } from "@/lib/constants";
 import { getBlockDetails } from "@/actions/block-info";
 import { geocodeBlock } from "@/lib/onemap";
+import { findNearestMrt, getMrtPremiumPercent } from "@/lib/mrt-stations";
 
 // ---------------------------------------------------------------------------
 // Input validation
@@ -99,21 +100,66 @@ export async function analyzeProperty(
   // 3. Tier the comps
   const { tier1, tier2, tier3 } = tierComparables(allTransactions, input);
 
+  // 3b. Batch-geocode subject + all unique comp blocks in parallel
+  const allRawComps = [...tier1, ...tier2, ...tier3];
+  const uniqueBlocks = new Map<string, { block: string; street: string }>();
+  uniqueBlocks.set(
+    `${input.block}|${input.streetName}`,
+    { block: input.block, street: input.streetName },
+  );
+  for (const c of allRawComps) {
+    const key = `${c.block}|${c.streetName}`;
+    if (!uniqueBlocks.has(key)) {
+      uniqueBlocks.set(key, { block: c.block, street: c.streetName });
+    }
+  }
+
+  const geocodeEntries = await Promise.all(
+    [...uniqueBlocks.entries()].map(async ([key, { block, street }]) => {
+      const result = await geocodeBlock(block, street);
+      return [key, result] as const;
+    }),
+  );
+  const geocodeMap = new Map(geocodeEntries);
+
+  const subjectGeo = geocodeMap.get(`${input.block}|${input.streetName}`);
+  const userCoords = subjectGeo ? { lat: subjectGeo.lat, lng: subjectGeo.lng } : null;
+
+  // 3c. Compute MRT proximity for subject + all comp blocks
+  const subjectMrt = userCoords
+    ? findNearestMrt(userCoords.lat, userCoords.lng)
+    : null;
+
+  const compMrtMap = new Map<string, MrtProximityResult | null>();
+  for (const [key, geo] of geocodeMap) {
+    if (geo) {
+      compMrtMap.set(key, findNearestMrt(geo.lat, geo.lng));
+    } else {
+      compMrtMap.set(key, null);
+    }
+  }
+
   // 4. Apply price adjustments (with max storey range for top-tier bonus)
   const adjustedTier1 = applyAdjustments(
     tier1.map((t) => ({ ...t, tier: 1 as const })),
     input,
     maxStoreyRange,
+    subjectMrt,
+    compMrtMap,
   );
   const adjustedTier2 = applyAdjustments(
     tier2.map((t) => ({ ...t, tier: 2 as const })),
     input,
     maxStoreyRange,
+    subjectMrt,
+    compMrtMap,
   );
   const adjustedTier3 = applyAdjustments(
     tier3.map((t) => ({ ...t, tier: 3 as const })),
     input,
     maxStoreyRange,
+    subjectMrt,
+    compMrtMap,
   );
 
   // 5. Calculate market context (trends)
@@ -128,6 +174,32 @@ export async function analyzeProperty(
     marketContext,
   );
 
+  // 6b. Enrich offer rationales with MRT context if adjustment is material
+  if (subjectMrt && subjectMrt.premiumPercent > 0) {
+    const compMrtDistances = allRawComps
+      .map((c) => compMrtMap.get(`${c.block}|${c.streetName}`))
+      .filter((m): m is MrtProximityResult => m !== null)
+      .map((m) => m.distanceMeters);
+
+    if (compMrtDistances.length > 0) {
+      const avgCompMrtDist = Math.round(
+        compMrtDistances.reduce((a, b) => a + b, 0) / compMrtDistances.length,
+      );
+      const avgCompPremium =
+        compMrtDistances
+          .map((d) => getMrtPremiumPercent(d, "operational").percent)
+          .reduce((a, b) => a + b, 0) / compMrtDistances.length;
+      const netMrtAdj = subjectMrt.premiumPercent - avgCompPremium;
+
+      if (Math.abs(netMrtAdj) >= 0.01) {
+        const mrtNote = ` MRT-adjusted: subject is ${subjectMrt.distanceMeters}m from ${subjectMrt.station.name} MRT vs comp avg ${avgCompMrtDist}m (${netMrtAdj > 0 ? "+" : ""}${(netMrtAdj * 100).toFixed(1)}% location premium).`;
+        offer.lowRationale += mrtNote;
+        offer.midRationale += mrtNote;
+        offer.maxRationale += mrtNote;
+      }
+    }
+  }
+
   // 7. Calculate costs at each offer level
   const costs = {
     atLow: calculateCostBreakdown(offer.low, input.flatType),
@@ -135,21 +207,16 @@ export async function analyzeProperty(
     atMax: calculateCostBreakdown(offer.max, input.flatType),
   };
 
-  // 8. Geocode user's block for distance-based BTO proximity detection
-  // Gracefully returns null if OneMap credentials are not configured
-  const geocoded = await geocodeBlock(input.block, input.streetName);
-  const userCoords = geocoded ? { lat: geocoded.lat, lng: geocoded.lng } : null;
-
-  // 9. Assess risks (with distance-based BTO proximity if geocoded)
+  // 8. Assess risks (with distance-based BTO proximity if geocoded)
   const comps = {
     tier1: adjustedTier1,
     tier2: adjustedTier2,
     tier3: adjustedTier3,
   };
-  const risks = assessRisks(input, comps, marketContext, userCoords);
+  const risks = assessRisks(input, comps, marketContext, userCoords, subjectMrt);
 
   // 10. Generate checklist
-  const checklist = generateChecklist(input, risks, marketContext, userCoords);
+  const checklist = generateChecklist(input, risks, marketContext, userCoords, subjectMrt);
 
   // 10. Optional: Renovation-adjusted offers
   let renovation: AnalysisResult["renovation"];
@@ -217,6 +284,7 @@ export async function analyzeProperty(
     checklist,
     marketContext,
     dataSource,
+    mrtProximity: subjectMrt ?? undefined,
   };
 
   // Fire-and-forget: log to Google Sheets (never blocks the response)

@@ -4,6 +4,7 @@ import type {
   MarketContext,
   RiskFlag,
   ChecklistItem,
+  MrtProximityResult,
 } from "@/types";
 import {
   LEASE_FULL_ELIGIBILITY_YEARS,
@@ -40,6 +41,7 @@ export function assessRisks(
   },
   marketContext: MarketContext,
   userCoords?: { lat: number; lng: number } | null,
+  subjectMrt?: MrtProximityResult | null,
 ): RiskFlag[] {
   const flags: RiskFlag[] = [];
   const remainingLease = calculateRemainingLease(input.leaseCommenceDate);
@@ -191,6 +193,43 @@ export function assessRisks(
     });
   }
 
+  // 6. MRT proximity
+  if (subjectMrt) {
+    if (subjectMrt.distanceMeters > 1000) {
+      flags.push({
+        id: "mrt-far",
+        title: "Far from MRT",
+        severity: "medium",
+        description: `Nearest MRT: ${subjectMrt.station.name} (${subjectMrt.station.codes.join("/")}) at ${(subjectMrt.distanceMeters / 1000).toFixed(1)}km (~${subjectMrt.walkingMinutes} min walk).`,
+        detail:
+          "Properties within 500m of MRT typically command 5-8% price premium. " +
+          "This distance may limit resale value appreciation and reduce your buyer pool when selling.",
+      });
+    } else if (subjectMrt.distanceMeters > 500) {
+      flags.push({
+        id: "mrt-moderate",
+        title: "Moderate MRT Distance",
+        severity: "low",
+        description: `Nearest MRT: ${subjectMrt.station.name} (${subjectMrt.station.codes.join("/")}) at ${subjectMrt.distanceMeters}m (~${subjectMrt.walkingMinutes} min walk).`,
+        detail:
+          "Walkable to MRT but not within the immediate 500m premium zone. " +
+          "Expect a smaller location premium (2-5%) compared to properties right next to the station.",
+      });
+    }
+
+    if (subjectMrt.station.status === "under-construction") {
+      flags.push({
+        id: "mrt-under-construction",
+        title: "Nearest MRT Under Construction",
+        severity: "low",
+        description: `${subjectMrt.station.name} (${subjectMrt.station.codes.join("/")}) is under construction, expected ${subjectMrt.station.expectedYear ?? "TBC"}.`,
+        detail:
+          "The MRT premium is partially priced in but discounted for time to completion. " +
+          "Property value may appreciate as the station opens. Factor construction timeline into your holding period.",
+      });
+    }
+  }
+
   return flags;
 }
 
@@ -203,6 +242,7 @@ export function generateChecklist(
   risks: RiskFlag[],
   marketContext: MarketContext,
   userCoords?: { lat: number; lng: number } | null,
+  subjectMrt?: MrtProximityResult | null,
 ): ChecklistItem[] {
   const items: ChecklistItem[] = [];
   const remainingLease = calculateRemainingLease(input.leaseCommenceDate);
@@ -337,6 +377,36 @@ export function generateChecklist(
                   : "Some supply pressure expected in the broader area."
             }`,
     });
+  }
+
+  // MRT proximity
+  if (subjectMrt) {
+    if (subjectMrt.distanceMeters <= 200 && subjectMrt.station.status === "operational") {
+      items.push({
+        category: "Location",
+        question: "Is the property near an MRT station?",
+        assessment: "positive",
+        detail: `Immediate proximity to ${subjectMrt.station.name} MRT (${subjectMrt.station.codes.join("/")}) at ${subjectMrt.distanceMeters}m (~${subjectMrt.walkingMinutes} min walk). Strong location premium of 8-15%.`,
+      });
+    } else if (subjectMrt.distanceMeters <= 1000) {
+      items.push({
+        category: "Location",
+        question: "Is the property near an MRT station?",
+        assessment: "neutral",
+        detail: `${subjectMrt.station.name} MRT (${subjectMrt.station.codes.join("/")}) is ${subjectMrt.distanceMeters}m away (~${subjectMrt.walkingMinutes} min walk). ${
+          subjectMrt.station.status === "under-construction"
+            ? `Under construction, expected ${subjectMrt.station.expectedYear ?? "TBC"}.`
+            : "Walkable but not immediate proximity."
+        }`,
+      });
+    } else {
+      items.push({
+        category: "Location",
+        question: "Is the property near an MRT station?",
+        assessment: "negative",
+        detail: `Nearest MRT is ${subjectMrt.station.name} (${subjectMrt.station.codes.join("/")}) at ${(subjectMrt.distanceMeters / 1000).toFixed(1)}km (~${subjectMrt.walkingMinutes} min walk). Not within convenient walking distance.`,
+      });
+    }
   }
 
   // Risk summary

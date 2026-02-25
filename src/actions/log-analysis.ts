@@ -18,6 +18,7 @@ export async function logAnalysis(result: AnalysisResult): Promise<void> {
   try {
     const reno = result.renovation;
     const offer = result.offerWithReno ?? result.offer;
+    const mrt = result.mrtProximity;
 
     await fetch(GOOGLE_SCRIPT_URL, {
       method: "POST",
@@ -50,6 +51,10 @@ export async function logAnalysis(result: AnalysisResult): Promise<void> {
         trendDirection: result.marketContext.trendDirection,
         trendPercent: result.marketContext.trendPercentage.toFixed(1),
         transactionCount12m: result.marketContext.transactionCount12m,
+        // MRT proximity (if available)
+        mrtStation: mrt?.station.name ?? "",
+        mrtDistance: mrt?.distanceMeters ?? "",
+        mrtPremiumTier: mrt?.premiumTier ?? "",
         // Renovation (if assessed)
         renoCondition: reno?.condition ?? "",
         renoScore: reno?.overallScore ?? "",

@@ -1,4 +1,4 @@
-import type { TieredComparable, PropertyInput } from "@/types";
+import type { TieredComparable, PropertyInput, MrtProximityResult } from "@/types";
 import {
   STOREY_RANGES,
   STOREY_PREMIUM_PER_LEVEL_LOW_RISE,
@@ -116,6 +116,21 @@ export function calculateSizeAdjustment(
   return -sizeDiffPercent * 0.3;
 }
 
+/**
+ * MRT proximity adjustment: accounts for the difference in MRT proximity
+ * between subject and comparable. If subject is closer to MRT, comp's PSF
+ * should be adjusted upward (subject commands a premium the comp didn't capture).
+ *
+ * Returns a percentage adjustment (e.g., +0.065 means comp PSF goes up 6.5%).
+ */
+export function calculateMrtAdjustment(
+  subjectMrt: MrtProximityResult | null,
+  compMrt: MrtProximityResult | null,
+): number {
+  if (!subjectMrt || !compMrt) return 0;
+  return subjectMrt.premiumPercent - compMrt.premiumPercent;
+}
+
 // ---------------------------------------------------------------------------
 // Combined adjustment
 // ---------------------------------------------------------------------------
@@ -133,6 +148,7 @@ export function adjustComparablePsf(
   comp: TieredComparable,
   input: PropertyInput,
   maxStoreyRange?: string,
+  mrtAdjustment?: number,
 ): number {
   const subjectLeaseYears = calculateRemainingLease(input.leaseCommenceDate);
   const subjectSqft = input.floorAreaSqm * SQM_TO_SQFT;
@@ -149,7 +165,7 @@ export function adjustComparablePsf(
   const leaseAdj = calculateLeaseAdjustment(comp.remainingLeaseYears, subjectLeaseYears);
   const sizeAdj = calculateSizeAdjustment(comp.floorAreaSqm, input.floorAreaSqm);
 
-  const percentMultiplier = 1 + leaseAdj + sizeAdj;
+  const percentMultiplier = 1 + leaseAdj + sizeAdj + (mrtAdjustment ?? 0);
   return comp.pricePsf * percentMultiplier + storeyPsfOffset;
 }
 
@@ -162,9 +178,15 @@ export function applyAdjustments(
   comps: TieredComparable[],
   input: PropertyInput,
   maxStoreyRange?: string,
+  subjectMrt?: MrtProximityResult | null,
+  compMrtMap?: Map<string, MrtProximityResult | null>,
 ): TieredComparable[] {
-  return comps.map((c) => ({
-    ...c,
-    adjustedPricePsf: adjustComparablePsf(c, input, maxStoreyRange),
-  }));
+  return comps.map((c) => {
+    const compMrt = compMrtMap?.get(`${c.block}|${c.streetName}`) ?? null;
+    const mrtAdj = calculateMrtAdjustment(subjectMrt ?? null, compMrt);
+    return {
+      ...c,
+      adjustedPricePsf: adjustComparablePsf(c, input, maxStoreyRange, mrtAdj),
+    };
+  });
 }

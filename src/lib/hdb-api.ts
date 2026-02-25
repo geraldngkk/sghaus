@@ -178,24 +178,32 @@ export const fetchResaleData = unstable_cache(
  * Used for building attributes (storey ranges, lease year, floor area) that
  * don't change over time. 24-month window is too narrow for block-level lookups
  * where a specific storey range may not have had a recent sale.
+ *
+ * NOTE: Not wrapped in unstable_cache because all-time datasets for popular
+ * towns exceed Next.js's 2MB cache limit. Callers that need caching should
+ * cache their own derived results (e.g. street names, block lists).
  */
-export const fetchResaleDataAllTime = unstable_cache(
-  async (town: string, flatType: string): Promise<ParsedTransaction[]> => {
-    return fetchResaleDataUncached(town, flatType, 999);
-  },
-  ["hdb-resale-data-alltime"],
-  { revalidate: DATA_GOV_SG.cacheTtlSeconds, tags: ["hdb-data"] },
-);
+export async function fetchResaleDataAllTime(
+  town: string,
+  flatType: string,
+): Promise<ParsedTransaction[]> {
+  return fetchResaleDataUncached(town, flatType, 999);
+}
 
 /**
  * Get the unique street names for a town+flatType combo (for street dropdown).
- * Reuses fetchResaleDataAllTime to share the cache and avoid duplicate API calls.
+ * Cached independently — the derived string array is tiny (<10KB) and stays
+ * well under Next.js's 2MB unstable_cache limit.
  */
-export async function fetchStreetNames(town: string, flatType: string): Promise<string[]> {
-  const transactions = await fetchResaleDataAllTime(town, flatType);
-  const streets = new Set(transactions.map((t) => t.streetName));
-  return Array.from(streets).sort();
-}
+export const fetchStreetNames = unstable_cache(
+  async (town: string, flatType: string): Promise<string[]> => {
+    const transactions = await fetchResaleDataAllTime(town, flatType);
+    const streets = new Set(transactions.map((t) => t.streetName));
+    return Array.from(streets).sort();
+  },
+  ["hdb-street-names"],
+  { revalidate: DATA_GOV_SG.cacheTtlSeconds, tags: ["hdb-data"] },
+);
 
 // ---------------------------------------------------------------------------
 // Fallback-aware wrappers

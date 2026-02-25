@@ -140,6 +140,28 @@ export interface RenovationResult {
   }[];
 }
 
+/** MRT/LRT station static data */
+export interface MrtStation {
+  name: string;
+  code: string;
+  codes: string[];
+  line: string;
+  lines: string[];
+  lat: number;
+  lng: number;
+  status: "operational" | "under-construction";
+  expectedYear?: number;
+}
+
+/** MRT proximity result for a given property location */
+export interface MrtProximityResult {
+  station: MrtStation;
+  distanceMeters: number;
+  walkingMinutes: number;
+  premiumTier: "immediate" | "convenient" | "walkable" | "baseline";
+  premiumPercent: number;
+}
+
 /** Complete analysis result returned by the server action */
 export interface AnalysisResult {
   input: PropertyInput;
@@ -162,4 +184,5 @@ export interface AnalysisResult {
   checklist: ChecklistItem[];
   marketContext: MarketContext;
   dataSource?: DataSourceInfo;
+  mrtProximity?: MrtProximityResult;
 }
