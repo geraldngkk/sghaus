@@ -12,6 +12,8 @@ interface EmailCaptureProps {
   delayMs?: number;
   /** Analysis result to send via email on capture */
   result?: AnalysisResult | null;
+  /** Controls copy tone: buyer sees "offer" language, seller sees "pricing" language */
+  mode?: "buy" | "sell";
 }
 
 /**
@@ -24,7 +26,7 @@ interface EmailCaptureProps {
  * - Skipped entirely if user already submitted email (localStorage)
  * - On success, blur lifts and reading continues
  */
-export default function EmailCapture({ delayMs = 12_000, result }: EmailCaptureProps) {
+export default function EmailCapture({ delayMs = 12_000, result, mode = "buy" }: EmailCaptureProps) {
   const [show, setShow] = useState(false);
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
@@ -116,7 +118,9 @@ export default function EmailCapture({ delayMs = 12_000, result }: EmailCaptureP
                   You&apos;re in.
                 </h3>
                 <p className="mt-2 text-sm text-slate">
-                  We&apos;ll send your personalised offer report to{" "}
+                  {mode === "sell"
+                    ? "We'll send your personalised pricing report to "
+                    : "We'll send your personalised offer report to "}
                   <strong className="text-charcoal">{email}</strong>.
                 </p>
                 <button
@@ -133,12 +137,14 @@ export default function EmailCapture({ delayMs = 12_000, result }: EmailCaptureP
                   className="font-display text-2xl text-charcoal"
                   style={{ lineHeight: 1.15 }}
                 >
-                  Your offer range is ready.
+                  {mode === "sell"
+                    ? "Your pricing range is ready."
+                    : "Your offer range is ready."}
                 </h3>
                 <p className="mt-3 text-sm text-slate leading-relaxed">
-                  Enter your email to unlock the full analysis: comparable
-                  sales, cost breakdown, risk flags, and your personalised
-                  negotiation strategy.
+                  {mode === "sell"
+                    ? "Enter your email to unlock the full analysis: comparable sales, net proceeds breakdown, risk flags, and your personalised pricing strategy."
+                    : "Enter your email to unlock the full analysis: comparable sales, cost breakdown, risk flags, and your personalised negotiation strategy."}
                 </p>
 
                 <form onSubmit={handleSubmit} className="mt-6">
@@ -178,7 +184,9 @@ export default function EmailCapture({ delayMs = 12_000, result }: EmailCaptureP
                 </form>
 
                 <p className="mt-5 text-center text-[11px] text-slate/50">
-                  No spam. Just your offer report and negotiation scripts.
+                  {mode === "sell"
+                    ? "No spam. Just your pricing report and market insights."
+                    : "No spam. Just your offer report and negotiation scripts."}
                 </p>
               </>
             )}

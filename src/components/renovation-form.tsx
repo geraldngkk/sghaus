@@ -48,13 +48,13 @@ export default function RenovationForm({ onComplete, onSkip, mode = "buy" }: Ren
           <div className="min-w-0">
             <h4 className="text-sm font-semibold text-charcoal">
               {mode === "sell"
-                ? "Your pricing could be off by $10,000+"
-                : "Your offer could be off by $10,000+"}
+                ? "Get a more accurate price for your flat"
+                : "Get a more accurate offer for this flat"}
             </h4>
             <p className="mt-1 text-xs leading-relaxed text-slate">
               {mode === "sell"
-                ? "Right now, your numbers assume average condition. A 2-minute self-assessment adjusts your pricing based on your flat's actual state."
-                : "Right now, your numbers assume average condition. A 2-minute check based on what you saw during viewing adjusts your offer for renovation reality."}
+                ? "A quick 2-minute condition check adjusts your pricing and estimates what a buyer would need to spend on renovation. Better condition means a stronger asking price."
+                : "A quick 2-minute condition check adjusts your numbers and estimates renovation costs for each area of the unit. The closer you get to reality, the stronger your position."}
             </p>
           </div>
           <button

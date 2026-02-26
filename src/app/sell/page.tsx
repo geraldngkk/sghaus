@@ -6,6 +6,7 @@ import PropertyForm from "@/components/property-form";
 import MarketContextDisplay from "@/components/market-context";
 import RiskFlagsDisplay from "@/components/risk-flags";
 import AnalysisSkeleton from "@/components/analysis-skeleton";
+import EmailCapture from "@/components/email-capture";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 
@@ -320,7 +321,7 @@ export default function SellPage() {
         {/* Hero + Form */}
         <>
           {/* Hero section with background image */}
-          <section className="hero-bg relative border-b border-border">
+          <section className="hero-sell relative border-b border-border">
             {/* Dark overlay — slightly warmer for seller context */}
             <div className="absolute inset-0 bg-gradient-to-b from-[#1A1A2E]/75 via-[#1A1A2E]/65 to-[#2D6A4F]/70" />
 
@@ -374,6 +375,9 @@ export default function SellPage() {
         {/* Results */}
         {result && pricing && view === "results" && (
           <section id="seller-results">
+            {/* Email capture popup — same logic as buyer page */}
+            <EmailCapture delayMs={12000} result={result} mode="sell" />
+
             {/* Fallback data banner */}
             {result.dataSource?.type === "fallback" && (
               <div className="border-b border-amber-200 bg-amber-50">
