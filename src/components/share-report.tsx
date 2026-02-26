@@ -44,7 +44,7 @@ export default function ShareReport({ result }: ShareReportProps) {
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
         await navigator.share({
-          title: `SGHaus — ${result.input.flatType} at ${result.input.streetName}`,
+          title: `SGHaus - ${result.input.flatType} at ${result.input.streetName}`,
           text,
         });
         return;

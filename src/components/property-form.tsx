@@ -14,6 +14,8 @@ interface PropertyFormProps {
   onResult: (result: AnalysisResult) => void;
   onError: (error: string) => void;
   onAnalyzing?: () => void;
+  /** Controls copy tone in renovation form: "buy" for buyers, "sell" for sellers */
+  mode?: "buy" | "sell";
 }
 
 const selectClasses =
@@ -22,7 +24,7 @@ const inputClasses =
   "w-full rounded-xl border border-border bg-white px-3 py-2.5 text-sm text-charcoal focus:border-forest focus:ring-1 focus:ring-forest disabled:bg-fog disabled:text-slate";
 const labelClasses = "block text-sm font-medium text-charcoal mb-1.5";
 
-export default function PropertyForm({ onResult, onError, onAnalyzing }: PropertyFormProps) {
+export default function PropertyForm({ onResult, onError, onAnalyzing, mode = "buy" }: PropertyFormProps) {
   const [isPending, startTransition] = useTransition();
   const [town, setTown] = useState("");
   const [flatType, setFlatType] = useState("");
@@ -340,6 +342,7 @@ export default function PropertyForm({ onResult, onError, onAnalyzing }: Propert
       <RenovationForm
         onComplete={(answers) => setRenovationAnswers(answers)}
         onSkip={() => setRenovationAnswers(null)}
+        mode={mode}
       />
 
       {/* Submit */}
@@ -369,7 +372,7 @@ export default function PropertyForm({ onResult, onError, onAnalyzing }: Propert
             Analysing transactions...
           </span>
         ) : (
-          "Calculate Offer Range"
+          mode === "sell" ? "Calculate Pricing Range" : "Calculate Offer Range"
         )}
       </button>
     </form>

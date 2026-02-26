@@ -79,7 +79,7 @@ function OutcomePageInner() {
           {block && street ? (
             <>
               You analysed <strong className="text-charcoal">{propertyLabel}</strong>.
-              Tell us what happened — your outcome helps us make SGHaus more
+              Tell us what happened. Your outcome helps us make SGHaus more
               accurate for the next buyer.
             </>
           ) : (

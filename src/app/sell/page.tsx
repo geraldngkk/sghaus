@@ -54,9 +54,9 @@ function deriveSellerPricing(result: AnalysisResult): SellerPricing {
     targetPsf: offer.midPsf,
     openingAskPsf: offer.maxPsf,
 
-    floorRationale: `Floor price at $${offer.lowPsf.toFixed(0)} psf \u2014 this is where data-savvy buyers will anchor their opening bid. Don\u2019t accept offers at or below this level unless you need a quick sale.`,
-    targetRationale: `Target price at $${offer.midPsf.toFixed(0)} psf \u2014 the median of ${compCount} comparable transactions. This is fair market value \u2014 what most similar flats actually sold for.`,
-    openingAskRationale: `Opening ask at $${offer.maxPsf.toFixed(0)} psf \u2014 this is what above-average sellers achieved. List here and expect to negotiate down toward target.`,
+    floorRationale: `Floor price at $${offer.lowPsf.toFixed(0)} psf. This is where data-savvy buyers will anchor their opening bid. Don\u2019t accept offers at or below this level unless you need a quick sale.`,
+    targetRationale: `Target price at $${offer.midPsf.toFixed(0)} psf. The median of ${compCount} comparable transactions. This is fair market value: what most similar flats actually sold for.`,
+    openingAskRationale: `Opening ask at $${offer.maxPsf.toFixed(0)} psf. This is what above-average sellers achieved. List here and expect to negotiate down toward target.`,
 
     sellerCosts: {
       agentCommission,
@@ -338,7 +338,7 @@ export default function SellPage() {
                   style={{ maxWidth: "38em" }}
                 >
                   Know your floor price, your fair market value, and where to
-                  start negotiations — backed by real HDB transaction data.
+                  start negotiations.
                 </p>
               </div>
 
@@ -354,6 +354,7 @@ export default function SellPage() {
                     onResult={handleResult}
                     onError={handleError}
                     onAnalyzing={handleAnalyzing}
+                    mode="sell"
                   />
                 </div>
               </div>
@@ -523,7 +524,7 @@ export default function SellPage() {
                 </div>
 
                 <p className="text-center text-xs text-slate/60">
-                  Powered by official Singapore government data | Generated{" "}
+                  Generated{" "}
                   {new Date(result.generatedAt).toLocaleString("en-SG")}
                 </p>
               </div>

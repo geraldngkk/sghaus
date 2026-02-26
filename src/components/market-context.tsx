@@ -29,7 +29,7 @@ export default function MarketContextDisplay({
     <div className="rounded-2xl border border-border bg-white p-5 sm:p-6">
       <h3 className="font-display text-xl text-charcoal">Market Context</h3>
       <p className="mt-1 text-sm text-slate">
-        {flatType} flats in {town} — last 12 months
+        {flatType} flats in {town}, last 12 months
       </p>
 
       <div className="mt-5 grid grid-cols-2 gap-5 sm:grid-cols-4">

@@ -54,7 +54,7 @@ ${content}
 <!-- Footer -->
 <tr><td style="background:${BRAND.fog};padding:20px 32px;border-top:1px solid ${BRAND.border};">
   <p style="margin:0;font-size:11px;color:${BRAND.slate};line-height:1.6;">
-    Powered by official Singapore government data<br>
+    &copy; ${new Date().getFullYear()} SGHaus<br>
     This is not financial advice. Always conduct your own due diligence.<br>
     <a href="https://sghaus.com" style="color:${BRAND.forest};text-decoration:none;">sghaus.com</a>
   </p>

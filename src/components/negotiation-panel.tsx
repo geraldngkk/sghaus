@@ -403,7 +403,7 @@ export default function NegotiationPanel({ result }: NegotiationPanelProps) {
               Negotiation Scripts
             </h3>
             <p className="mt-1 text-sm text-slate">
-              Personalised scripts for each stage — what to say, when to move, and when to walk.
+              Personalised scripts for each stage: what to say, when to move, and when to walk.
             </p>
           </div>
           <div className="ml-4 shrink-0 rounded-xl bg-forest px-4 py-2 text-sm font-semibold text-white transition-colors group-hover:bg-forest/90">

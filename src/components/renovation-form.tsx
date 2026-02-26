@@ -9,9 +9,11 @@ import {
 interface RenovationFormProps {
   onComplete: (answers: RenovationAnswer[]) => void;
   onSkip: () => void;
+  /** Controls copy tone: buyer sees "offer" language, seller sees "pricing" language */
+  mode?: "buy" | "sell";
 }
 
-export default function RenovationForm({ onComplete, onSkip }: RenovationFormProps) {
+export default function RenovationForm({ onComplete, onSkip, mode = "buy" }: RenovationFormProps) {
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [expanded, setExpanded] = useState(false);
   const [applied, setApplied] = useState(false);
@@ -45,10 +47,14 @@ export default function RenovationForm({ onComplete, onSkip }: RenovationFormPro
         <div className="flex items-center justify-between gap-4">
           <div className="min-w-0">
             <h4 className="text-sm font-semibold text-charcoal">
-              Your offer could be off by $10,000+
+              {mode === "sell"
+                ? "Your pricing could be off by $10,000+"
+                : "Your offer could be off by $10,000+"}
             </h4>
             <p className="mt-1 text-xs leading-relaxed text-slate">
-              Right now, your numbers assume average condition. A 2-minute check based on what you saw during viewing adjusts your offer for renovation reality.
+              {mode === "sell"
+                ? "Right now, your numbers assume average condition. A 2-minute self-assessment adjusts your pricing based on your flat's actual state."
+                : "Right now, your numbers assume average condition. A 2-minute check based on what you saw during viewing adjusts your offer for renovation reality."}
             </p>
           </div>
           <button
@@ -56,7 +62,7 @@ export default function RenovationForm({ onComplete, onSkip }: RenovationFormPro
             onClick={() => setExpanded(true)}
             className="shrink-0 rounded-lg bg-forest px-4 py-2 text-xs font-semibold text-white shadow-sm transition-all hover:bg-forest/90 hover:shadow-md"
           >
-            Refine Offer
+            {mode === "sell" ? "Refine Pricing" : "Refine Offer"}
           </button>
         </div>
       </div>
@@ -71,7 +77,9 @@ export default function RenovationForm({ onComplete, onSkip }: RenovationFormPro
             Flat condition ({answeredCount}/{totalCount})
           </h4>
           <p className="mt-0.5 text-xs text-slate">
-            Rate each area based on what you observed during viewing
+            {mode === "sell"
+              ? "Rate each area honestly to get the most accurate pricing"
+              : "Rate each area based on what you observed during viewing"}
           </p>
         </div>
         <button
@@ -136,7 +144,9 @@ export default function RenovationForm({ onComplete, onSkip }: RenovationFormPro
         </button>
         {applied ? (
           <span className="text-xs font-medium text-emerald-600">
-            Condition factored into your offer prices
+            {mode === "sell"
+              ? "Condition factored into your pricing"
+              : "Condition factored into your offer prices"}
           </span>
         ) : !allAnswered ? (
           <span className="text-xs text-slate">

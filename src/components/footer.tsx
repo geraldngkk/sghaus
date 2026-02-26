@@ -32,7 +32,7 @@ export default function Footer() {
             </Link>
           </div>
           <p className="text-xs text-white/40">
-            Powered by official Singapore government data
+            &copy; {new Date().getFullYear()} SGHaus
           </p>
         </div>
       </div>

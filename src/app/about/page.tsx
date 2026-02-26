@@ -3,7 +3,7 @@ import Header from "@/components/header";
 import Footer from "@/components/footer";
 
 export const metadata: Metadata = {
-  title: "About — SGHaus",
+  title: "About - SGHaus",
   description:
     "SGHaus helps Singapore homebuyers make data-driven offers on HDB resale flats using official transaction records and market intelligence.",
 };
@@ -41,23 +41,23 @@ export default function AboutPage() {
           <h2 className="font-display text-xl text-charcoal pt-4">How it works</h2>
           <ol className="space-y-3 pl-5 list-decimal marker:text-forest marker:font-semibold">
             <li>
-              <strong className="text-charcoal">Comparable sales analysis</strong> &mdash;
+              <strong className="text-charcoal">Comparable sales analysis</strong> :
               We find recent transactions for similar flats on the same street, in the same
               area, and town-wide, then tier them by relevance.
             </li>
             <li>
-              <strong className="text-charcoal">Price adjustments</strong> &mdash;
+              <strong className="text-charcoal">Price adjustments</strong> :
               Each comparable is adjusted for storey height, remaining lease, and floor
               area differences so you&apos;re comparing like for like.
             </li>
             <li>
-              <strong className="text-charcoal">3-tier offer strategy</strong> &mdash;
+              <strong className="text-charcoal">3-tier offer strategy</strong> :
               Your opening bid (data-backed anchor), target price (fair market value),
               and hard ceiling (walk away above this) are calculated from the adjusted
               comparables.
             </li>
             <li>
-              <strong className="text-charcoal">Risk assessment</strong> &mdash;
+              <strong className="text-charcoal">Risk assessment</strong> :
               Flags for lease decay, low liquidity, price trends, and upcoming BTO
               supply help you see what the numbers don&apos;t.
             </li>
@@ -65,10 +65,10 @@ export default function AboutPage() {
 
           <h2 className="font-display text-xl text-charcoal pt-4">What we&apos;re not</h2>
           <p>
-            SGHaus is not a property portal. We don&apos;t list properties, represent sellers,
-            or take commissions. We&apos;re a tool that sits entirely on the buyer&apos;s side
-            of the table. Our only job is to make sure you know what to offer before you
-            walk in.
+            SGHaus is not a property portal. We don&apos;t list properties or take commissions.
+            We&apos;re an independent tool that helps both buyers and sellers make
+            data-informed decisions. Whether you&apos;re buying or selling, our only job
+            is to make sure you know the right number before you sit down at the table.
           </p>
 
           <div className="mt-8 rounded-xl border border-border bg-white p-5">

@@ -295,7 +295,7 @@ export default function BuyPage() {
                 </div>
 
                 <p className="text-center text-xs text-slate/60">
-                  Powered by official Singapore government data | Generated{" "}
+                  Generated{" "}
                   {new Date(result.generatedAt).toLocaleString("en-SG")}
                 </p>
               </div>

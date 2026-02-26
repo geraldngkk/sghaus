@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "SGHaus — Know What to Offer Before You Walk In";
+export const alt = "SGHaus - Know What to Offer Before You Walk In";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

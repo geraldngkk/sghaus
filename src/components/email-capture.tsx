@@ -136,7 +136,7 @@ export default function EmailCapture({ delayMs = 12_000, result }: EmailCaptureP
                   Your offer range is ready.
                 </h3>
                 <p className="mt-3 text-sm text-slate leading-relaxed">
-                  Enter your email to unlock the full analysis — comparable
+                  Enter your email to unlock the full analysis: comparable
                   sales, cost breakdown, risk flags, and your personalised
                   negotiation strategy.
                 </p>

@@ -16,23 +16,23 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "SGHaus — Know Exactly What Your HDB Flat Is Worth",
+  title: "SGHaus - Know Exactly What Your HDB Flat Is Worth",
   description:
     "This is probably the biggest decision of your life. Don't wing it. Data-backed offer strategies for HDB buyers and pricing tools for sellers.",
   metadataBase: new URL("https://sghaus.com"),
   openGraph: {
-    title: "SGHaus — Know Exactly What Your HDB Flat Is Worth",
+    title: "SGHaus - Know Exactly What Your HDB Flat Is Worth",
     description:
-      "Data-backed offer strategies for HDB buyers and pricing tools for sellers. Powered by official Singapore government data.",
+      "Data-backed offer strategies for HDB buyers and pricing tools for sellers.",
     siteName: "SGHaus",
     type: "website",
     url: "https://sghaus.com",
   },
   twitter: {
     card: "summary_large_image",
-    title: "SGHaus — Know Exactly What Your HDB Flat Is Worth",
+    title: "SGHaus - Know Exactly What Your HDB Flat Is Worth",
     description:
-      "Data-backed offer strategies for HDB buyers and pricing tools for sellers. Powered by official Singapore government data.",
+      "Data-backed offer strategies for HDB buyers and pricing tools for sellers.",
   },
   icons: {
     icon: "/favicon.svg",
