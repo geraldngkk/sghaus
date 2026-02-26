@@ -6,6 +6,9 @@ import {
   buildImmediateEmail,
   build48hReminderEmail,
   build14dOutcomeEmail,
+  buildSellerImmediateEmail,
+  buildSeller48hEmail,
+  buildSeller14dOutcomeEmail,
 } from "@/lib/emails";
 
 interface SendReportResult {
@@ -29,6 +32,7 @@ export async function sendReportEmail(
   email: string,
   result: AnalysisResult,
   sendFollowUps: boolean = true,
+  mode: "buy" | "sell" = "buy",
 ): Promise<SendReportResult> {
   const resend = getResendClient();
   if (!resend) {
@@ -46,7 +50,7 @@ export async function sendReportEmail(
 
   try {
     // Email 1 — Immediate
-    const email1 = buildImmediateEmail(result);
+    const email1 = mode === "sell" ? buildSellerImmediateEmail(result) : buildImmediateEmail(result);
     const { error: err1 } = await resend.emails.send({
       from: EMAIL_FROM,
       to: [email],
@@ -68,7 +72,7 @@ export async function sendReportEmail(
     await new Promise((r) => setTimeout(r, 600));
 
     // Email 2 — 48 hours later
-    const email2 = build48hReminderEmail(result);
+    const email2 = mode === "sell" ? buildSeller48hEmail(result) : build48hReminderEmail(result);
     const scheduledAt48h = new Date(
       Date.now() + 48 * 60 * 60 * 1000,
     ).toISOString();
@@ -95,7 +99,7 @@ export async function sendReportEmail(
 
     // Email 3 — 14 days later
     // Requires Resend paid plan (free tier only supports up to 72h scheduling)
-    const email3 = build14dOutcomeEmail(result);
+    const email3 = mode === "sell" ? buildSeller14dOutcomeEmail(result) : build14dOutcomeEmail(result);
     const scheduledAt14d = new Date(
       Date.now() + 14 * 24 * 60 * 60 * 1000,
     ).toISOString();

@@ -157,15 +157,15 @@ ${offerTable(result)}
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:13px;color:${BRAND.charcoal};">
     <tr>
       <td style="padding:4px 0;"><strong>Open at</strong></td>
-      <td style="padding:4px 0;">${fmt(offer.low)} &mdash; anchor to data, leave room to move</td>
+      <td style="padding:4px 0;">${fmt(offer.low)}. Anchor to data, leave room to move.</td>
     </tr>
     <tr>
       <td style="padding:4px 0;"><strong>Target</strong></td>
-      <td style="padding:4px 0;">${fmt(offer.mid)} &mdash; fair market value, present as your number</td>
+      <td style="padding:4px 0;">${fmt(offer.mid)}. Fair market value, present as your number.</td>
     </tr>
     <tr>
       <td style="padding:4px 0;"><strong>Never exceed</strong></td>
-      <td style="padding:4px 0;">${fmt(offer.max)} &mdash; walk away above this</td>
+      <td style="padding:4px 0;">${fmt(offer.max)}. Walk away above this.</td>
     </tr>
     <tr>
       <td colspan="2" style="padding:8px 0 0;font-size:11px;color:${BRAND.slate};">
@@ -185,7 +185,7 @@ ${riskBadges(result)}
 </div>
 
 <p style="font-size:12px;color:${BRAND.slate};text-align:center;margin:16px 0 0;line-height:1.5;">
-  Save this email &mdash; you'll need these numbers when you make your offer.
+  Save this email. You'll need these numbers when you make your offer.
 </p>
 `);
 
@@ -332,6 +332,260 @@ export function build14dOutcomeEmail(result: AnalysisResult): {
 <div style="background:#FFF8F0;border:1px solid ${BRAND.amber};border-radius:10px;padding:16px;margin:0 0 8px;">
   <p style="font-size:13px;color:${BRAND.charcoal};margin:0;line-height:1.5;">
     <strong>Why share?</strong> Your outcome helps us refine our pricing model for the next buyer.
+    Every data point makes SGHaus more accurate. All responses are anonymised.
+  </p>
+</div>
+`);
+
+  return { subject, html };
+}
+
+// ---------------------------------------------------------------------------
+// Seller email helpers
+// ---------------------------------------------------------------------------
+
+function sellerPricingTable(result: AnalysisResult): string {
+  const offer = result.offerWithReno ?? result.offer;
+  return `
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;">
+  <tr>
+    <td width="33%" style="padding:8px;">
+      <div style="background:${BRAND.fog};border:1px solid ${BRAND.red};border-radius:12px;padding:16px;text-align:center;">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:${BRAND.red};">Floor Price</div>
+        <div style="font-family:${FONT_DISPLAY};font-size:24px;color:${BRAND.charcoal};margin-top:8px;">${fmt(offer.low)}</div>
+        <div style="font-size:11px;color:${BRAND.slate};margin-top:4px;">${fmtPsf(offer.lowPsf)}</div>
+      </div>
+    </td>
+    <td width="34%" style="padding:8px;">
+      <div style="background:${BRAND.mist};border:2px solid ${BRAND.forest};border-radius:12px;padding:16px;text-align:center;">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:${BRAND.forest};">Target Price</div>
+        <div style="font-family:${FONT_DISPLAY};font-size:28px;color:${BRAND.forest};margin-top:8px;">${fmt(offer.mid)}</div>
+        <div style="font-size:11px;color:${BRAND.forest};margin-top:4px;">${fmtPsf(offer.midPsf)}</div>
+      </div>
+    </td>
+    <td width="33%" style="padding:8px;">
+      <div style="background:#EFF6FF;border:1px solid #3B82F6;border-radius:12px;padding:16px;text-align:center;">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#3B82F6;">Opening Ask</div>
+        <div style="font-family:${FONT_DISPLAY};font-size:24px;color:${BRAND.charcoal};margin-top:8px;">${fmt(offer.max)}</div>
+        <div style="font-size:11px;color:${BRAND.slate};margin-top:4px;">${fmtPsf(offer.maxPsf)}</div>
+      </div>
+    </td>
+  </tr>
+</table>`;
+}
+
+// ---------------------------------------------------------------------------
+// Seller Email 1 — Immediate: Your Pricing Report
+// ---------------------------------------------------------------------------
+
+export function buildSellerImmediateEmail(result: AnalysisResult): {
+  subject: string;
+  html: string;
+} {
+  const { input } = result;
+  const offer = result.offerWithReno ?? result.offer;
+  const compCount =
+    result.comps.tier1.length +
+    result.comps.tier2.length +
+    result.comps.tier3.length;
+
+  const agentCommission = Math.round(offer.mid * 0.02);
+  const legalFees = 1000;
+  const netAtTarget = offer.mid - agentCommission - legalFees;
+
+  const subject = `Your SGHaus Pricing Report - Blk ${input.block} ${input.streetName}`;
+
+  const html = layout(`
+<h1 style="font-family:${FONT_DISPLAY};font-size:24px;margin:0 0 4px;color:${BRAND.charcoal};">
+  Your Pricing Report
+</h1>
+<p style="font-size:14px;color:${BRAND.slate};margin:0 0 20px;line-height:1.5;">
+  ${input.flatType} &middot; Blk ${input.block} ${input.streetName}, ${input.town}<br>
+  Based on ${compCount} comparable transactions
+</p>
+
+${sellerPricingTable(result)}
+
+<!-- Pricing Quick Reference -->
+<div style="background:${BRAND.fog};border:1px solid ${BRAND.border};border-radius:10px;padding:16px;margin:16px 0;">
+  <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:${BRAND.forest};margin-bottom:10px;">Pricing Quick Reference</div>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:13px;color:${BRAND.charcoal};">
+    <tr>
+      <td style="padding:4px 0;"><strong>Floor</strong></td>
+      <td style="padding:4px 0;">${fmt(offer.low)}. Don't accept offers at or below this level.</td>
+    </tr>
+    <tr>
+      <td style="padding:4px 0;"><strong>Target</strong></td>
+      <td style="padding:4px 0;">${fmt(offer.mid)}. Fair market value based on comparable sales.</td>
+    </tr>
+    <tr>
+      <td style="padding:4px 0;"><strong>Opening Ask</strong></td>
+      <td style="padding:4px 0;">${fmt(offer.max)}. List here and negotiate down toward target.</td>
+    </tr>
+    <tr>
+      <td colspan="2" style="padding:8px 0 0;font-size:11px;color:${BRAND.slate};">
+        Net proceeds at target (after 2% agent + legal): ${fmt(netAtTarget)}
+      </td>
+    </tr>
+  </table>
+</div>
+
+${riskBadges(result)}
+
+<!-- CTA -->
+<div style="text-align:center;margin:28px 0 12px;">
+  <a href="https://sghaus.com/sell" style="display:inline-block;background:${BRAND.forest};color:${BRAND.white};font-size:14px;font-weight:600;text-decoration:none;padding:12px 28px;border-radius:10px;">
+    View Full Analysis on SGHaus
+  </a>
+</div>
+
+<p style="font-size:12px;color:${BRAND.slate};text-align:center;margin:16px 0 0;line-height:1.5;">
+  Save this email. You'll need these numbers when setting your asking price.
+</p>
+`);
+
+  return { subject, html };
+}
+
+// ---------------------------------------------------------------------------
+// Seller Email 2 — 48h: Listing Strategy Tips
+// ---------------------------------------------------------------------------
+
+export function buildSeller48hEmail(result: AnalysisResult): {
+  subject: string;
+  html: string;
+} {
+  const { input } = result;
+  const offer = result.offerWithReno ?? result.offer;
+
+  const subject = `Ready to list Blk ${input.block} ${input.streetName}?`;
+
+  const tips = [
+    `List at ${fmt(offer.max)} and be prepared to negotiate. Buyers anchored by data will open around ${fmt(offer.low)}, so know your floor before you start.`,
+    "Highlight your flat's strengths: high floor, good facing, recent renovation, or proximity to MRT. These justify pricing above the median.",
+    `If offers cluster around ${fmt(offer.mid)}, that's the market speaking. Holding out too long risks losing serious buyers to competing listings.`,
+  ];
+
+  const tipsHtml = tips
+    .map(
+      (t, i) =>
+        `<tr>
+          <td style="vertical-align:top;padding:0 10px 12px 0;font-size:18px;font-weight:700;color:${BRAND.forest};">${i + 1}</td>
+          <td style="vertical-align:top;padding:0 0 12px;font-size:13px;color:${BRAND.charcoal};line-height:1.5;">${t}</td>
+        </tr>`,
+    )
+    .join("");
+
+  const html = layout(`
+<h1 style="font-family:${FONT_DISPLAY};font-size:24px;margin:0 0 4px;color:${BRAND.charcoal};">
+  Ready to list your flat?
+</h1>
+<p style="font-size:14px;color:${BRAND.slate};margin:0 0 24px;line-height:1.5;">
+  ${input.flatType} &middot; Blk ${input.block} ${input.streetName}, ${input.town}
+</p>
+
+<!-- Quick pricing recap -->
+<div style="background:${BRAND.mist};border:2px solid ${BRAND.forest};border-radius:12px;padding:20px;text-align:center;margin:0 0 24px;">
+  <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:${BRAND.forest};">Your Pricing Range</div>
+  <div style="font-family:${FONT_DISPLAY};font-size:16px;color:${BRAND.charcoal};margin-top:10px;">
+    ${fmt(offer.low)} &nbsp;&rarr;&nbsp; <span style="font-size:22px;color:${BRAND.forest};font-weight:700;">${fmt(offer.mid)}</span> &nbsp;&rarr;&nbsp; ${fmt(offer.max)}
+  </div>
+  <div style="font-size:11px;color:${BRAND.slate};margin-top:6px;">
+    Floor &nbsp;&middot;&nbsp; Target &nbsp;&middot;&nbsp; Opening Ask
+  </div>
+</div>
+
+<!-- 3 Tips -->
+<div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:${BRAND.forest};margin-bottom:12px;">
+  Top 3 Listing Tips
+</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+  ${tipsHtml}
+</table>
+
+<!-- CTA -->
+<div style="background:${BRAND.fog};border:1px solid ${BRAND.border};border-radius:10px;padding:20px;text-align:center;margin:20px 0;">
+  <p style="font-size:14px;color:${BRAND.charcoal};margin:0 0 12px;">
+    Need help with your listing?
+  </p>
+  <a href="https://sghaus.com/contact" style="display:inline-block;background:${BRAND.forest};color:${BRAND.white};font-size:14px;font-weight:600;text-decoration:none;padding:10px 24px;border-radius:10px;">
+    Get in Touch
+  </a>
+  <p style="font-size:11px;color:${BRAND.slate};margin:12px 0 0;">
+    Or reply directly to this email.
+  </p>
+</div>
+`);
+
+  return { subject, html };
+}
+
+// ---------------------------------------------------------------------------
+// Seller Email 3 — 14-day Outcome Collection
+// ---------------------------------------------------------------------------
+
+export function buildSeller14dOutcomeEmail(result: AnalysisResult): {
+  subject: string;
+  html: string;
+} {
+  const { input } = result;
+
+  const subject = `How did your sale of Blk ${input.block} ${input.streetName} go?`;
+
+  const outcomeUrl = `https://sghaus.com/outcome?block=${encodeURIComponent(input.block)}&street=${encodeURIComponent(input.streetName)}`;
+
+  const html = layout(`
+<h1 style="font-family:${FONT_DISPLAY};font-size:24px;margin:0 0 4px;color:${BRAND.charcoal};">
+  How did it go?
+</h1>
+<p style="font-size:14px;color:${BRAND.slate};margin:0 0 24px;line-height:1.5;">
+  Two weeks ago, you analysed ${input.flatType} at Blk ${input.block} ${input.streetName} for sale.<br>
+  We'd love to know what happened.
+</p>
+
+<!-- Outcome questions preview -->
+<div style="background:${BRAND.fog};border:1px solid ${BRAND.border};border-radius:12px;padding:24px;margin:0 0 24px;">
+  <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:${BRAND.forest};margin-bottom:16px;">
+    Quick Questions
+  </div>
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;color:${BRAND.charcoal};">
+    <tr>
+      <td style="padding:0 0 14px;line-height:1.5;">
+        <strong>1.</strong> Have you listed or sold this flat?
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:0 0 14px;line-height:1.5;">
+        <strong>2.</strong> If sold, what was the final agreed price?
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:0 0 14px;line-height:1.5;">
+        <strong>3.</strong> How long did the process take?
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:0 0 4px;line-height:1.5;">
+        <strong>4.</strong> Were the SGHaus pricing numbers useful?
+      </td>
+    </tr>
+  </table>
+</div>
+
+<!-- CTA -->
+<div style="text-align:center;margin:0 0 20px;">
+  <a href="${outcomeUrl}" style="display:inline-block;background:${BRAND.forest};color:${BRAND.white};font-size:14px;font-weight:600;text-decoration:none;padding:12px 28px;border-radius:10px;">
+    Share Your Result
+  </a>
+  <p style="font-size:12px;color:${BRAND.slate};margin:12px 0 0;">
+    Or just reply to this email with your answers.
+  </p>
+</div>
+
+<div style="background:#FFF8F0;border:1px solid ${BRAND.amber};border-radius:10px;padding:16px;margin:0 0 8px;">
+  <p style="font-size:13px;color:${BRAND.charcoal};margin:0;line-height:1.5;">
+    <strong>Why share?</strong> Your outcome helps us refine our pricing model for the next seller.
     Every data point makes SGHaus more accurate. All responses are anonymised.
   </p>
 </div>

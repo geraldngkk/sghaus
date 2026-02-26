@@ -81,7 +81,7 @@ export default function EmailCapture({ delayMs = 12_000, result, mode = "buy" }:
 
       // Fire-and-forget: send the report email sequence via Resend
       if (result) {
-        sendReportEmail(email.trim(), result).catch(() => {});
+        sendReportEmail(email.trim(), result, true, mode).catch(() => {});
       }
     } else {
       setStatus("error");
