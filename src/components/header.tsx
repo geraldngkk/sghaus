@@ -1,0 +1,73 @@
+import Link from "next/link";
+
+interface HeaderProps {
+  /** Currently active nav item for underline styling */
+  activeNav?: "buy" | "sell" | "about" | "contact";
+}
+
+export default function Header({ activeNav }: HeaderProps) {
+  const navItems = [
+    { key: "buy", label: "Buy", href: "/buy" },
+    { key: "sell", label: "Sell", href: "/sell" },
+    { key: "about", label: "About", href: "/about" },
+    { key: "contact", label: "Contact", href: "/contact" },
+  ] as const;
+
+  return (
+    <header className="sticky top-0 z-[200] border-b border-border bg-white">
+      <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between px-5 sm:px-10">
+        <Link
+          href="/"
+          className="flex items-center gap-2.5 transition-opacity hover:opacity-80"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo-square.svg"
+            alt=""
+            width={28}
+            height={28}
+            className="rounded-[5px]"
+          />
+          <span className="font-display text-xl tracking-tight">
+            <span className="text-forest">SG</span>
+            <span className="text-charcoal">haus</span>
+          </span>
+        </Link>
+
+        {/* Desktop nav */}
+        <nav className="hidden items-center gap-6 sm:flex">
+          {navItems.map((item) => (
+            <Link
+              key={item.key}
+              href={item.href}
+              className={`text-sm font-medium transition-colors ${
+                activeNav === item.key
+                  ? "text-forest border-b-2 border-forest pb-0.5"
+                  : "text-slate hover:text-charcoal"
+              }`}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+
+        {/* Mobile nav */}
+        <nav className="flex items-center gap-5 sm:hidden">
+          {navItems.map((item) => (
+            <Link
+              key={item.key}
+              href={item.href}
+              className={`text-xs font-medium transition-colors ${
+                activeNav === item.key
+                  ? "text-forest"
+                  : "text-slate hover:text-charcoal"
+              }`}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+      </div>
+    </header>
+  );
+}

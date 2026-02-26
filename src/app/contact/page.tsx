@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { submitContactForm } from "@/actions/contact";
+import Header from "@/components/header";
+import Footer from "@/components/footer";
 
 type FormState = "idle" | "submitting" | "success" | "error";
 
@@ -33,30 +34,7 @@ export default function ContactPage() {
 
   return (
     <main className="min-h-screen flex flex-col bg-fog">
-      {/* Header */}
-      <header className="sticky top-0 z-[200] border-b border-border bg-white">
-        <div className="mx-auto flex max-w-[1200px] items-center justify-between px-5 py-4 sm:px-10">
-          <Link href="/" className="flex items-center gap-2.5 transition-opacity hover:opacity-80">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo-square.svg" alt="" width={28} height={28} className="rounded-[5px]" />
-            <span className="font-display text-xl tracking-tight">
-              <span className="text-forest">SG</span>
-              <span className="text-charcoal">haus</span>
-            </span>
-          </Link>
-          <nav className="flex items-center gap-6">
-            <Link href="/" className="text-sm font-medium text-forest transition-colors hover:text-forest/80">
-              Home
-            </Link>
-            <Link href="/about" className="text-sm font-medium text-slate transition-colors hover:text-charcoal">
-              About
-            </Link>
-            <span className="rounded-full bg-mist px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-forest">
-              Beta
-            </span>
-          </nav>
-        </div>
-      </header>
+      <Header activeNav="contact" />
 
       <div className="mx-auto w-full max-w-[720px] flex-1 px-5 py-16 sm:px-10 sm:py-24">
         <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-forest">Contact</p>
@@ -150,27 +128,7 @@ export default function ContactPage() {
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="bg-forest mt-auto">
-        <div className="mx-auto max-w-[1200px] px-5 py-8 sm:px-10">
-          <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-            <div className="flex items-center gap-2.5">
-              <span className="font-display text-lg tracking-tight">
-                <span className="text-white">SG</span>
-                <span className="text-white/60">haus</span>
-              </span>
-            </div>
-            <div className="flex items-center gap-6 text-sm text-white/60">
-              <Link href="/" className="transition-colors hover:text-white">Home</Link>
-              <Link href="/about" className="transition-colors hover:text-white">About</Link>
-              <Link href="/contact" className="transition-colors hover:text-white">Contact</Link>
-            </div>
-            <p className="text-xs text-white/40">
-              Powered by official Singapore government data
-            </p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </main>
   );
 }
