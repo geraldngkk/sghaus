@@ -532,7 +532,7 @@ export function buildSeller14dOutcomeEmail(result: AnalysisResult): {
 
   const subject = `How did your sale of Blk ${input.block} ${input.streetName} go?`;
 
-  const outcomeUrl = `https://sghaus.com/outcome?block=${encodeURIComponent(input.block)}&street=${encodeURIComponent(input.streetName)}`;
+  const outcomeUrl = `https://sghaus.com/outcome?block=${encodeURIComponent(input.block)}&street=${encodeURIComponent(input.streetName)}&mode=sell`;
 
   const html = layout(`
 <h1 style="font-family:${FONT_DISPLAY};font-size:24px;margin:0 0 4px;color:${BRAND.charcoal};">

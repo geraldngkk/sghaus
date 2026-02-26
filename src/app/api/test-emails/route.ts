@@ -4,6 +4,9 @@ import {
   buildImmediateEmail,
   build48hReminderEmail,
   build14dOutcomeEmail,
+  buildSellerImmediateEmail,
+  buildSeller48hEmail,
+  buildSeller14dOutcomeEmail,
 } from "@/lib/emails";
 import type { AnalysisResult, TieredComparable, ChecklistItem } from "@/types";
 
@@ -134,9 +137,10 @@ const MOCK_RESULT: AnalysisResult = {
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const to = url.searchParams.get("to");
+  const mode = url.searchParams.get("mode") === "sell" ? "sell" : "buy";
 
   if (!to) {
-    return NextResponse.json({ error: "Pass ?to=email@example.com" }, { status: 400 });
+    return NextResponse.json({ error: "Pass ?to=email@example.com&mode=buy|sell" }, { status: 400 });
   }
 
   const resend = getResendClient();
@@ -147,8 +151,8 @@ export async function GET(request: Request) {
   const replyTo = process.env.RESEND_REPLY_TO ?? "gerald@sghaus.com";
   const results: Record<string, unknown> = {};
 
-  // Email 1 — Immediate offer report
-  const email1 = buildImmediateEmail(MOCK_RESULT);
+  // Email 1 — Immediate report
+  const email1 = mode === "sell" ? buildSellerImmediateEmail(MOCK_RESULT) : buildImmediateEmail(MOCK_RESULT);
   const { data: d1, error: e1 } = await resend.emails.send({
     from: EMAIL_FROM,
     to: [to],
@@ -161,8 +165,8 @@ export async function GET(request: Request) {
   // Avoid Resend rate limit (2 req/s on free tier)
   await new Promise((r) => setTimeout(r, 600));
 
-  // Email 2 — 48h reminder (sent immediately for test)
-  const email2 = build48hReminderEmail(MOCK_RESULT);
+  // Email 2 — 48h (sent immediately for test)
+  const email2 = mode === "sell" ? buildSeller48hEmail(MOCK_RESULT) : build48hReminderEmail(MOCK_RESULT);
   const { data: d2, error: e2 } = await resend.emails.send({
     from: EMAIL_FROM,
     to: [to],
@@ -175,7 +179,7 @@ export async function GET(request: Request) {
   await new Promise((r) => setTimeout(r, 600));
 
   // Email 3 — 14d outcome (sent immediately for test)
-  const email3 = build14dOutcomeEmail(MOCK_RESULT);
+  const email3 = mode === "sell" ? buildSeller14dOutcomeEmail(MOCK_RESULT) : build14dOutcomeEmail(MOCK_RESULT);
   const { data: d3, error: e3 } = await resend.emails.send({
     from: EMAIL_FROM,
     to: [to],
