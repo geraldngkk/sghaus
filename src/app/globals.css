@@ -92,6 +92,14 @@ body {
   background-repeat: no-repeat;
 }
 
+/* Landing page hero — full viewport */
+.hero-landing {
+  background-image: url("/hero-landing.jpg");
+  background-size: cover;
+  background-position: center 40%;
+  background-repeat: no-repeat;
+}
+
 /* Modal animations */
 @keyframes fadeIn {
   from { opacity: 0; }
