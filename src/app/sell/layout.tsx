@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "SGHaus - Know What Your HDB Flat Is Really Worth",
+  title: "SGHaus - Know What Your Flat Is Really Worth",
   description:
-    "Data-backed pricing for HDB sellers. Your floor price, target, and opening ask.",
+    "Data-backed pricing for sellers. Your floor price, target, and opening ask.",
 };
 
 export default function SellLayout({

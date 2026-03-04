@@ -1,13 +1,13 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "SGHaus - Know Exactly What Your Flat Is Worth";
+export const alt = "SGHaus - Know What Your Flat Is Really Worth";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 export default async function OgImage() {
   const imageData = await fetch(
-    new URL("../../public/hero-landing.jpg", import.meta.url),
+    new URL("../../../public/hero-sell.jpg", import.meta.url),
   ).then((res) => res.arrayBuffer());
 
   return new ImageResponse(
@@ -34,7 +34,7 @@ export default async function OgImage() {
             objectFit: "cover",
           }}
         />
-        {/* Gradient overlay matching the page */}
+        {/* Gradient overlay matching the sell page */}
         <div
           style={{
             position: "absolute",
@@ -112,7 +112,7 @@ export default async function OgImage() {
               lineHeight: 1.4,
             }}
           >
-            The biggest decision of your life. Don't wing it.
+            Selling your flat? Price it right.
           </div>
 
           {/* Subtitle */}
@@ -124,7 +124,7 @@ export default async function OgImage() {
               marginTop: 14,
             }}
           >
-            Data-backed offer strategies for buyers and pricing tools for sellers
+            Data-backed pricing for sellers
           </div>
         </div>
       </div>
