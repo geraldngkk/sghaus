@@ -1,4 +1,6 @@
 import { ImageResponse } from "next/og";
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 
 export const runtime = "nodejs";
 export const alt = "SGHaus - Know What to Offer Before You Walk In";
@@ -6,9 +8,8 @@ export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 export default async function OgImage() {
-  const imageData = await fetch(
-    new URL("../../../public/hero-bg.jpg", import.meta.url),
-  ).then((res) => res.arrayBuffer());
+  const imageBuffer = await readFile(join(process.cwd(), "public", "hero-bg.jpg"));
+  const imageData = `data:image/jpeg;base64,${imageBuffer.toString("base64")}`;
 
   return new ImageResponse(
     (
@@ -22,7 +23,7 @@ export default async function OgImage() {
       >
         {/* Background image */}
         <img
-          src={imageData as unknown as string}
+          src={imageData}
           width={1200}
           height={630}
           style={{
