@@ -104,6 +104,11 @@ export const STOREY_BAND_PROXIMITY = 2;
 export const TIER_1_2_MONTHS = 12;
 export const TIER_3_MONTHS = 24;
 
+/** Nearby transactions: block range ±7, size tolerance ±200 sqft, 36-month window */
+export const NEARBY_BLOCK_RANGE = 7;
+export const NEARBY_SIZE_TOLERANCE_SQFT = 200;
+export const NEARBY_MONTHS = 36;
+
 /** Minimum Tier 1 comps before falling back to Tier 2 */
 export const MIN_TIER1_COMPS = 3;
 

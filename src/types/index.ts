@@ -48,6 +48,11 @@ export interface ParsedTransaction {
   pricePsf: number;
 }
 
+/** A nearby transaction with same-block flag for display grouping */
+export interface NearbyTransaction extends ParsedTransaction {
+  isSameBlock: boolean;
+}
+
 /** User input from the property form */
 export interface PropertyInput {
   town: string;
@@ -214,4 +219,5 @@ export interface AnalysisResult {
   dataSource?: DataSourceInfo;
   mrtProximity?: MrtProximityResult;
   schoolProximity?: SchoolProximityResult[];
+  nearbyTransactions?: NearbyTransaction[];
 }

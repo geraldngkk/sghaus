@@ -273,6 +273,7 @@ export default function BuyPage() {
                   context={result.marketContext}
                   town={result.input.town}
                   flatType={result.input.flatType}
+                  nearbyTransactions={result.nearbyTransactions}
                 />
                 <CostBreakdownDisplay
                   atLow={result.costs.atLow}

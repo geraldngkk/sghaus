@@ -1,10 +1,14 @@
-import type { ParsedTransaction, PropertyInput, CompTier, TieredComparable } from "@/types";
+import type { ParsedTransaction, PropertyInput, CompTier, TieredComparable, NearbyTransaction } from "@/types";
 import {
   STOREY_RANGES,
   STOREY_BAND_PROXIMITY,
   SIZE_TOLERANCE_PERCENT,
   TIER_1_2_MONTHS,
   TIER_3_MONTHS,
+  NEARBY_BLOCK_RANGE,
+  NEARBY_SIZE_TOLERANCE_SQFT,
+  NEARBY_MONTHS,
+  SQM_TO_SQFT,
 } from "./constants";
 
 // ---------------------------------------------------------------------------
@@ -98,4 +102,37 @@ export function tierComparables(
   }
 
   return { tier1, tier2, tier3 };
+}
+
+/**
+ * Filter transactions to nearby blocks built in the same era,
+ * within ±200 sqft and ±7 block numbers, last 36 months.
+ * Returns results tagged with isSameBlock for display grouping.
+ */
+export function filterNearbyTransactions(
+  transactions: ParsedTransaction[],
+  input: PropertyInput,
+): NearbyTransaction[] {
+  const cutoff = getMonthCutoff(NEARBY_MONTHS);
+  const subjectBlockNum = input.block ? parseBlockNumber(input.block) : null;
+  const subjectAreaSqft = input.floorAreaSqm * SQM_TO_SQFT;
+
+  const results: NearbyTransaction[] = [];
+
+  for (const txn of transactions) {
+    if (txn.month < cutoff) continue;
+    if (txn.streetName !== input.streetName) continue;
+    if (txn.leaseCommenceDate !== input.leaseCommenceDate) continue;
+    if (Math.abs(txn.floorAreaSqft - subjectAreaSqft) > NEARBY_SIZE_TOLERANCE_SQFT) continue;
+
+    const txnBlockNum = parseBlockNumber(txn.block);
+    if (subjectBlockNum === null || txnBlockNum === null) continue;
+    if (Math.abs(txnBlockNum - subjectBlockNum) > NEARBY_BLOCK_RANGE) continue;
+
+    const isSameBlock = txn.block === input.block;
+    results.push({ ...txn, isSameBlock });
+  }
+
+  results.sort((a, b) => b.month.localeCompare(a.month));
+  return results;
 }

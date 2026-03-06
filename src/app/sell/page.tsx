@@ -508,6 +508,7 @@ export default function SellPage() {
                   context={result.marketContext}
                   town={result.input.town}
                   flatType={result.input.flatType}
+                  nearbyTransactions={result.nearbyTransactions}
                 />
 
                 {/* Risk Flags */}

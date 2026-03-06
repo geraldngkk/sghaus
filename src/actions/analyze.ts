@@ -2,7 +2,7 @@
 
 import type { AnalysisResult, PropertyInput, MrtProximityResult, SchoolProximityResult } from "@/types";
 import { fetchResaleDataWithFallback } from "@/lib/hdb-api";
-import { tierComparables } from "@/lib/comparables";
+import { tierComparables, filterNearbyTransactions } from "@/lib/comparables";
 import { applyAdjustments } from "@/lib/adjustments";
 import { calculateOffers, calculateMarketContext } from "@/lib/offer-calculator";
 import { calculateCostBreakdown } from "@/lib/cost-calculator";
@@ -100,6 +100,9 @@ export async function analyzeProperty(
 
   // 3. Tier the comps
   const { tier1, tier2, tier3 } = tierComparables(allTransactions, input);
+
+  // 3a. Filter nearby transactions for market context display
+  const nearbyTransactions = filterNearbyTransactions(allTransactions, input);
 
   // 3b. Batch-geocode subject + all unique comp blocks in parallel
   const allRawComps = [...tier1, ...tier2, ...tier3];
@@ -329,6 +332,7 @@ export async function analyzeProperty(
     dataSource,
     mrtProximity: subjectMrt ?? undefined,
     schoolProximity: subjectSchools.length > 0 ? subjectSchools : undefined,
+    nearbyTransactions,
   };
 
   // Fire-and-forget: log to Google Sheets (never blocks the response)
