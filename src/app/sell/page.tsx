@@ -1,14 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import type { AnalysisResult } from "@/types";
 import PropertyForm from "@/components/property-form";
 import MarketContextDisplay from "@/components/market-context";
 import RiskFlagsDisplay from "@/components/risk-flags";
 import AnalysisSkeleton from "@/components/analysis-skeleton";
 import EmailCapture from "@/components/email-capture";
+import ShareReport from "@/components/share-report";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
+import { captureUtmParams, type UtmParams } from "@/lib/utm";
 
 // ---------------------------------------------------------------------------
 // Seller pricing derived from buyer analysis
@@ -284,6 +286,8 @@ export default function SellPage() {
   const [error, setError] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [view, setView] = useState<"home" | "results">("home");
+  const utmRef = useRef<UtmParams>({});
+  useEffect(() => { utmRef.current = captureUtmParams(); }, []);
 
   function handleResult(data: AnalysisResult) {
     setResult(data);
@@ -376,7 +380,7 @@ export default function SellPage() {
         {result && pricing && view === "results" && (
           <section id="seller-results">
             {/* Email capture popup — same logic as buyer page */}
-            <EmailCapture delayMs={12000} result={result} mode="sell" />
+            <EmailCapture delayMs={12000} result={result} mode="sell" utm={utmRef.current} />
 
             {/* Fallback data banner */}
             {result.dataSource?.type === "fallback" && (
@@ -479,6 +483,7 @@ export default function SellPage() {
 
                 {/* Actions */}
                 <div className="mt-6 flex flex-wrap items-center gap-3">
+                  <ShareReport result={result} mode="sell" />
                   <button
                     onClick={handleBackToSearch}
                     className="rounded-[10px] border border-border px-5 py-2.5 text-sm text-slate transition-colors hover:border-charcoal hover:text-charcoal"

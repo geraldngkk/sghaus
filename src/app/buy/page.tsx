@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import type { AnalysisResult } from "@/types";
 import PropertyForm from "@/components/property-form";
 import OfferStrategyDisplay from "@/components/offer-strategy";
@@ -17,6 +17,7 @@ import EmailCapture from "@/components/email-capture";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import { saveAnalysis, getAnalysis, type SavedAnalysis } from "@/lib/storage";
+import { captureUtmParams, type UtmParams } from "@/lib/utm";
 
 type View = "home" | "results" | "comparison";
 
@@ -28,6 +29,8 @@ export default function BuyPage() {
   const [saveRefreshKey, setSaveRefreshKey] = useState(0);
   const [view, setView] = useState<View>("home");
   const [comparisonAnalyses, setComparisonAnalyses] = useState<SavedAnalysis[]>([]);
+  const utmRef = useRef<UtmParams>({});
+  useEffect(() => { utmRef.current = captureUtmParams(); }, []);
 
   function handleResult(data: AnalysisResult) {
     setResult(data);
@@ -173,7 +176,7 @@ export default function BuyPage() {
         {result && view === "results" && (
           <section id="results">
             {/* Email capture popup — triggers on scroll to analysis or 8s timer */}
-            <EmailCapture delayMs={12000} result={result} />
+            <EmailCapture delayMs={12000} result={result} utm={utmRef.current} />
 
             {/* Fallback data banner */}
             {result.dataSource?.type === "fallback" && (
@@ -244,7 +247,7 @@ export default function BuyPage() {
                       Save This Report
                     </button>
                   )}
-                  <ShareReport result={result} />
+                  <ShareReport result={result} mode="buy" />
                   <button
                     onClick={handleBackToSearch}
                     className="rounded-[10px] border border-border px-5 py-2.5 text-sm text-slate transition-colors hover:border-charcoal hover:text-charcoal"

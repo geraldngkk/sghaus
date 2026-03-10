@@ -9,7 +9,10 @@ const GOOGLE_SCRIPT_URL = process.env.GOOGLE_SCRIPT_URL;
  * Runs server-side after every successful analysis.
  * Never blocks or fails the user-facing response.
  */
-export async function logAnalysis(result: AnalysisResult): Promise<void> {
+export async function logAnalysis(
+  result: AnalysisResult,
+  utm?: { utm_source?: string; utm_medium?: string; utm_campaign?: string; utm_content?: string },
+): Promise<void> {
   if (!GOOGLE_SCRIPT_URL) {
     console.log("[log-analysis] GOOGLE_SCRIPT_URL not set, skipping.");
     return;
@@ -63,6 +66,10 @@ export async function logAnalysis(result: AnalysisResult): Promise<void> {
         renoAdjustPercent: reno
           ? (reno.priceAdjustmentPercent * 100).toFixed(1)
           : "",
+        // UTM tracking
+        utmSource: utm?.utm_source || "",
+        utmMedium: utm?.utm_medium || "",
+        utmCampaign: utm?.utm_campaign || "",
         // Risk summary
         riskCount: result.risks.length,
         highRisks: result.risks

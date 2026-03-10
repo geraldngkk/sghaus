@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import type { AnalysisResult } from "@/types";
+import type { UtmParams } from "@/lib/utm";
 import { subscribeEmail } from "@/actions/subscribe";
 import { sendReportEmail } from "@/actions/send-report-email";
 
@@ -14,6 +15,8 @@ interface EmailCaptureProps {
   result?: AnalysisResult | null;
   /** Controls copy tone: buyer sees "offer" language, seller sees "pricing" language */
   mode?: "buy" | "sell";
+  /** UTM params to pass through to subscribe */
+  utm?: UtmParams;
 }
 
 /**
@@ -26,7 +29,7 @@ interface EmailCaptureProps {
  * - Skipped entirely if user already submitted email (localStorage)
  * - On success, blur lifts and reading continues
  */
-export default function EmailCapture({ delayMs = 12_000, result, mode = "buy" }: EmailCaptureProps) {
+export default function EmailCapture({ delayMs = 12_000, result, mode = "buy", utm }: EmailCaptureProps) {
   const [show, setShow] = useState(false);
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
@@ -70,7 +73,7 @@ export default function EmailCapture({ delayMs = 12_000, result, mode = "buy" }:
     setStatus("loading");
     setErrorMsg("");
 
-    const subResult = await subscribeEmail(email.trim());
+    const subResult = await subscribeEmail(email.trim(), utm);
 
     if (subResult.success) {
       setStatus("success");

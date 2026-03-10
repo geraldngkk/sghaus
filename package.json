@@ -7,7 +7,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "generate-fallback": "tsx scripts/generate-fallback-data.mts"
+    "generate-fallback": "tsx scripts/generate-fallback-data.mts",
+    "generate-pulse": "tsx scripts/generate-market-pulse.mts",
+    "generate-bto": "tsx scripts/generate-bto-campaign.mts",
+    "generate-mop": "tsx scripts/generate-mop-outreach.mts",
+    "generate-reply": "tsx scripts/generate-reply.mts",
+    "generate-video": "tsx scripts/generate-video-script.mts"
   },
   "dependencies": {
     "next": "16.1.6",

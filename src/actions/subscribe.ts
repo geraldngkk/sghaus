@@ -7,7 +7,10 @@ interface SubscribeResult {
   error?: string;
 }
 
-export async function subscribeEmail(email: string): Promise<SubscribeResult> {
+export async function subscribeEmail(
+  email: string,
+  utm?: { utm_source?: string; utm_medium?: string; utm_campaign?: string; utm_content?: string },
+): Promise<SubscribeResult> {
   // Validate email
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
@@ -26,7 +29,10 @@ export async function subscribeEmail(email: string): Promise<SubscribeResult> {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         email,
-        source: "sghaus-website",
+        source: utm?.utm_source || "direct",
+        medium: utm?.utm_medium || "",
+        campaign: utm?.utm_campaign || "",
+        content: utm?.utm_content || "",
         timestamp: new Date().toISOString(),
       }),
     });
