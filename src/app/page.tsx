@@ -9,8 +9,10 @@ export default function LandingPage() {
       <Header />
 
       <main className="flex-1">
-        {/* Hero:drenched forest canvas, no photo overlay */}
-        <section className="hero-drench relative overflow-hidden">
+        {/* Hero: cityscape photo under a forest scrim */}
+        <section className="relative overflow-hidden bg-forest-deep">
+          <div className="hero-photo absolute inset-0" aria-hidden="true" />
+          <div className="hero-photo-scrim absolute inset-0" aria-hidden="true" />
           <div className="hero-grid absolute inset-0" aria-hidden="true" />
 
           <div className="relative mx-auto max-w-[1200px] px-5 pb-16 pt-16 sm:px-10 sm:pb-20 sm:pt-24 lg:pb-28 lg:pt-28">

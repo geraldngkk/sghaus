@@ -124,7 +124,7 @@ function riskBadges(result: AnalysisResult): string {
 }
 
 // ---------------------------------------------------------------------------
-// Email 1 — Immediate: Your Offer Report
+// Email 1 - Immediate: Your Offer Report
 // ---------------------------------------------------------------------------
 
 export function buildImmediateEmail(result: AnalysisResult): {
@@ -138,7 +138,7 @@ export function buildImmediateEmail(result: AnalysisResult): {
     result.comps.tier2.length +
     result.comps.tier3.length;
 
-  const subject = `Your SGHaus Offer Report — Blk ${input.block} ${input.streetName}`;
+  const subject = `Your SGHaus Offer Report - Blk ${input.block} ${input.streetName}`;
 
   const html = layout(`
 <h1 style="font-family:${FONT_DISPLAY};font-size:24px;margin:0 0 4px;color:${BRAND.charcoal};">
@@ -193,7 +193,7 @@ ${riskBadges(result)}
 }
 
 // ---------------------------------------------------------------------------
-// Email 2 — 48h Reminder
+// Email 2 - 48h Reminder
 // ---------------------------------------------------------------------------
 
 export function build48hReminderEmail(result: AnalysisResult): {
@@ -207,8 +207,8 @@ export function build48hReminderEmail(result: AnalysisResult): {
 
   // Pick 3 stage-specific tips
   const tips = [
-    `Open at ${fmt(offer.low)} and anchor to the ${result.comps.tier1.length + result.comps.tier2.length} comparable transactions on this street. Don't justify — let the data speak.`,
-    "Move in smaller increments as you approach your target. Each step should be smaller than the last — this signals you're near your limit.",
+    `Open at ${fmt(offer.low)} and anchor to the ${result.comps.tier1.length + result.comps.tier2.length} comparable transactions on this street. Don't justify. Let the data speak.`,
+    "Move in smaller increments as you approach your target. Each step should be smaller than the last. This signals you're near your limit.",
     `If the seller won't come below ${fmt(offer.max)}, walk away respectfully. Deals that fall through sometimes come back in 3-4 weeks.`,
   ];
 
@@ -267,7 +267,7 @@ export function build48hReminderEmail(result: AnalysisResult): {
 }
 
 // ---------------------------------------------------------------------------
-// Email 3 — 14-day Outcome Collection
+// Email 3 - 14-day Outcome Collection
 // ---------------------------------------------------------------------------
 
 export function build14dOutcomeEmail(result: AnalysisResult): {
@@ -375,7 +375,7 @@ function sellerPricingTable(result: AnalysisResult): string {
 }
 
 // ---------------------------------------------------------------------------
-// Seller Email 1 — Immediate: Your Pricing Report
+// Seller Email 1 - Immediate: Your Pricing Report
 // ---------------------------------------------------------------------------
 
 export function buildSellerImmediateEmail(result: AnalysisResult): {
@@ -448,7 +448,7 @@ ${riskBadges(result)}
 }
 
 // ---------------------------------------------------------------------------
-// Seller Email 2 — 48h: Listing Strategy Tips
+// Seller Email 2 - 48h: Listing Strategy Tips
 // ---------------------------------------------------------------------------
 
 export function buildSeller48hEmail(result: AnalysisResult): {
@@ -521,7 +521,7 @@ export function buildSeller48hEmail(result: AnalysisResult): {
 }
 
 // ---------------------------------------------------------------------------
-// Seller Email 3 — 14-day Outcome Collection
+// Seller Email 3 - 14-day Outcome Collection
 // ---------------------------------------------------------------------------
 
 export function buildSeller14dOutcomeEmail(result: AnalysisResult): {
