@@ -2,28 +2,24 @@ import type { RiskFlag } from "@/types";
 
 const severityConfig = {
   critical: {
-    bg: "bg-[#EF4444]/5",
-    border: "border-[#EF4444]/20",
-    badge: "bg-[#EF4444] text-white",
-    text: "text-[#EF4444]",
+    bg: "bg-error/5",
+    border: "border-error/20",
+    badge: "bg-error text-white",
   },
   high: {
     bg: "bg-amber-light",
-    border: "border-amber/30",
-    badge: "bg-amber text-white",
-    text: "text-amber",
+    border: "border-amber/40",
+    badge: "bg-amber text-forest-deep",
   },
   medium: {
-    bg: "bg-[#F59E0B]/5",
-    border: "border-[#F59E0B]/20",
-    badge: "bg-[#F59E0B] text-white",
-    text: "text-[#F59E0B]",
+    bg: "bg-warning/5",
+    border: "border-warning/25",
+    badge: "bg-warning text-forest-deep",
   },
   low: {
     bg: "bg-fog",
     border: "border-border",
     badge: "bg-slate text-white",
-    text: "text-slate",
   },
 };
 
@@ -60,7 +56,7 @@ export default function RiskFlagsDisplay({ risks }: RiskFlagsDisplayProps) {
                 >
                   {risk.severity}
                 </span>
-                <h4 className={`text-sm font-semibold ${config.text}`}>{risk.title}</h4>
+                <h4 className="text-sm font-semibold text-charcoal">{risk.title}</h4>
               </div>
               <p className="mt-1.5 text-sm text-slate">{risk.description}</p>
               <p className="mt-2 text-xs text-slate/70 leading-relaxed">{risk.detail}</p>

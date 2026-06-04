@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { CostBreakdown, LoanType } from "@/types";
+import CountUp from "@/components/count-up";
 
 function formatPrice(value: number): string {
   return `$${value.toLocaleString("en-SG")}`;
@@ -114,7 +115,7 @@ export default function CostBreakdownDisplay({
               <th className="px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wider text-forest">
                 Target
               </th>
-              <th className="px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wider text-amber">
+              <th className="px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wider text-amber-ink">
                 Ceiling
               </th>
             </tr>
@@ -172,7 +173,9 @@ export default function CostBreakdownDisplay({
           </div>
           <div className="text-right">
             <div className="price-display text-xl text-forest sm:text-2xl">
-              {formatRange(allInLowAtMid, allInHighAtMid)}
+              <CountUp value={allInLowAtMid} prefix="$" />
+              {" - "}
+              <CountUp value={allInHighAtMid} prefix="$" />
             </div>
           </div>
         </div>

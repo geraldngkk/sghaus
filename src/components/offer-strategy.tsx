@@ -1,9 +1,5 @@
 import type { OfferStrategy } from "@/types";
-
-function formatPrice(value: number): string {
-  if (value === 0) return "--";
-  return `$${value.toLocaleString("en-SG")}`;
-}
+import CountUp from "@/components/count-up";
 
 function formatPsf(value: number): string {
   if (value === 0) return "--";
@@ -36,7 +32,7 @@ function OfferCard({ label, sublabel, price, psf, rationale, variant }: OfferCar
     max: {
       card: "border-amber/40 bg-amber-light/20",
       price: "text-charcoal",
-      tag: "bg-amber text-white",
+      tag: "bg-amber text-forest-deep",
       accent: "bg-amber",
     },
   };
@@ -65,7 +61,7 @@ function OfferCard({ label, sublabel, price, psf, rationale, variant }: OfferCar
         )}
       </div>
 
-      {/* THE NUMBER — bold, prominent, DM Serif Display, tabular nums */}
+      {/* THE NUMBER:heavy grotesque, tabular, counts into place */}
       <div className="mt-4">
         <div
           className={`price-display leading-none ${s.price} ${
@@ -74,7 +70,7 @@ function OfferCard({ label, sublabel, price, psf, rationale, variant }: OfferCar
               : "text-[2.25rem] sm:text-[2.75rem]"
           }`}
         >
-          {formatPrice(price)}
+          {price > 0 ? <CountUp value={price} prefix="$" /> : "--"}
         </div>
         <div className="mt-2 flex items-center gap-2 text-sm text-slate tabular-nums">
           <span className="font-medium">{formatPsf(psf)}</span>
@@ -104,14 +100,9 @@ export default function OfferStrategyDisplay({
   return (
     <div>
       <div className="flex items-end justify-between">
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-forest">
-            Your Offer Range
-          </p>
-          <h2 className="mt-1.5 font-display text-2xl text-charcoal sm:text-[2rem]">
-            Here&apos;s what you should offer
-          </h2>
-        </div>
+        <h2 className="font-display text-2xl text-charcoal sm:text-[2rem]">
+          Here&apos;s what you should offer
+        </h2>
         <p className="hidden text-sm text-slate sm:block">
           Based on <span className="font-medium text-charcoal">{compCount}</span>{" "}
           comparable sales in{" "}
@@ -150,17 +141,17 @@ export default function OfferStrategyDisplay({
       </div>
 
       {offer.walkAwayTriggers.length > 0 && (
-        <div className="mt-6 rounded-xl border border-[#EF4444]/20 bg-[#EF4444]/5 p-4">
-          <h3 className="text-sm font-semibold text-[#EF4444]">
+        <div className="mt-6 rounded-xl border border-error/20 bg-error/5 p-4">
+          <h3 className="text-sm font-semibold text-error">
             Walk-Away Triggers
           </h3>
           <ul className="mt-2 space-y-1.5">
             {offer.walkAwayTriggers.map((trigger, i) => (
               <li
                 key={i}
-                className="flex items-start gap-2 text-sm text-[#EF4444]/80"
+                className="flex items-start gap-2 text-sm text-charcoal"
               >
-                <span className="mt-0.5 shrink-0 text-xs">&bull;</span>
+                <span className="mt-0.5 shrink-0 text-xs text-error">&bull;</span>
                 <span>{trigger}</span>
               </li>
             ))}

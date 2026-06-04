@@ -119,19 +119,19 @@ export const RENOVATION_QUESTIONS: RenovationQuestion[] = [
       },
       {
         label: "Good",
-        description: "Functional with minor wear — some marks or dated style but fully usable",
+        description: "Functional with minor wear,some marks or dated style but fully usable",
         score: 75,
         costImpact: { low: 2_000, high: 5_000 },
       },
       {
         label: "Needs updating",
-        description: "Worn cabinets, old appliances, stained countertops — works but looks tired",
+        description: "Worn cabinets, old appliances, stained countertops,works but looks tired",
         score: 40,
         costImpact: { low: 8_000, high: 15_000 },
       },
       {
         label: "Needs full redo",
-        description: "Broken fixtures, water damage, or completely outdated — gut and replace",
+        description: "Broken fixtures, water damage, or completely outdated,gut and replace",
         score: 10,
         costImpact: { low: 15_000, high: 25_000 },
       },
@@ -151,21 +151,21 @@ export const RENOVATION_QUESTIONS: RenovationQuestion[] = [
       },
       {
         label: "Good",
-        description: "Functional with minor wear — some discolouration or old-style fittings",
+        description: "Functional with minor wear,some discolouration or old-style fittings",
         score: 75,
         // Cost per bathroom: $1k-$2.5k × 2 bathrooms for 4-room
         costImpact: { low: 2_000, high: 5_000 },
       },
       {
         label: "Needs updating",
-        description: "Stained grout, old fixtures, possible minor leaks — needs retiling and new fittings",
+        description: "Stained grout, old fixtures, possible minor leaks,needs retiling and new fittings",
         score: 40,
         // $4k-$8k per bathroom × 2 for 4-room
         costImpact: { low: 8_000, high: 16_000 },
       },
       {
         label: "Needs full redo",
-        description: "Cracked tiles, water damage, mould — full hack, waterproof, and retile",
+        description: "Cracked tiles, water damage, mould,full hack, waterproof, and retile",
         score: 10,
         // $8k-$14k per bathroom × 2 for 4-room
         costImpact: { low: 16_000, high: 28_000 },
@@ -179,7 +179,7 @@ export const RENOVATION_QUESTIONS: RenovationQuestion[] = [
     options: [
       {
         label: "Excellent",
-        description: "Clean, level, no chips or cracks — vinyl/tile/parquet in great shape",
+        description: "Clean, level, no chips or cracks,vinyl/tile/parquet in great shape",
         score: 100,
         costImpact: { low: 0, high: 0 },
       },
@@ -191,14 +191,14 @@ export const RENOVATION_QUESTIONS: RenovationQuestion[] = [
       },
       {
         label: "Needs overlay",
-        description: "Visible damage or outdated — can overlay with vinyl without hacking ($4-5/sqft)",
+        description: "Visible damage or outdated,can overlay with vinyl without hacking ($4-5/sqft)",
         score: 45,
         // ~1,000 sqft for 4-room at $4-5.50/sqft
         costImpact: { low: 4_000, high: 6_000 },
       },
       {
         label: "Needs hacking & retiling",
-        description: "Cracked, uneven, or hollow tiles — must hack and re-tile ($7-10/sqft)",
+        description: "Cracked, uneven, or hollow tiles,must hack and re-tile ($7-10/sqft)",
         score: 10,
         // ~1,000 sqft for 4-room at $7-10/sqft
         costImpact: { low: 7_000, high: 12_000 },
@@ -218,13 +218,13 @@ export const RENOVATION_QUESTIONS: RenovationQuestion[] = [
       },
       {
         label: "Needs repainting",
-        description: "Faded, minor marks, or dated colour — just needs a fresh coat",
+        description: "Faded, minor marks, or dated colour,just needs a fresh coat",
         score: 65,
         costImpact: { low: 1_500, high: 3_000 },
       },
       {
         label: "Minor repairs needed",
-        description: "Hairline cracks, small water stains — patch, skim coat, and repaint",
+        description: "Hairline cracks, small water stains,patch, skim coat, and repaint",
         score: 35,
         costImpact: { low: 3_000, high: 6_000 },
       },
@@ -243,25 +243,25 @@ export const RENOVATION_QUESTIONS: RenovationQuestion[] = [
     options: [
       {
         label: "All working",
-        description: "Everything functions — no tripping, no flickering, good water pressure, no leaks",
+        description: "Everything functions,no tripping, no flickering, good water pressure, no leaks",
         score: 100,
         costImpact: { low: 0, high: 0 },
       },
       {
         label: "Minor issues",
-        description: "A few faulty switches, slow drains, or dated power points — easy fixes",
+        description: "A few faulty switches, slow drains, or dated power points,easy fixes",
         score: 65,
         costImpact: { low: 1_000, high: 3_000 },
       },
       {
         label: "Partial rewiring/replumbing",
-        description: "Some circuits trip frequently, uneven water pressure — targeted professional work",
+        description: "Some circuits trip frequently, uneven water pressure,targeted professional work",
         score: 30,
         costImpact: { low: 5_000, high: 10_000 },
       },
       {
         label: "Full rewiring & replumbing",
-        description: "Old wiring (pre-2000), frequent tripping, poor pressure throughout — full overhaul",
+        description: "Old wiring (pre-2000), frequent tripping, poor pressure throughout,full overhaul",
         score: 10,
         costImpact: { low: 8_000, high: 18_000 },
       },
@@ -286,7 +286,7 @@ export const RENOVATION_QUESTIONS: RenovationQuestion[] = [
       },
       {
         label: "Needs replacement",
-        description: "Warped frames, broken locks, poor sealing — replace windows and grilles",
+        description: "Warped frames, broken locks, poor sealing,replace windows and grilles",
         score: 20,
         // Window + grille package for 4-room: $2.5k-$5k
         costImpact: { low: 2_500, high: 5_000 },
@@ -312,13 +312,13 @@ export const RENOVATION_QUESTIONS: RenovationQuestion[] = [
       },
       {
         label: "Partial replacement",
-        description: "Some units working, others need replacing — 1-2 fan coil units",
+        description: "Some units working, others need replacing,1-2 fan coil units",
         score: 35,
         costImpact: { low: 2_000, high: 4_000 },
       },
       {
         label: "No aircon / full replacement",
-        description: "No system installed or entire system is old/broken — need new System 3/4",
+        description: "No system installed or entire system is old/broken,need new System 3/4",
         score: 5,
         // System 3-4 full install: $4.5k-$8k
         costImpact: { low: 4_500, high: 8_000 },
@@ -332,25 +332,25 @@ export const RENOVATION_QUESTIONS: RenovationQuestion[] = [
     options: [
       {
         label: "Excellent",
-        description: "Good quality wardrobes, ample storage, modern design — keep as-is",
+        description: "Good quality wardrobes, ample storage, modern design,keep as-is",
         score: 100,
         costImpact: { low: 0, high: 0 },
       },
       {
         label: "Functional but dated",
-        description: "Wardrobes work but look old — cosmetic refresh or handle replacement",
+        description: "Wardrobes work but look old,cosmetic refresh or handle replacement",
         score: 65,
         costImpact: { low: 1_500, high: 4_000 },
       },
       {
         label: "Needs significant work",
-        description: "Missing wardrobes in some rooms, damaged cabinets — need new built-ins",
+        description: "Missing wardrobes in some rooms, damaged cabinets,need new built-ins",
         score: 30,
         costImpact: { low: 5_000, high: 12_000 },
       },
       {
         label: "No built-in / full replacement",
-        description: "No wardrobes, no shoe cabinet, no storage — need full custom carpentry",
+        description: "No wardrobes, no shoe cabinet, no storage,need full custom carpentry",
         score: 5,
         // Full carpentry for 4-room: $10k-$20k
         costImpact: { low: 10_000, high: 20_000 },
@@ -395,7 +395,7 @@ function scoreToCondition(
 //
 // Logic:
 // 1. Calculate estimated reno cost from questionnaire (scaled by flat type)
-// 2. Compare to "condition baseline" — the condition-driven portion of
+// 2. Compare to "condition baseline",the condition-driven portion of
 //    what a typical buyer expects to spend (≈45% of total reno budget,
 //    since the rest is personal preference / upgrade choices)
 // 3. Delta > 0 (more reno needed) → reduce offer (55% pass-through)

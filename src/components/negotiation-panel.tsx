@@ -107,7 +107,7 @@ function ScriptCard({
           {fmt(script.offerAmount)}
         </span>
         {script.scenario && (
-          <span className="rounded-full bg-amber/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-amber">
+          <span className="rounded-full bg-amber-light px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-amber-ink">
             {script.scenario === "below-market"
               ? "Below Market"
               : script.scenario === "long-dom"
@@ -281,12 +281,12 @@ function FinalOfferTab({ sequence }: { sequence: NegotiationSequence }) {
       {/* Walk away script */}
       <div>
         <div className="flex items-center gap-2 mb-3">
-          <span className="rounded-full bg-[#EF4444]/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#EF4444]">
+          <span className="rounded-full bg-error/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-error">
             Walk Away
           </span>
           <span className="text-xs text-slate">If the seller won&apos;t come below your ceiling</span>
         </div>
-        <div className="rounded-xl border border-[#EF4444]/15 bg-[#EF4444]/[0.03] p-4">
+        <div className="rounded-xl border border-error/15 bg-error/[0.03] p-4">
           <p className="text-sm leading-relaxed text-charcoal">
             &ldquo;{walkAwayScript}&rdquo;
           </p>
@@ -338,7 +338,7 @@ function TacticsSection({ sequence }: { sequence: NegotiationSequence }) {
         <div className="mt-4 space-y-3">
           {sequence.tacticRebuttals.map((item, i) => (
             <div key={i} className="rounded-xl border border-border bg-fog/40 p-4">
-              <p className="text-xs font-semibold text-amber">{item.tactic}</p>
+              <p className="text-xs font-semibold text-amber-ink">{item.tactic}</p>
               <div className="mt-2 rounded-lg border border-border bg-white p-3">
                 <p className="text-sm leading-relaxed text-charcoal">
                   &ldquo;{item.rebuttal}&rdquo;
@@ -351,12 +351,12 @@ function TacticsSection({ sequence }: { sequence: NegotiationSequence }) {
           ))}
 
           {/* Do Not Say */}
-          <div className="rounded-xl border border-[#EF4444]/15 bg-[#EF4444]/[0.03] p-4">
-            <p className="text-xs font-semibold text-[#EF4444]">What Not to Say</p>
+          <div className="rounded-xl border border-error/15 bg-error/[0.03] p-4">
+            <p className="text-xs font-semibold text-error">What Not to Say</p>
             <ul className="mt-2 space-y-1.5">
               {sequence.doNotSay.map((item, i) => (
                 <li key={i} className="flex items-start gap-2 text-xs text-slate leading-relaxed">
-                  <span className="mt-0.5 shrink-0 text-[#EF4444]/60">&times;</span>
+                  <span className="mt-0.5 shrink-0 text-error/60">&times;</span>
                   <span>{item}</span>
                 </li>
               ))}

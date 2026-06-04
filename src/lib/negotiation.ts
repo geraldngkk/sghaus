@@ -73,13 +73,13 @@ function detectScenario(
   const offer = result.offerWithReno ?? result.offer;
   const remainingLease = calculateRemainingLease(result.input.leaseCommenceDate);
 
-  // Scenario A — Seller is already below market (asking < MID)
+  // Scenario A,Seller is already below market (asking < MID)
   const belowMarket = askingPrice != null && askingPrice <= offer.mid;
 
-  // Scenario B — Long days on market (60+ days)
+  // Scenario B,Long days on market (60+ days)
   const longDom = daysOnMarket != null && daysOnMarket >= 60;
 
-  // Lease warning — walk-away language applicable
+  // Lease warning,walk-away language applicable
   const leaseWarning = remainingLease < 60;
 
   if (belowMarket) {
@@ -164,7 +164,7 @@ function generateOpenScript(
       `which is close to the median of ${compCount} recent transactions on ${street}. ` +
       `I think that's fair for both sides and I'm ready to move quickly.`;
     tips = [
-      "The seller is already near or below market — don't risk losing the deal by going lower.",
+      "The seller is already near or below market,don't risk losing the deal by going lower.",
       "Speed is your value-add here. Signal that you can commit fast.",
       "If the agent confirms other interest, move to MID immediately.",
     ];
@@ -177,13 +177,13 @@ function generateOpenScript(
     tips = [
       "You're anchoring to data (MID), not to your LOW. Your LOW is a position relative to a stated reference point.",
       "If the agent pushes back immediately, ask: \"Can you help me understand what's driving the asking price above recent sales?\"",
-      "Never reveal your maximum budget or say \"I love this flat\" — it signals urgency.",
+      "Never reveal your maximum budget or say \"I love this flat\",it signals urgency.",
     ];
   }
 
   if (scenario.leverageSpeed) {
     tips.push(
-      "The flat has been listed for 60+ days. Speed and certainty are genuine value-adds — use them.",
+      "The flat has been listed for 60+ days. Speed and certainty are genuine value-adds,use them.",
     );
   }
 
@@ -226,27 +226,27 @@ function generateNegotiateScript(
   if (isFinalTarget) {
     message =
       `My target is ${fmt(offerAmount)}. That's the median of ${compCount} recent transactions ` +
-      `on ${street} — it's not a number I made up, it's what the market says this flat is worth. ` +
+      `on ${street},it's not a number I made up, it's what the market says this flat is worth. ` +
       `I'd be happy to close at this price.`;
     tips = [
-      "This is your MID — fair market value. Present it as your final target with conviction.",
+      "This is your MID,fair market value. Present it as your final target with conviction.",
       "If you have the SGHaus comp data, offer to share it. Good-faith sellers and agents will engage with data.",
       "Don't say \"this is my final offer\" unless you truly mean it. Credibility is your main asset.",
     ];
   } else {
     message =
-      `I can come up to ${fmt(offerAmount)}. I want to be transparent — I'm working toward a number ` +
+      `I can come up to ${fmt(offerAmount)}. I want to be transparent,I'm working toward a number ` +
       `that reflects what comparable units have actually sold for. I'm not far from where I need to be, ` +
       `but I can't go much further without overpaying relative to the market.`;
     tips = [
-      "Move in smaller steps as you approach MID — this communicates you're nearing your limit.",
+      "Move in smaller steps as you approach MID,this communicates you're nearing your limit.",
       `You're now at Round ${roundNumber} of ~${totalNegotiateRounds}. Don't jump straight to MID.`,
       "If the agent says \"we have another offer\", don't panic-bid. Stick to your number.",
     ];
   }
 
   if (scenario.leverageSpeed) {
-    message += ` I should mention — if we can close the gap, I can commit this week and move the process forward quickly.`;
+    message += ` I should mention,if we can close the gap, I can commit this week and move the process forward quickly.`;
     tips.push("Speed and certainty are genuine leverage when a flat has been listed 60+ days.");
   }
 
@@ -254,7 +254,7 @@ function generateNegotiateScript(
     `Updated offer: ${fmt(offerAmount)}. ` +
     `Based on ${compCount} comps on ${street}, ` +
     `median is ${fmtPsf(offer.midPsf)}. ` +
-    `${isFinalTarget ? "This is my target — happy to close here." : "Room to move is limited."}`;
+    `${isFinalTarget ? "This is my target,happy to close here." : "Room to move is limited."}`;
 
   return {
     stage: "negotiate",
@@ -263,7 +263,7 @@ function generateNegotiateScript(
     message,
     rationale: isFinalTarget
       ? `${fmt(offerAmount)} is the data-backed market value. Half of comparable sales closed above this, half below.`
-      : `Moving to ${fmt(offerAmount)} (${((offerAmount - offer.low) / (offer.mid - offer.low) * 100).toFixed(0)}% of the way from LOW to MID) — diminishing steps signal you're approaching your limit.`,
+      : `Moving to ${fmt(offerAmount)} (${((offerAmount - offer.low) / (offer.mid - offer.low) * 100).toFixed(0)}% of the way from LOW to MID),diminishing steps signal you're approaching your limit.`,
     tips,
     whatsappTemplate,
     scenario: scenario.type,
@@ -282,7 +282,7 @@ function generateCommitScript(
 
   let message =
     `This is my best offer: ${fmt(offerAmount)}. I've based this on what above-average buyers ` +
-    `have paid for similar units on ${street} — I'm already at the top of that range. ` +
+    `have paid for similar units on ${street},I'm already at the top of that range. ` +
     `If this doesn't work for the seller, I understand, but I won't be able to improve on it.`;
 
   const tips = [
@@ -295,7 +295,7 @@ function generateCommitScript(
       ` I should also flag that with ~${Math.round(remainingLease)} years remaining on the lease, ` +
       `financing options for this flat are limited. That's factored into my valuation.`;
     tips.push(
-      "Lease below 60 years is a real constraint — CPF and bank loans are restricted. This isn't a negotiating tactic, it's a fact.",
+      "Lease below 60 years is a real constraint,CPF and bank loans are restricted. This isn't a negotiating tactic, it's a fact.",
     );
   }
 
@@ -306,7 +306,7 @@ function generateCommitScript(
   const whatsappTemplate =
     `Best and final: ${fmt(offerAmount)}. ` +
     `Top of comparable range on ${street} (${compCount} transactions). ` +
-    `I'm not able to go further — hope we can close.`;
+    `I'm not able to go further,hope we can close.`;
 
   return {
     stage: "commit",
@@ -371,17 +371,17 @@ export function generateNegotiationSequence(
   return {
     rounds,
     doNotSay: [
-      "\"This is my final offer\" — unless it genuinely is. If you say final and then move, the seller knows you have more room.",
-      "\"I love this flat\" — reveals urgency, reduces your leverage.",
-      "\"My maximum budget is $X\" — never share your ceiling, even approximately.",
-      "\"I can go a little higher\" — vague signal that you have room. Just move to your next number or don't.",
-      "\"The market is going down\" — may be true, but sounds like a scare tactic. Use trend data as a flag, not a threat.",
+      "\"This is my final offer\",unless it genuinely is. If you say final and then move, the seller knows you have more room.",
+      "\"I love this flat\",reveals urgency, reduces your leverage.",
+      "\"My maximum budget is $X\",never share your ceiling, even approximately.",
+      "\"I can go a little higher\",vague signal that you have room. Just move to your next number or don't.",
+      "\"The market is going down\",may be true, but sounds like a scare tactic. Use trend data as a flag, not a threat.",
     ],
     tacticRebuttals: [
       {
         tactic: "\"We have another offer\"",
         rebuttal:
-          "I understand. I'm not in a position to get into a bidding war — I have a number that works for me based on the market, and I'll stick to it. If the other offer doesn't work out, I hope you'll come back to me.",
+          "I understand. I'm not in a position to get into a bidding war,I have a number that works for me based on the market, and I'll stick to it. If the other offer doesn't work out, I hope you'll come back to me.",
       },
       {
         tactic: "\"The seller paid $X for renovations\"",
@@ -396,7 +396,7 @@ export function generateNegotiationSequence(
       {
         tactic: "\"Other buyers are willing to pay more\"",
         rebuttal:
-          "Maybe so. But I'm buying based on what the data says, not what other people are willing to pay. If a buyer wants to pay above market, that's their decision — it's not the benchmark I'm using.",
+          "Maybe so. But I'm buying based on what the data says, not what other people are willing to pay. If a buyer wants to pay above market, that's their decision,it's not the benchmark I'm using.",
       },
     ],
   };
