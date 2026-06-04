@@ -58,14 +58,14 @@ export function assessRisks(
       detail:
         "CPF usage will be severely restricted. HDB loan LTV will be significantly pro-rated. " +
         "Banks may refuse loans if the lease ends before the borrower turns 95. " +
-        "Resale will be very difficult — your buyer pool shrinks drastically.",
+        "Resale will be very difficult,your buyer pool shrinks drastically.",
     });
   } else if (remainingLease < LEASE_WARNING_YEARS) {
     flags.push({
       id: "lease-high",
       title: "Short Remaining Lease",
       severity: "high",
-      description: `~${Math.round(remainingLease)} years remaining — below the 70-year full eligibility threshold.`,
+      description: `~${Math.round(remainingLease)} years remaining,below the 70-year full eligibility threshold.`,
       detail:
         "CPF usage and HDB loan quantum are pro-rated based on remaining lease vs. buyer's age. " +
         "Your future buyers will face the same restrictions, affecting resale value. " +
@@ -96,7 +96,7 @@ export function assessRisks(
       description: `Prices in ${input.town} are down ${Math.abs(marketContext.trendPercentage).toFixed(1)}% year-on-year.`,
       detail:
         "The market in this area is softening. You may be able to negotiate harder or wait for better pricing. " +
-        "However, timing the market is inherently risky — if you need to buy now, negotiate accordingly.",
+        "However, timing the market is inherently risky,if you need to buy now, negotiate accordingly.",
     });
   }
 
@@ -159,7 +159,7 @@ export function assessRisks(
       description: `No recent transactions found on ${input.streetName}. Pricing is based on ${comps.tier2.length > 0 ? `${comps.tier2.length} town-wide` : "area-wide"} comparables.`,
       detail:
         "Without transactions on the same street, the offer calculation relies on broader area data. " +
-        "This means wider pricing uncertainty — the actual market value for your specific block could be higher or lower " +
+        "This means wider pricing uncertainty,the actual market value for your specific block could be higher or lower " +
         "than the town-wide median suggests. Consider requesting recent transaction records from the seller's agent " +
         "or checking if similar blocks nearby have recent sales.",
     });
@@ -285,21 +285,21 @@ export function generateChecklist(
       category: "Financing",
       question: "Is the remaining lease sufficient for full CPF and loan eligibility?",
       assessment: "positive",
-      detail: `~${Math.round(remainingLease)} years remaining — full CPF usage and HDB loan eligibility.`,
+      detail: `~${Math.round(remainingLease)} years remaining,full CPF usage and HDB loan eligibility.`,
     });
   } else if (remainingLease >= LEASE_WARNING_YEARS) {
     items.push({
       category: "Financing",
       question: "Is the remaining lease sufficient for full CPF and loan eligibility?",
       assessment: "neutral",
-      detail: `~${Math.round(remainingLease)} years remaining — CPF and loan may be pro-rated. Check with CPF Board.`,
+      detail: `~${Math.round(remainingLease)} years remaining,CPF and loan may be pro-rated. Check with CPF Board.`,
     });
   } else {
     items.push({
       category: "Financing",
       question: "Is the remaining lease sufficient for full CPF and loan eligibility?",
       assessment: "negative",
-      detail: `~${Math.round(remainingLease)} years remaining — significant financing restrictions. May require more cash.`,
+      detail: `~${Math.round(remainingLease)} years remaining,significant financing restrictions. May require more cash.`,
     });
   }
 
@@ -309,21 +309,21 @@ export function generateChecklist(
       category: "Market",
       question: "Is the price trend in this town favourable?",
       assessment: "positive",
-      detail: `Prices up ${marketContext.trendPercentage.toFixed(1)}% YoY — market momentum is positive.`,
+      detail: `Prices up ${marketContext.trendPercentage.toFixed(1)}% YoY,market momentum is positive.`,
     });
   } else if (marketContext.trendDirection === "flat") {
     items.push({
       category: "Market",
       question: "Is the price trend in this town favourable?",
       assessment: "neutral",
-      detail: "Prices relatively flat YoY — stable market, no strong momentum either way.",
+      detail: "Prices relatively flat YoY,stable market, no strong momentum either way.",
     });
   } else {
     items.push({
       category: "Market",
       question: "Is the price trend in this town favourable?",
       assessment: "negative",
-      detail: `Prices down ${Math.abs(marketContext.trendPercentage).toFixed(1)}% YoY — negotiate harder or consider waiting.`,
+      detail: `Prices down ${Math.abs(marketContext.trendPercentage).toFixed(1)}% YoY,negotiate harder or consider waiting.`,
     });
   }
 
@@ -333,21 +333,21 @@ export function generateChecklist(
       category: "Liquidity",
       question: "Is there sufficient transaction volume for reliable pricing?",
       assessment: "positive",
-      detail: `${marketContext.transactionCount12m} transactions in the last 12 months — good liquidity.`,
+      detail: `${marketContext.transactionCount12m} transactions in the last 12 months,good liquidity.`,
     });
   } else if (marketContext.transactionCount12m >= 5) {
     items.push({
       category: "Liquidity",
       question: "Is there sufficient transaction volume for reliable pricing?",
       assessment: "neutral",
-      detail: `${marketContext.transactionCount12m} transactions in the last 12 months — moderate liquidity.`,
+      detail: `${marketContext.transactionCount12m} transactions in the last 12 months,moderate liquidity.`,
     });
   } else {
     items.push({
       category: "Liquidity",
       question: "Is there sufficient transaction volume for reliable pricing?",
       assessment: "negative",
-      detail: `Only ${marketContext.transactionCount12m} transactions in the last 12 months — low liquidity, pricing uncertain.`,
+      detail: `Only ${marketContext.transactionCount12m} transactions in the last 12 months,low liquidity, pricing uncertain.`,
     });
   }
 
@@ -374,7 +374,7 @@ export function generateChecklist(
       assessment: "positive",
       detail: btoChecklist
         ? btoChecklist.checklistDetail
-        : `No major BTO supply pressure in ${input.town} — limited new supply supports resale values.`,
+        : `No major BTO supply pressure in ${input.town},limited new supply supports resale values.`,
     });
   }
 
@@ -504,14 +504,14 @@ export function generateChecklist(
       category: "Risk",
       question: "Are there any critical risk flags?",
       assessment: "negative",
-      detail: `${criticalRisks} critical risk(s) identified — review carefully before proceeding.`,
+      detail: `${criticalRisks} critical risk(s) identified,review carefully before proceeding.`,
     });
   } else if (highRisks > 0) {
     items.push({
       category: "Risk",
       question: "Are there any critical risk flags?",
       assessment: "neutral",
-      detail: `${highRisks} high-severity risk(s) — manageable but factor into your decision.`,
+      detail: `${highRisks} high-severity risk(s),manageable but factor into your decision.`,
     });
   } else {
     items.push({

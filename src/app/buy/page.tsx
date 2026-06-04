@@ -112,7 +112,7 @@ export default function BuyPage() {
         {/* Hero + Form (show in home or results view) */}
         {view !== "comparison" && (
           <>
-            {/* Hero band — drenched, with the three-number promise */}
+            {/* Hero band:drenched, with the three-number promise */}
             <section className="hero-drench relative overflow-hidden">
               <div className="hero-grid absolute inset-0" aria-hidden="true" />
 
@@ -153,7 +153,7 @@ export default function BuyPage() {
               </div>
             </section>
 
-            {/* Form card — lifted out of the hero band */}
+            {/* Form card:lifted out of the hero band */}
             <section className="relative z-10 mx-auto max-w-[1200px] px-5 sm:px-10">
               <div
                 className="rise -mt-16 max-w-3xl rounded-3xl border border-border bg-white p-6 shadow-[var(--shadow-lg)] sm:-mt-20 sm:p-8"
@@ -198,7 +198,7 @@ export default function BuyPage() {
         {/* Results */}
         {result && view === "results" && (
           <section id="results">
-            {/* Email capture popup — triggers on scroll to analysis or 8s timer */}
+            {/* Email capture popup:triggers on scroll to analysis or 8s timer */}
             <EmailCapture delayMs={12000} result={result} utm={utmRef.current} />
 
             {/* Fallback data banner */}
@@ -237,7 +237,7 @@ export default function BuyPage() {
                 {result.offerWithReno && result.renovation && (
                   <div className="mt-4 rounded-xl border border-amber/30 bg-amber-light/20 p-4">
                     <div className="flex items-center gap-2">
-                      <span className="rounded-full bg-amber px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+                      <span className="rounded-full bg-amber px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-forest-deep">
                         Renovation Adjusted
                       </span>
                       <span className="text-xs text-slate">
@@ -279,7 +279,7 @@ export default function BuyPage() {
                   </button>
                 </div>
 
-                {/* Negotiation Scripts — collapsed by default */}
+                {/* Negotiation Scripts:collapsed by default */}
                 <NegotiationPanel result={result} />
               </div>
             </div>

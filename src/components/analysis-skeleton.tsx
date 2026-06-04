@@ -5,8 +5,7 @@ export default function AnalysisSkeleton() {
       {/* Offer cards skeleton */}
       <div className="bg-white border-b border-border">
         <div className="mx-auto max-w-[1200px] px-5 py-10 sm:px-10 sm:py-14">
-          <div className="skeleton h-4 w-28 mb-2" />
-          <div className="skeleton h-8 w-64 mb-1" />
+          <div className="skeleton h-9 w-72 mb-1" />
           <div className="skeleton h-4 w-48 mt-2" />
 
           <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-3">

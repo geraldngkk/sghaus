@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { DM_Serif_Display, Hanken_Grotesk } from "next/font/google";
 import "./globals.css";
 
-// Display serif — the brand's emotional voice (wordmark + hero headline only)
+// Display serif:the brand's emotional voice (wordmark + hero headline only)
 const dmSerif = DM_Serif_Display({
   weight: "400",
   subsets: ["latin"],
@@ -10,7 +10,7 @@ const dmSerif = DM_Serif_Display({
   display: "swap",
 });
 
-// Workhorse grotesque — body, UI, and all numbers. Carries the data-authoritative weight.
+// Workhorse grotesque:body, UI, and all numbers. Carries the data-authoritative weight.
 const hanken = Hanken_Grotesk({
   subsets: ["latin"],
   variable: "--font-hanken",

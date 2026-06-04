@@ -5,22 +5,19 @@ const assessmentConfig = {
     icon: "\u2713",
     iconBg: "bg-forest/10 text-forest",
     bg: "bg-mist/20",
-    border: "border-meadow/20",
-    text: "text-forest",
+    border: "border-meadow/30",
   },
   neutral: {
     icon: "\u2013",
-    iconBg: "bg-[#F59E0B]/10 text-[#F59E0B]",
-    bg: "bg-[#F59E0B]/5",
-    border: "border-[#F59E0B]/20",
-    text: "text-[#F59E0B]",
+    iconBg: "bg-amber-light text-amber-ink",
+    bg: "bg-amber-light/40",
+    border: "border-amber/30",
   },
   negative: {
     icon: "\u2717",
-    iconBg: "bg-[#EF4444]/10 text-[#EF4444]",
-    bg: "bg-[#EF4444]/5",
-    border: "border-[#EF4444]/20",
-    text: "text-[#EF4444]",
+    iconBg: "bg-error/10 text-error",
+    bg: "bg-error/5",
+    border: "border-error/20",
   },
 };
 
@@ -57,7 +54,7 @@ export default function DecisionChecklist({ checklist }: DecisionChecklistProps)
                 <span className="text-[10px] font-semibold uppercase tracking-widest text-slate">
                   {item.category}
                 </span>
-                <p className={`text-sm font-medium ${config.text}`}>{item.question}</p>
+                <p className="text-sm font-medium text-charcoal">{item.question}</p>
                 <p className="mt-0.5 text-xs text-slate leading-relaxed">{item.detail}</p>
               </div>
             </div>

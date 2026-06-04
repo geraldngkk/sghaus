@@ -38,7 +38,7 @@ function buildLowRationale(
 ): string {
   const pctBelow = ((streetMedianPsf - psfValue) / streetMedianPsf * 100).toFixed(1);
   return (
-    `Opening bid at $${psfValue.toFixed(0)} psf — ${pctBelow}% below the ${benchmarkLabel} median ($${streetMedianPsf.toFixed(0)} psf) ` +
+    `Opening bid at $${psfValue.toFixed(0)} psf,${pctBelow}% below the ${benchmarkLabel} median ($${streetMedianPsf.toFixed(0)} psf) ` +
     `based on ${benchmarkCount} comparable transactions. ` +
     `A credible, data-backed anchor that gives you negotiation room while showing the seller you've done your homework.`
   );
@@ -50,9 +50,9 @@ function buildMidRationale(
   psfValue: number,
 ): string {
   return (
-    `Target price at $${psfValue.toFixed(0)} psf — the median of ${benchmarkCount} ${benchmarkLabel} transactions. ` +
+    `Target price at $${psfValue.toFixed(0)} psf,the median of ${benchmarkCount} ${benchmarkLabel} transactions. ` +
     `This is what the typical buyer paid for a comparable unit. ` +
-    `A fair market value price — you're matching the market, not overpaying.`
+    `A fair market value price,you're matching the market, not overpaying.`
   );
 }
 
@@ -67,7 +67,7 @@ function buildMaxRationale(
     ? ` Average premium over market value on this street: $${avgCov.toFixed(0)} psf.`
     : "";
   return (
-    `Hard ceiling at $${psfValue.toFixed(0)} psf — median ($${streetMedianPsf.toFixed(0)} psf) plus the average COV (Cash Over Valuation) ` +
+    `Hard ceiling at $${psfValue.toFixed(0)} psf,median ($${streetMedianPsf.toFixed(0)} psf) plus the average COV (Cash Over Valuation) ` +
     `from ${benchmarkCount} ${benchmarkLabel} transactions.${covNote} ` +
     `This is what above-average buyers paid. Walk away above this price.`
   );
@@ -85,22 +85,22 @@ function generateWalkAwayTriggers(
   const remainingLease = calculateRemainingLease(input.leaseCommenceDate);
   if (remainingLease < 60) {
     triggers.push(
-      `Remaining lease is only ~${Math.round(remainingLease)} years — limited CPF usage and loan eligibility`,
+      `Remaining lease is only ~${Math.round(remainingLease)} years,limited CPF usage and loan eligibility`,
     );
   }
   if (remainingLease < 50) {
     triggers.push(
-      `CRITICAL: Remaining lease below 50 years — very restricted financing and difficult resale`,
+      `CRITICAL: Remaining lease below 50 years,very restricted financing and difficult resale`,
     );
   }
 
   if (tier1.length < 2) {
-    triggers.push("Very few comparable transactions on this street — pricing is uncertain");
+    triggers.push("Very few comparable transactions on this street,pricing is uncertain");
   }
 
   if (marketContext.trendDirection === "down" && marketContext.trendPercentage < -3) {
     triggers.push(
-      `Prices in ${input.town} are trending down (${marketContext.trendPercentage.toFixed(1)}% YoY) — consider waiting`,
+      `Prices in ${input.town} are trending down (${marketContext.trendPercentage.toFixed(1)}% YoY),consider waiting`,
     );
   }
 
@@ -135,7 +135,7 @@ export function calculateOffers(
   const subjectBlockNum = parseBlockNumber(input.block);
 
   // =====================================================================
-  // V5 — COV-Based Offer Strategy
+  // V5,COV-Based Offer Strategy
   //
   //   LOW = street median - negotiation discount (~5-7% below)
   //   MID = street-level median PSF (= market value)
@@ -192,7 +192,7 @@ export function calculateOffers(
       lowRationale: "Insufficient comparable data to calculate an opening bid.",
       midRationale: "Insufficient comparable data to calculate a target price.",
       maxRationale: "Insufficient comparable data to calculate a ceiling price.",
-      walkAwayTriggers: ["Insufficient data — conduct manual research before making an offer"],
+      walkAwayTriggers: ["Insufficient data,conduct manual research before making an offer"],
     };
   }
 
@@ -268,7 +268,7 @@ export function calculateOffers(
       maxPsf = askingPsf;
       maxCappedByAsking = true;
     }
-    // If asking is even below MID, cap MID too — the seller is already below market
+    // If asking is even below MID, cap MID too,the seller is already below market
     if (askingPsf < midPsf) {
       midPsf = askingPsf;
       // Also pull LOW down proportionally so tiers stay spaced
@@ -283,7 +283,7 @@ export function calculateOffers(
   const maxRationale = maxCappedByAsking
     ? `Hard ceiling capped at the listing price ($${maxPsf.toFixed(0)} psf). ` +
       `Your calculated ceiling was higher, but there's no reason to offer above what the seller is asking. ` +
-      `Negotiate down from here — start at LOW and work toward MID.`
+      `Negotiate down from here,start at LOW and work toward MID.`
     : buildMaxRationale(benchmarkLabel, benchmarkComps.length, maxPsf, midPsf, avgCov);
 
   return {

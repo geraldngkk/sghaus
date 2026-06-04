@@ -1,26 +1,29 @@
 @import "tailwindcss";
 
 :root {
-  /* SGHaus Brand Colors — preserved */
+  /* SGHaus Brand Colors:preserved */
   --color-forest: #2D6A4F;
   --color-meadow: #52B788;
   --color-mist: #D8F3DC;
   --color-fog: #F7F9F6;
   --color-amber: #F4A261;
   --color-amber-light: #FFF1E6;
+  /* Readable warm ink: amber as TEXT on light surfaces (4.9:1 on white).
+     Plain --amber is a fill color and fails as small text. */
+  --color-amber-ink: #A85D18;
 
-  /* New — depth for the bolder, drenched direction */
+  /* New:depth for the bolder, drenched direction */
   --color-forest-deep: #0E2A1E;
   --color-forest-800: #143A2A;
   --color-forest-700: #245741;
 
-  /* Ink & neutrals — darkened slightly to clear contrast */
+  /* Ink & neutrals:darkened slightly to clear contrast */
   --color-charcoal: #16161F;
   --color-slate: #42505F;
   --color-border: #E2E8E4;
   --color-white: #FFFFFF;
 
-  /* Semantic — darker so they pass as text, not just fills */
+  /* Semantic:darker so they pass as text, not just fills */
   --color-success: #16A34A;
   --color-error: #DC2626;
   --color-warning: #D97706;
@@ -40,7 +43,7 @@
   --space-16: 64px;
   --space-24: 96px;
 
-  /* Shadows — tinted toward forest, not pure black */
+  /* Shadows:tinted toward forest, not pure black */
   --shadow-xs: 0 1px 3px rgba(14, 42, 30, 0.06);
   --shadow-sm: 0 4px 12px rgba(14, 42, 30, 0.07);
   --shadow-md: 0 12px 32px rgba(14, 42, 30, 0.10);
@@ -67,6 +70,7 @@
   --color-fog: #F7F9F6;
   --color-amber: #F4A261;
   --color-amber-light: #FFF1E6;
+  --color-amber-ink: #A85D18;
   --color-charcoal: #16161F;
   --color-slate: #42505F;
   --color-border: #E2E8E4;
@@ -101,7 +105,7 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-/* THE NUMBER — heavy grotesque, tabular, tight. The data-authoritative voice. */
+/* THE NUMBER:heavy grotesque, tabular, tight. The data-authoritative voice. */
 .price-display {
   font-family: var(--font-sans);
   font-weight: 800;
@@ -119,7 +123,7 @@ body {
 .text-pretty { text-wrap: pretty; }
 
 /* ---------------------------------------------------------------------------
-   Hero surfaces — drenched forest canvas, no photo overlay
+   Hero surfaces:drenched forest canvas, no photo overlay
    --------------------------------------------------------------------------- */
 
 .hero-drench {
@@ -158,7 +162,7 @@ body {
 }
 
 /* ---------------------------------------------------------------------------
-   Motion — orchestrated entrance + interaction
+   Motion:orchestrated entrance + interaction
    --------------------------------------------------------------------------- */
 
 @keyframes rise-in {

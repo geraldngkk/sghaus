@@ -9,7 +9,7 @@ export default function LandingPage() {
       <Header />
 
       <main className="flex-1">
-        {/* Hero — drenched forest canvas, no photo overlay */}
+        {/* Hero:drenched forest canvas, no photo overlay */}
         <section className="hero-drench relative overflow-hidden">
           <div className="hero-grid absolute inset-0" aria-hidden="true" />
 
@@ -120,7 +120,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* How it works — a real 3-step sequence */}
+        {/* How it works:a real 3-step sequence */}
         <section className="mx-auto max-w-[1200px] px-5 py-16 sm:px-10 sm:py-20">
           <h2 className="max-w-2xl text-balance font-display text-[clamp(1.75rem,1.4rem+1.4vw,2.5rem)] leading-tight text-charcoal">
             Three steps to a number you can stand behind

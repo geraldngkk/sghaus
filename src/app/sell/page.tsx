@@ -9,6 +9,7 @@ import AnalysisSkeleton from "@/components/analysis-skeleton";
 import EmailCapture from "@/components/email-capture";
 import ShareReport from "@/components/share-report";
 import TierPreview from "@/components/tier-preview";
+import CountUp from "@/components/count-up";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import { captureUtmParams, type UtmParams } from "@/lib/utm";
@@ -104,10 +105,10 @@ interface SellerCardProps {
 function SellerCard({ label, sublabel, price, psf, rationale, variant }: SellerCardProps) {
   const styles = {
     floor: {
-      card: "border-[#EF4444]/20 bg-[#EF4444]/[0.03]",
-      price: "text-[#EF4444]",
-      tag: "bg-[#EF4444] text-white",
-      accent: "bg-[#EF4444]",
+      card: "border-border bg-white",
+      price: "text-charcoal",
+      tag: "bg-mist text-forest",
+      accent: "bg-border",
     },
     target: {
       card: "border-forest/30 bg-forest/[0.03] ring-1 ring-forest/10",
@@ -116,10 +117,10 @@ function SellerCard({ label, sublabel, price, psf, rationale, variant }: SellerC
       accent: "bg-forest",
     },
     ask: {
-      card: "border-[#3B82F6]/30 bg-[#3B82F6]/[0.03]",
-      price: "text-[#3B82F6]",
-      tag: "bg-[#3B82F6] text-white",
-      accent: "bg-[#3B82F6]",
+      card: "border-amber/40 bg-amber-light/20",
+      price: "text-charcoal",
+      tag: "bg-amber text-forest-deep",
+      accent: "bg-amber",
     },
   };
   const s = styles[variant];
@@ -155,7 +156,7 @@ function SellerCard({ label, sublabel, price, psf, rationale, variant }: SellerC
               : "text-[2.25rem] sm:text-[2.75rem]"
           }`}
         >
-          {fmt(price)}
+          {price > 0 ? <CountUp value={price} prefix="$" /> : "--"}
         </div>
         <div className="mt-2 flex items-center gap-2 text-sm text-slate tabular-nums">
           <span className="font-medium">{fmtPsf(psf)}</span>
@@ -223,13 +224,13 @@ function NetProceedsTable({ pricing }: { pricing: SellerPricing }) {
               <th className="pb-3 pr-4 text-left text-[11px] font-semibold uppercase tracking-[0.15em] text-slate">
                 &nbsp;
               </th>
-              <th className="pb-3 px-4 text-right text-[11px] font-semibold uppercase tracking-[0.15em] text-[#EF4444]">
+              <th className="pb-3 px-4 text-right text-[11px] font-semibold uppercase tracking-[0.15em] text-slate">
                 Floor
               </th>
               <th className="pb-3 px-4 text-right text-[11px] font-semibold uppercase tracking-[0.15em] text-forest">
                 Target
               </th>
-              <th className="pb-3 pl-4 text-right text-[11px] font-semibold uppercase tracking-[0.15em] text-[#3B82F6]">
+              <th className="pb-3 pl-4 text-right text-[11px] font-semibold uppercase tracking-[0.15em] text-amber-ink">
                 Opening Ask
               </th>
             </tr>
@@ -254,14 +255,14 @@ function NetProceedsTable({ pricing }: { pricing: SellerPricing }) {
               <td className="pt-3 pr-4 font-semibold text-charcoal">
                 Net Proceeds
               </td>
-              <td className="pt-3 px-4 text-right font-semibold tabular-nums text-[#EF4444]">
-                {fmt(netFloor)}
+              <td className="pt-3 px-4 text-right font-semibold tabular-nums text-charcoal">
+                <CountUp value={netFloor} prefix="$" />
               </td>
               <td className="pt-3 px-4 text-right font-semibold tabular-nums text-forest">
-                {fmt(netTarget)}
+                <CountUp value={netTarget} prefix="$" />
               </td>
-              <td className="pt-3 pl-4 text-right font-semibold tabular-nums text-[#3B82F6]">
-                {fmt(netAsk)}
+              <td className="pt-3 pl-4 text-right font-semibold tabular-nums text-amber-ink">
+                <CountUp value={netAsk} prefix="$" />
               </td>
             </tr>
           </tbody>
@@ -325,7 +326,7 @@ export default function SellPage() {
       <main className="flex-1">
         {/* Hero + Form */}
         <>
-          {/* Hero band — warm drench, with the three-number promise */}
+          {/* Hero band:warm drench, with the three-number promise */}
           <section className="hero-drench-warm relative overflow-hidden">
             <div className="hero-grid absolute inset-0" aria-hidden="true" />
 
@@ -366,7 +367,7 @@ export default function SellPage() {
             </div>
           </section>
 
-          {/* Form card — lifted out of the hero band */}
+          {/* Form card:lifted out of the hero band */}
           <section className="relative z-10 mx-auto max-w-[1200px] px-5 sm:px-10">
             <div
               className="rise -mt-16 max-w-3xl rounded-3xl border border-border bg-white p-6 shadow-[var(--shadow-lg)] sm:-mt-20 sm:p-8"
@@ -402,7 +403,7 @@ export default function SellPage() {
         {/* Results */}
         {result && pricing && view === "results" && (
           <section id="seller-results">
-            {/* Email capture popup — same logic as buyer page */}
+            {/* Email capture popup:same logic as buyer page */}
             <EmailCapture delayMs={12000} result={result} mode="sell" utm={utmRef.current} />
 
             {/* Fallback data banner */}
@@ -428,14 +429,9 @@ export default function SellPage() {
             <div className="bg-white border-b border-border">
               <div className="mx-auto max-w-[1200px] px-5 py-10 sm:px-10 sm:py-14">
                 <div className="flex items-end justify-between">
-                  <div>
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-forest">
-                      Your Pricing Range
-                    </p>
-                    <h2 className="mt-1.5 font-display text-2xl text-charcoal sm:text-[2rem]">
-                      Here&apos;s how to price your flat
-                    </h2>
-                  </div>
+                  <h2 className="font-display text-2xl text-charcoal sm:text-[2rem]">
+                    Here&apos;s how to price your flat
+                  </h2>
                   <p className="hidden text-sm text-slate sm:block">
                     Based on{" "}
                     <span className="font-medium text-charcoal">
@@ -488,7 +484,7 @@ export default function SellPage() {
                 {result.offerWithReno && result.renovation && (
                   <div className="mt-4 rounded-xl border border-amber/30 bg-amber-light/20 p-4">
                     <div className="flex items-center gap-2">
-                      <span className="rounded-full bg-amber px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+                      <span className="rounded-full bg-amber px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-forest-deep">
                         Renovation Adjusted
                       </span>
                       <span className="text-xs text-slate">
