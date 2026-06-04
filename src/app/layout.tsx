@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { DM_Serif_Display, DM_Sans } from "next/font/google";
+import { DM_Serif_Display, Hanken_Grotesk } from "next/font/google";
 import "./globals.css";
 
+// Display serif — the brand's emotional voice (wordmark + hero headline only)
 const dmSerif = DM_Serif_Display({
   weight: "400",
   subsets: ["latin"],
@@ -9,9 +10,10 @@ const dmSerif = DM_Serif_Display({
   display: "swap",
 });
 
-const dmSans = DM_Sans({
+// Workhorse grotesque — body, UI, and all numbers. Carries the data-authoritative weight.
+const hanken = Hanken_Grotesk({
   subsets: ["latin"],
-  variable: "--font-dm-sans",
+  variable: "--font-hanken",
   display: "swap",
 });
 
@@ -47,7 +49,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${dmSerif.variable} ${dmSans.variable} antialiased`}>
+      <body className={`${dmSerif.variable} ${hanken.variable} antialiased`}>
         {children}
       </body>
     </html>

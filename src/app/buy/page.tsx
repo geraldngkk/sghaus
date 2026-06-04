@@ -14,6 +14,7 @@ import ShareReport from "@/components/share-report";
 import AnalysisSkeleton from "@/components/analysis-skeleton";
 import NegotiationPanel from "@/components/negotiation-panel";
 import EmailCapture from "@/components/email-capture";
+import TierPreview from "@/components/tier-preview";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import { saveAnalysis, getAnalysis, type SavedAnalysis } from "@/lib/storage";
@@ -111,55 +112,77 @@ export default function BuyPage() {
         {/* Hero + Form (show in home or results view) */}
         {view !== "comparison" && (
           <>
-            {/* Hero section with background image */}
-            <section className="hero-bg relative border-b border-border">
-              {/* Dark overlay */}
-              <div className="absolute inset-0 bg-gradient-to-b from-[#1A1A2E]/75 via-[#1A1A2E]/65 to-[#2D6A4F]/70" />
+            {/* Hero band — drenched, with the three-number promise */}
+            <section className="hero-drench relative overflow-hidden">
+              <div className="hero-grid absolute inset-0" aria-hidden="true" />
 
-              <div className="relative mx-auto max-w-[1200px] px-5 py-16 sm:px-10 sm:py-20 lg:py-24">
+              <div className="relative mx-auto max-w-[1200px] px-5 pb-24 pt-14 sm:px-10 sm:pb-28 sm:pt-20">
                 <div className="max-w-2xl">
                   <h1
-                    className="font-display text-3xl text-white sm:text-4xl lg:text-[3.25rem]"
-                    style={{ lineHeight: 1.1 }}
+                    className="rise text-balance font-display text-white"
+                    style={{
+                      fontSize: "clamp(2.25rem, 1.5rem + 2.6vw, 3.5rem)",
+                      lineHeight: 1.05,
+                      letterSpacing: "-0.01em",
+                    }}
                   >
-                    This is probably the biggest purchase of your life.{" "}
-                    <span className="text-mist">Don&apos;t wing it.</span>
+                    Know what to offer{" "}
+                    <span className="text-mist">before you walk in.</span>
                   </h1>
                   <p
-                    className="mt-5 text-base text-white/70 leading-relaxed sm:text-lg"
-                    style={{ maxWidth: "38em" }}
+                    className="rise mt-5 max-w-xl text-lg leading-relaxed text-mist/85"
+                    style={{ "--rise-delay": "80ms" } as React.CSSProperties}
                   >
-                    Real HDB transaction data. Your opening bid, your target price,
-                    and the number you should never go past.
+                    Enter the listing. Get your opening bid, your target price, and
+                    the number you should never go past.
                   </p>
                 </div>
 
-                <div className="mt-10 max-w-xl rounded-2xl border border-white/10 bg-white p-6 shadow-[var(--shadow-md)] sm:p-8">
-                  <h2 className="font-display text-xl text-charcoal sm:text-2xl">
-                    Property details
-                  </h2>
-                  <p className="mt-1 text-sm text-slate">
-                    Enter the listing details to get your personalised offer range.
-                  </p>
-                  <div className="mt-6">
-                    <PropertyForm
-                      onResult={handleResult}
-                      onError={handleError}
-                      onAnalyzing={handleAnalyzing}
-                    />
-                  </div>
+                <div
+                  className="rise mt-9"
+                  style={{ "--rise-delay": "140ms" } as React.CSSProperties}
+                >
+                  <TierPreview
+                    tiers={[
+                      { label: "Opening bid", desc: "Where you start the conversation", tone: "muted" },
+                      { label: "Target price", desc: "What the flat is actually worth", tone: "primary" },
+                      { label: "Hard ceiling", desc: "The number you never go past", tone: "warm" },
+                    ]}
+                  />
+                </div>
+              </div>
+            </section>
+
+            {/* Form card — lifted out of the hero band */}
+            <section className="relative z-10 mx-auto max-w-[1200px] px-5 sm:px-10">
+              <div
+                className="rise -mt-16 max-w-3xl rounded-3xl border border-border bg-white p-6 shadow-[var(--shadow-lg)] sm:-mt-20 sm:p-8"
+                style={{ "--rise-delay": "220ms" } as React.CSSProperties}
+              >
+                <h2 className="font-display text-2xl text-charcoal">
+                  Property details
+                </h2>
+                <p className="mt-1 text-sm text-slate">
+                  Enter the listing details to get your personalised offer range.
+                </p>
+                <div className="mt-6">
+                  <PropertyForm
+                    onResult={handleResult}
+                    onError={handleError}
+                    onAnalyzing={handleAnalyzing}
+                  />
                 </div>
 
                 {error && (
-                  <div className="mt-4 max-w-xl rounded-xl border border-[#EF4444]/30 bg-[#EF4444]/10 p-4">
-                    <p className="text-sm text-white">{error}</p>
+                  <div className="mt-4 rounded-xl border border-error/30 bg-error/5 p-4">
+                    <p className="text-sm text-error">{error}</p>
                   </div>
                 )}
               </div>
             </section>
 
             {/* Saved Reports */}
-            <section className="mx-auto max-w-[1200px] px-5 py-10 sm:px-10">
+            <section className="mx-auto max-w-[1200px] px-5 py-12 sm:px-10">
               <SavedReports
                 onLoad={handleLoadReport}
                 onCompare={handleCompare}

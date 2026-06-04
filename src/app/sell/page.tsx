@@ -8,6 +8,7 @@ import RiskFlagsDisplay from "@/components/risk-flags";
 import AnalysisSkeleton from "@/components/analysis-skeleton";
 import EmailCapture from "@/components/email-capture";
 import ShareReport from "@/components/share-report";
+import TierPreview from "@/components/tier-preview";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import { captureUtmParams, type UtmParams } from "@/lib/utm";
@@ -324,49 +325,71 @@ export default function SellPage() {
       <main className="flex-1">
         {/* Hero + Form */}
         <>
-          {/* Hero section with background image */}
-          <section className="hero-sell relative border-b border-border">
-            {/* Dark overlay — slightly warmer for seller context */}
-            <div className="absolute inset-0 bg-gradient-to-b from-[#1A1A2E]/75 via-[#1A1A2E]/65 to-[#2D6A4F]/70" />
+          {/* Hero band — warm drench, with the three-number promise */}
+          <section className="hero-drench-warm relative overflow-hidden">
+            <div className="hero-grid absolute inset-0" aria-hidden="true" />
 
-            <div className="relative mx-auto max-w-[1200px] px-5 py-16 sm:px-10 sm:py-20 lg:py-24">
+            <div className="relative mx-auto max-w-[1200px] px-5 pb-24 pt-14 sm:px-10 sm:pb-28 sm:pt-20">
               <div className="max-w-2xl">
                 <h1
-                  className="font-display text-3xl text-white sm:text-4xl lg:text-[3.25rem]"
-                  style={{ lineHeight: 1.1 }}
+                  className="rise text-balance font-display text-white"
+                  style={{
+                    fontSize: "clamp(2.25rem, 1.5rem + 2.6vw, 3.5rem)",
+                    lineHeight: 1.05,
+                    letterSpacing: "-0.01em",
+                  }}
                 >
-                  Selling your flat?{" "}
-                  <span className="text-mist">Price it right.</span>
+                  Selling?{" "}
+                  <span className="text-amber">Price it right the first time.</span>
                 </h1>
                 <p
-                  className="mt-5 text-base text-white/70 leading-relaxed sm:text-lg"
-                  style={{ maxWidth: "38em" }}
+                  className="rise mt-5 max-w-xl text-lg leading-relaxed text-mist/85"
+                  style={{ "--rise-delay": "80ms" } as React.CSSProperties}
                 >
-                  Know your floor price, your fair market value, and where to
-                  start negotiations.
+                  Price too high and it sits. Too low and you leave money on the
+                  table. Find the number that actually sells.
                 </p>
               </div>
 
-              <div className="mt-10 max-w-xl rounded-2xl border border-white/10 bg-white p-6 shadow-[var(--shadow-md)] sm:p-8">
-                <h2 className="font-display text-xl text-charcoal sm:text-2xl">
-                  Your flat details
-                </h2>
-                <p className="mt-1 text-sm text-slate">
-                  Enter your property details to get your personalised pricing range.
-                </p>
-                <div className="mt-6">
-                  <PropertyForm
-                    onResult={handleResult}
-                    onError={handleError}
-                    onAnalyzing={handleAnalyzing}
-                    mode="sell"
-                  />
-                </div>
+              <div
+                className="rise mt-9"
+                style={{ "--rise-delay": "140ms" } as React.CSSProperties}
+              >
+                <TierPreview
+                  tiers={[
+                    { label: "Floor price", desc: "Don't accept less than this", tone: "muted" },
+                    { label: "Target price", desc: "Fair value, what similar flats fetch", tone: "primary" },
+                    { label: "Opening ask", desc: "List here, then negotiate down", tone: "warm" },
+                  ]}
+                />
+              </div>
+            </div>
+          </section>
+
+          {/* Form card — lifted out of the hero band */}
+          <section className="relative z-10 mx-auto max-w-[1200px] px-5 sm:px-10">
+            <div
+              className="rise -mt-16 max-w-3xl rounded-3xl border border-border bg-white p-6 shadow-[var(--shadow-lg)] sm:-mt-20 sm:p-8"
+              style={{ "--rise-delay": "220ms" } as React.CSSProperties}
+            >
+              <h2 className="font-display text-2xl text-charcoal">
+                Your flat details
+              </h2>
+              <p className="mt-1 text-sm text-slate">
+                Enter your property details to get your personalised pricing range.
+              </p>
+              <div className="mt-6">
+                <PropertyForm
+                  onResult={handleResult}
+                  onError={handleError}
+                  onAnalyzing={handleAnalyzing}
+                  mode="sell"
+                />
               </div>
 
               {error && (
-                <div className="mt-4 max-w-xl rounded-xl border border-[#EF4444]/30 bg-[#EF4444]/10 p-4">
-                  <p className="text-sm text-white">{error}</p>
+                <div className="mt-4 rounded-xl border border-error/30 bg-error/5 p-4">
+                  <p className="text-sm text-error">{error}</p>
                 </div>
               )}
             </div>

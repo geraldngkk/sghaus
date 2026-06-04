@@ -14,7 +14,7 @@ export default function Header({ activeNav }: HeaderProps) {
   ] as const;
 
   return (
-    <header className="sticky top-0 z-[200] border-b border-border bg-white">
+    <header className="sticky top-0 z-[200] border-b border-border bg-white/85 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between px-5 sm:px-10">
         <Link
           href="/"

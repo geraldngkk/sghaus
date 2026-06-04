@@ -2,22 +2,27 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="mt-auto bg-forest">
-      <div className="mx-auto max-w-[1200px] px-5 py-8 sm:px-10">
-        <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-          <Link
-            href="/"
-            className="flex items-center gap-2.5 transition-opacity hover:opacity-80"
-          >
-            <span className="font-display text-lg tracking-tight">
-              <span className="text-white">SG</span>
-              <span className="text-white/60">haus</span>
-            </span>
-          </Link>
-          <div className="flex items-center gap-6 text-sm text-white/60">
-            <Link href="/" className="transition-colors hover:text-white">
-              Home
+    <footer className="hero-drench relative mt-auto overflow-hidden">
+      <div className="hero-grid absolute inset-0 opacity-60" aria-hidden="true" />
+      <div className="relative mx-auto max-w-[1200px] px-5 py-12 sm:px-10">
+        <div className="flex flex-col gap-8 sm:flex-row sm:items-end sm:justify-between">
+          <div className="max-w-sm">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-2.5 transition-opacity hover:opacity-80"
+            >
+              <span className="font-display text-xl tracking-tight">
+                <span className="text-meadow">SG</span>
+                <span className="text-white">haus</span>
+              </span>
             </Link>
+            <p className="mt-3 text-sm leading-relaxed text-mist/70">
+              Three decisive numbers for the biggest decision of your life. Built
+              on real resale transactions, not guesswork.
+            </p>
+          </div>
+
+          <nav className="flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-mist/70">
             <Link href="/buy" className="transition-colors hover:text-white">
               Buy
             </Link>
@@ -30,10 +35,12 @@ export default function Footer() {
             <Link href="/contact" className="transition-colors hover:text-white">
               Contact
             </Link>
-          </div>
-          <p className="text-xs text-white/40">
-            &copy; {new Date().getFullYear()} SGHaus
-          </p>
+          </nav>
+        </div>
+
+        <div className="mt-10 flex flex-col gap-2 border-t border-white/10 pt-6 text-xs text-mist/50 sm:flex-row sm:items-center sm:justify-between">
+          <p>&copy; {new Date().getFullYear()} SGHaus. Estimates, not financial advice.</p>
+          <p>Always do your own due diligence before you offer.</p>
         </div>
       </div>
     </footer>
