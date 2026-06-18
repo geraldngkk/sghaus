@@ -75,15 +75,10 @@ export default async function OgImage() {
               marginBottom: 28,
             }}
           >
-            <svg width="50" height="50" viewBox="0 0 512 512" fill="none">
-              <rect x="128" y="244" width="256" height="168" fill="#2D6A4F" />
-              <path d="M96 256L256 124L416 256H96Z" fill="#2D6A4F" />
-              <path
-                d="M220 412V340C220 320.118 236.118 304 256 304C275.882 304 292 320.118 292 340V412H220Z"
-                fill="white"
-              />
-              <rect x="152" y="276" width="48" height="36" rx="4" fill="white" />
-              <rect x="312" y="276" width="48" height="36" rx="4" fill="white" />
+            <svg width="54" height="54" viewBox="0 0 512 512" fill="none">
+              <path d="M256 122 L426 278 L86 278 Z" fill="#2D6A4F" />
+              <path d="M134 278 L378 278 L378 410 L134 410 Z" fill="#2D6A4F" />
+              <rect x="134" y="330" width="244" height="26" fill="white" />
             </svg>
           </div>
 
