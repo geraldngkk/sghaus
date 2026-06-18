@@ -159,6 +159,19 @@ body {
   background-position: center 42%;
   background-repeat: no-repeat;
 }
+/* Buy + sell heroes share the photo treatment; only the source differs */
+.hero-photo-buy {
+  background-image: url("/hero-bg.jpg");
+  background-size: cover;
+  background-position: center 45%;
+  background-repeat: no-repeat;
+}
+.hero-photo-sell {
+  background-image: url("/hero-sell.jpg");
+  background-size: cover;
+  background-position: center 45%;
+  background-repeat: no-repeat;
+}
 .hero-photo-scrim {
   background:
     radial-gradient(115% 130% at 82% -10%, rgba(82, 183, 136, 0.20), transparent 52%),
@@ -167,6 +180,17 @@ body {
       rgba(14, 42, 30, 0.95) 0%,
       rgba(16, 42, 29, 0.85) 42%,
       rgba(20, 58, 42, 0.62) 100%
+    );
+}
+/* Warmer scrim for the seller side: dark forest base, amber glow top-right */
+.hero-photo-scrim-warm {
+  background:
+    radial-gradient(115% 130% at 84% -10%, rgba(244, 162, 97, 0.24), transparent 52%),
+    linear-gradient(
+      135deg,
+      rgba(14, 42, 30, 0.95) 0%,
+      rgba(20, 52, 39, 0.86) 44%,
+      rgba(33, 74, 55, 0.6) 100%
     );
 }
 
