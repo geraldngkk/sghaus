@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import { fetchResaleDataWithFallback } from "./hdb-api";
 import { HDB_TOWNS, FLAT_TYPES, SQM_TO_SQFT } from "./constants";
 import type { ParsedTransaction } from "@/types";
@@ -206,3 +207,162 @@ export async function getTownSummary(town: string): Promise<TownSummary> {
     lowestSale,
   };
 }
+
+// ---------------------------------------------------------------------------
+// Town x flat-type detail (programmatic /towns/[town]/[flatType] pages)
+// ---------------------------------------------------------------------------
+
+/** A page needs at least this many recent sales to be genuinely useful. */
+export const MIN_FLAT_TX = 5;
+
+/** "4 ROOM" -> "4-room", "EXECUTIVE" -> "executive" */
+export function flatTypeToSlug(ft: string): string {
+  return ft.toLowerCase().replace(/\s+/g, "-");
+}
+
+/** "4-room" -> "4 ROOM" */
+export function slugToFlatType(slug: string): string {
+  return slug.replace(/-/g, " ").toUpperCase();
+}
+
+/** "4 ROOM" -> "4-Room", "EXECUTIVE" -> "Executive" */
+export function flatTypeDisplay(ft: string): string {
+  if (ft === "EXECUTIVE") return "Executive";
+  return ft.replace(/\s*ROOM$/, "-Room");
+}
+
+export interface FlatComp {
+  month: string;
+  block: string;
+  street: string;
+  storeyRange: string;
+  floorAreaSqft: number;
+  remainingLeaseYears: number;
+  resalePrice: number;
+  pricePsf: number;
+}
+
+export interface FlatTypeDetail {
+  town: string;
+  flatType: string;
+  generatedAt: string;
+  count12m: number;
+  count24m: number;
+  medianPrice: number;
+  medianPsf: number;
+  trendPercent: number;
+  p25Price: number;
+  p75Price: number;
+  minPrice: number;
+  maxPrice: number;
+  medianSqft: number;
+  medianLease: number;
+  comps: FlatComp[];
+}
+
+function percentile(sorted: number[], p: number): number {
+  if (sorted.length === 0) return 0;
+  const idx = Math.min(sorted.length - 1, Math.floor((p / 100) * sorted.length));
+  return sorted[idx];
+}
+
+/** Per-combo resale summary for one town + flat type, from the last 12 months. */
+export async function getFlatTypeDetail(
+  town: string,
+  flatType: string,
+): Promise<FlatTypeDetail> {
+  const cutoff12m = getMonthCutoff(12);
+  const cutoff24m = getMonthCutoff(24);
+  const { data } = await fetchResaleDataWithFallback(town, flatType);
+
+  const recent12m = data.filter((t) => t.month >= cutoff12m);
+  const older12m = data.filter(
+    (t) => t.month >= cutoff24m && t.month < cutoff12m,
+  );
+
+  const prices = recent12m.map((t) => t.resalePrice).sort((a, b) => a - b);
+  const psfs = recent12m.map((t) => t.pricePsf).sort((a, b) => a - b);
+  const sqfts = recent12m.map((t) => t.floorAreaSqft).sort((a, b) => a - b);
+  const leases = recent12m
+    .map((t) => t.remainingLeaseYears)
+    .sort((a, b) => a - b);
+
+  const medPsf = median(psfs);
+  let trendPercent = 0;
+  if (older12m.length > 0) {
+    const olderMedPsf = median(older12m.map((t) => t.pricePsf));
+    if (olderMedPsf > 0) trendPercent = ((medPsf - olderMedPsf) / olderMedPsf) * 100;
+  }
+
+  const comps: FlatComp[] = [...recent12m]
+    .sort((a, b) =>
+      a.month < b.month ? 1 : a.month > b.month ? -1 : b.resalePrice - a.resalePrice,
+    )
+    .slice(0, 12)
+    .map((t) => ({
+      month: t.month,
+      block: t.block,
+      street: titleCase(t.streetName),
+      storeyRange: t.storeyRange,
+      floorAreaSqft: Math.round(t.floorAreaSqft),
+      remainingLeaseYears: Math.round(t.remainingLeaseYears),
+      resalePrice: t.resalePrice,
+      pricePsf: Math.round(t.pricePsf),
+    }));
+
+  return {
+    town,
+    flatType,
+    generatedAt: new Date().toISOString(),
+    count12m: recent12m.length,
+    count24m: data.filter((t) => t.month >= cutoff24m).length,
+    medianPrice: Math.round(median(prices)),
+    medianPsf: Math.round(medPsf),
+    trendPercent: Math.round(trendPercent * 10) / 10,
+    p25Price: Math.round(percentile(prices, 25)),
+    p75Price: Math.round(percentile(prices, 75)),
+    minPrice: prices[0] || 0,
+    maxPrice: prices[prices.length - 1] || 0,
+    medianSqft: Math.round(median(sqfts)),
+    medianLease: Math.round(median(leases)),
+    comps,
+  };
+}
+
+export interface TownFlatCombo {
+  townSlug: string;
+  flatSlug: string;
+  town: string;
+  flatType: string;
+}
+
+/**
+ * Every town x flat-type combination that has at least MIN_FLAT_TX recent sales.
+ * Drives both generateStaticParams and the sitemap so they never diverge and no
+ * thin page is published.
+ */
+async function computeValidTownFlatCombos(): Promise<TownFlatCombo[]> {
+  const combos: TownFlatCombo[] = [];
+  for (const town of HDB_TOWNS) {
+    const summary = await getTownSummary(town);
+    for (const ft of summary.flatTypes) {
+      if (ft.transactionCount >= MIN_FLAT_TX) {
+        combos.push({
+          townSlug: townToSlug(town),
+          flatSlug: flatTypeToSlug(ft.flatType),
+          town,
+          flatType: ft.flatType,
+        });
+      }
+    }
+  }
+  return combos;
+}
+
+// Cached so the several sitemap/feed routes and generateStaticParams share one
+// computation instead of each re-fetching every town's data at build.
+export const getValidTownFlatCombos = unstable_cache(
+  computeValidTownFlatCombos,
+  ["town-flat-combos-v1"],
+  { revalidate: 86400 },
+);

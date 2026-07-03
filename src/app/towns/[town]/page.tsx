@@ -9,6 +9,8 @@ import {
   getAllTownSlugs,
   getTownSummary,
   townToSlug,
+  flatTypeToSlug,
+  MIN_FLAT_TX,
 } from "@/lib/town-data";
 
 export const revalidate = 86400; // 24h ISR
@@ -283,7 +285,16 @@ export default async function TownPage({
                   return (
                     <tr key={ft.flatType} className="border-b border-border last:border-0">
                       <td className="px-4 py-3 font-medium text-charcoal sm:px-6">
-                        {formatFlatType(ft.flatType)}
+                        {ft.transactionCount >= MIN_FLAT_TX ? (
+                          <Link
+                            href={`/towns/${slug}/${flatTypeToSlug(ft.flatType)}`}
+                            className="text-forest hover:underline"
+                          >
+                            {formatFlatType(ft.flatType)}
+                          </Link>
+                        ) : (
+                          formatFlatType(ft.flatType)
+                        )}
                       </td>
                       <td className="px-4 py-3 text-right text-charcoal sm:px-6">
                         {formatPrice(ft.medianPrice)}
