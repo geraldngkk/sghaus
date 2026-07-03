@@ -7,10 +7,20 @@ import { getTownSummary, townToSlug, titleCase } from "@/lib/town-data";
 
 export const revalidate = 86400; // 24h ISR
 
+const SITE = "https://sghaus.com";
+
 export const metadata: Metadata = {
   title: "Resale Prices by Town - SGHaus",
   description:
     "Browse resale flat prices, trends, and transaction data for all 27 HDB towns in Singapore. Compare median prices and find your ideal neighbourhood.",
+  alternates: { canonical: "/towns" },
+  openGraph: {
+    title: "Resale Prices by Town - SGHaus",
+    description:
+      "Browse resale flat prices, trends, and transaction data for all 27 HDB towns in Singapore. Compare median prices and find your ideal neighbourhood.",
+    url: `${SITE}/towns`,
+    type: "website",
+  },
 };
 
 function formatTrend(pct: number): { label: string; color: string } {
@@ -33,8 +43,47 @@ export default async function TownsIndexPage() {
     .filter((s) => s.totalTransactions12m > 0)
     .sort((a, b) => b.totalTransactions12m - a.totalTransactions12m);
 
+  // -------------------------------------------------------------------------
+  // Structured data (inline JSON-LD)
+  // -------------------------------------------------------------------------
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: SITE },
+      { "@type": "ListItem", position: 2, name: "Towns", item: `${SITE}/towns` },
+    ],
+  };
+
+  const collectionJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "Resale Prices by Town",
+    description:
+      "Resale flat prices, 12-month trends, and transaction volumes for every HDB town in Singapore.",
+    url: `${SITE}/towns`,
+    mainEntity: {
+      "@type": "ItemList",
+      numberOfItems: sorted.length,
+      itemListElement: sorted.map((summary, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        name: `${titleCase(summary.town)} resale prices`,
+        url: `${SITE}/towns/${townToSlug(summary.town)}`,
+      })),
+    },
+  };
+
   return (
     <div className="flex min-h-screen flex-col bg-fog">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionJsonLd) }}
+      />
       <Header />
 
       <main className="mx-auto w-full max-w-[1200px] flex-1 px-5 py-8 sm:px-10">

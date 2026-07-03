@@ -17,6 +17,7 @@ import EmailCapture from "@/components/email-capture";
 import TierPreview from "@/components/tier-preview";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
+import BuySeoContent from "./seo-content";
 import { saveAnalysis, getAnalysis, type SavedAnalysis } from "@/lib/storage";
 import { captureUtmParams, type UtmParams } from "@/lib/utm";
 
@@ -331,6 +332,9 @@ export default function BuyPage() {
             </div>
           </section>
         )}
+
+        {/* Server-rendered SEO / answer-engine content (always present in initial HTML) */}
+        <BuySeoContent />
       </main>
 
       {/* Footer */}

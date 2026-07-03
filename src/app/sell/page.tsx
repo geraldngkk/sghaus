@@ -12,6 +12,7 @@ import TierPreview from "@/components/tier-preview";
 import CountUp from "@/components/count-up";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
+import SellSeoContent from "./seo-content";
 import { captureUtmParams, type UtmParams } from "@/lib/utm";
 
 // ---------------------------------------------------------------------------
@@ -562,6 +563,9 @@ export default function SellPage() {
             </div>
           </section>
         )}
+
+        {/* Server-rendered SEO / answer-engine content (always present in initial HTML) */}
+        <SellSeoContent />
       </main>
 
       <Footer />

@@ -1,9 +1,16 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "SGHaus - Know What to Offer Before You Walk In",
+  title: "What to Offer on a Singapore House | SGHaus",
   description:
-    "Real transaction data. Your opening bid, your target price, and the number you should never go past.",
+    "Free HDB resale offer calculator. Get your opening bid, target price, and hard ceiling from real resale transactions, so you negotiate from data, not the asking price.",
+  alternates: { canonical: "/buy" },
+  openGraph: {
+    title: "What to Offer on a Singapore House | SGHaus",
+    description:
+      "Get your opening bid, target price, and hard ceiling from real resale transactions.",
+    url: "https://sghaus.com/buy",
+  },
 };
 
 export default function BuyLayout({

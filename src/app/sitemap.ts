@@ -1,6 +1,10 @@
 import type { MetadataRoute } from "next";
 import { HDB_TOWNS } from "@/lib/constants";
 
+// Stable timestamp: bumped intentionally on meaningful content changes, not on
+// every crawl. A moving "now" date erodes crawler trust in lastModified.
+const LAST_UPDATED = new Date("2026-07-03");
+
 function townToSlug(town: string): string {
   return town.toLowerCase().replace(/[\s/]+/g, "-");
 }
@@ -8,15 +12,34 @@ function townToSlug(town: string): string {
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = "https://sghaus.com";
   return [
-    { url: base, lastModified: new Date(), changeFrequency: "weekly", priority: 1 },
-    { url: `${base}/buy`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.9 },
-    { url: `${base}/sell`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.9 },
-    { url: `${base}/about`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.3 },
-    { url: `${base}/contact`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.3 },
+    { url: base, lastModified: LAST_UPDATED, changeFrequency: "weekly", priority: 1 },
+    { url: `${base}/buy`, lastModified: LAST_UPDATED, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${base}/sell`, lastModified: LAST_UPDATED, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${base}/about`, lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.3 },
+    { url: `${base}/contact`, lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.3 },
+    { url: `${base}/guides`, lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.6 },
+    {
+      url: `${base}/guides/how-much-to-offer-for-an-hdb-resale-flat`,
+      lastModified: LAST_UPDATED,
+      changeFrequency: "monthly",
+      priority: 0.6,
+    },
+    {
+      url: `${base}/guides/what-is-cov-cash-over-valuation`,
+      lastModified: LAST_UPDATED,
+      changeFrequency: "monthly",
+      priority: 0.6,
+    },
+    {
+      url: `${base}/guides/bto-vs-resale-which-is-cheaper`,
+      lastModified: LAST_UPDATED,
+      changeFrequency: "monthly",
+      priority: 0.6,
+    },
     ...HDB_TOWNS.map((town) => ({
       url: `${base}/towns/${townToSlug(town)}`,
-      lastModified: new Date(),
-      changeFrequency: "daily" as const,
+      lastModified: LAST_UPDATED,
+      changeFrequency: "weekly" as const,
       priority: 0.7,
     })),
   ];

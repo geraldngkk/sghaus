@@ -1,9 +1,16 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "SGHaus - Know What Your Flat Is Really Worth",
+  title: "How to Price Your Singapore House for Sale | SGHaus",
   description:
-    "Data-backed pricing for sellers. Your floor price, target, and opening ask.",
+    "Free HDB resale pricing tool for sellers. Get your floor price, target, and opening ask from real resale transactions, plus your net proceeds after costs.",
+  alternates: { canonical: "/sell" },
+  openGraph: {
+    title: "How to Price Your Singapore House for Sale | SGHaus",
+    description:
+      "Get your floor price, target, and opening ask from real resale transactions, plus net proceeds after costs.",
+    url: "https://sghaus.com/sell",
+  },
 };
 
 export default function SellLayout({
