@@ -16,6 +16,8 @@ export async function GET() {
     { url: `${SITE}/`, title: "SGHaus: know your number" },
     { url: `${SITE}/buy`, title: "What to offer on a Singapore house" },
     { url: `${SITE}/sell`, title: "Price your Singapore house for sale" },
+    { url: `${SITE}/towns`, title: "Resale prices by town" },
+    { url: `${SITE}/insights`, title: "Singapore resale price index" },
     { url: `${SITE}/guides`, title: "Singapore home guides" },
     { url: `${SITE}/guides/how-much-to-offer-for-an-hdb-resale-flat`, title: "How much should you offer" },
     { url: `${SITE}/guides/what-is-cov-cash-over-valuation`, title: "What is Cash Over Valuation" },

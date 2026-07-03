@@ -10,6 +10,8 @@ const STATIC_PATHS = [
   "/sell",
   "/about",
   "/contact",
+  "/towns",
+  "/insights",
   "/guides",
   "/guides/how-much-to-offer-for-an-hdb-resale-flat",
   "/guides/what-is-cov-cash-over-valuation",

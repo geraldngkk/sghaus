@@ -3,13 +3,15 @@ import { Wordmark } from "@/components/wordmark";
 
 interface HeaderProps {
   /** Currently active nav item for underline styling */
-  activeNav?: "buy" | "sell" | "about" | "contact";
+  activeNav?: "buy" | "sell" | "towns" | "guides" | "about" | "contact";
 }
 
 export default function Header({ activeNav }: HeaderProps) {
   const navItems = [
     { key: "buy", label: "Buy", href: "/buy" },
     { key: "sell", label: "Sell", href: "/sell" },
+    { key: "towns", label: "Towns", href: "/towns" },
+    { key: "guides", label: "Guides", href: "/guides" },
     { key: "about", label: "About", href: "/about" },
     { key: "contact", label: "Contact", href: "/contact" },
   ] as const;

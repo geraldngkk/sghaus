@@ -344,6 +344,42 @@ export default async function TownPage({
           </div>
         )}
 
+        {/* Cheapest & priciest blocks */}
+        {(summary.cheapestBlocks.length > 0 || summary.priciestBlocks.length > 0) && (
+          <div className="mb-8 grid gap-4 sm:grid-cols-2">
+            {summary.cheapestBlocks.length > 0 && (
+              <div className="overflow-hidden rounded-xl border border-border bg-white">
+                <div className="border-b border-border bg-mist px-4 py-3 sm:px-6">
+                  <h2 className="font-display text-lg text-charcoal">Most affordable blocks</h2>
+                </div>
+                <ul className="divide-y divide-border">
+                  {summary.cheapestBlocks.map((b) => (
+                    <li key={`c-${b.block}-${b.street}`} className="flex items-center justify-between px-4 py-3 text-sm sm:px-6">
+                      <span className="text-charcoal">Blk {b.block} {b.street}</span>
+                      <span className="font-medium text-charcoal">{formatPrice(b.medianPrice)}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {summary.priciestBlocks.length > 0 && (
+              <div className="overflow-hidden rounded-xl border border-border bg-white">
+                <div className="border-b border-border bg-mist px-4 py-3 sm:px-6">
+                  <h2 className="font-display text-lg text-charcoal">Priciest blocks</h2>
+                </div>
+                <ul className="divide-y divide-border">
+                  {summary.priciestBlocks.map((b) => (
+                    <li key={`p-${b.block}-${b.street}`} className="flex items-center justify-between px-4 py-3 text-sm sm:px-6">
+                      <span className="text-charcoal">Blk {b.block} {b.street}</span>
+                      <span className="font-medium text-charcoal">{formatPrice(b.medianPrice)}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* FAQ */}
         {faqEntries.length > 0 && (
           <div className="mb-8 overflow-hidden rounded-xl border border-border bg-white">

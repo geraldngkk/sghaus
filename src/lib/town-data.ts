@@ -43,6 +43,13 @@ export interface FlatTypeSummary {
   priceRange: { min: number; max: number };
 }
 
+export interface BlockStat {
+  block: string;
+  street: string;
+  medianPrice: number;
+  count: number;
+}
+
 export interface TownSummary {
   town: string;
   generatedAt: string;
@@ -55,6 +62,8 @@ export interface TownSummary {
   mostActiveStreet: string;
   highestSale: { price: number; block: string; street: string; flatType: string; month: string } | null;
   lowestSale: { price: number; block: string; street: string; flatType: string; month: string } | null;
+  priciestBlocks: BlockStat[];
+  cheapestBlocks: BlockStat[];
 }
 
 // ---------------------------------------------------------------------------
@@ -193,6 +202,25 @@ export async function getTownSummary(town: string): Promise<TownSummary> {
     };
   }
 
+  // Block-level medians (last 12m, blocks with at least 3 sales)
+  const blockMap = new Map<string, { block: string; street: string; prices: number[] }>();
+  for (const t of all12m) {
+    const key = `${t.block}|${t.streetName}`;
+    const e = blockMap.get(key) || { block: t.block, street: titleCase(t.streetName), prices: [] };
+    e.prices.push(t.resalePrice);
+    blockMap.set(key, e);
+  }
+  const blockStats: BlockStat[] = [...blockMap.values()]
+    .filter((b) => b.prices.length >= 3)
+    .map((b) => ({
+      block: b.block,
+      street: b.street,
+      medianPrice: Math.round(median(b.prices)),
+      count: b.prices.length,
+    }));
+  const priciestBlocks = [...blockStats].sort((a, b) => b.medianPrice - a.medianPrice).slice(0, 5);
+  const cheapestBlocks = [...blockStats].sort((a, b) => a.medianPrice - b.medianPrice).slice(0, 5);
+
   return {
     town,
     generatedAt: new Date().toISOString(),
@@ -205,8 +233,21 @@ export async function getTownSummary(town: string): Promise<TownSummary> {
     mostActiveStreet: titleCase(mostActiveStreet),
     highestSale,
     lowestSale,
+    priciestBlocks,
+    cheapestBlocks,
   };
 }
+
+/** All 27 town summaries, cached so the insights pages and towns index share one fetch. */
+async function computeAllTownSummaries(): Promise<TownSummary[]> {
+  return Promise.all(HDB_TOWNS.map((t) => getTownSummary(t)));
+}
+
+export const getAllTownSummaries = unstable_cache(
+  computeAllTownSummaries,
+  ["all-town-summaries-v1"],
+  { revalidate: 86400 },
+);
 
 // ---------------------------------------------------------------------------
 // Town x flat-type detail (programmatic /towns/[town]/[flatType] pages)

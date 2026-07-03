@@ -19,6 +19,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/sell`, lastModified: LAST_UPDATED, changeFrequency: "weekly", priority: 0.9 },
     { url: `${base}/about`, lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.3 },
     { url: `${base}/contact`, lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.3 },
+    { url: `${base}/towns`, lastModified: LAST_UPDATED, changeFrequency: "weekly", priority: 0.7 },
+    { url: `${base}/insights`, lastModified: LAST_UPDATED, changeFrequency: "weekly", priority: 0.7 },
     { url: `${base}/guides`, lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.6 },
     {
       url: `${base}/guides/how-much-to-offer-for-an-hdb-resale-flat`,
