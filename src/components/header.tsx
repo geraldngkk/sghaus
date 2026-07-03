@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Wordmark } from "@/components/wordmark";
 
 interface HeaderProps {
   /** Currently active nav item for underline styling */
@@ -18,20 +19,9 @@ export default function Header({ activeNav }: HeaderProps) {
       <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between px-5 sm:px-10">
         <Link
           href="/"
-          className="flex items-center gap-2.5 transition-opacity hover:opacity-80"
+          className="flex items-center transition-opacity hover:opacity-80"
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/logo-square.svg"
-            alt=""
-            width={28}
-            height={28}
-            className="rounded-[5px]"
-          />
-          <span className="font-display text-xl tracking-tight">
-            <span className="text-forest">SG</span>
-            <span className="text-charcoal">haus</span>
-          </span>
+          <Wordmark className="h-7 w-auto" />
         </Link>
 
         {/* Desktop nav */}

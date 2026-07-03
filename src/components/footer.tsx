@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Wordmark } from "@/components/wordmark";
 
 export default function Footer() {
   return (
@@ -11,10 +12,7 @@ export default function Footer() {
               href="/"
               className="inline-flex items-center gap-2.5 transition-opacity hover:opacity-80"
             >
-              <span className="font-display text-xl tracking-tight">
-                <span className="text-meadow">SG</span>
-                <span className="text-white">haus</span>
-              </span>
+              <Wordmark className="h-6 w-auto" color="#F4EFE6" />
             </Link>
             <p className="mt-3 text-sm leading-relaxed text-mist/70">
               Three decisive numbers for the biggest decision of your life. Built
@@ -39,7 +37,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-10 flex flex-col gap-2 border-t border-white/10 pt-6 text-xs text-mist/50 sm:flex-row sm:items-center sm:justify-between">
-          <p>&copy; {new Date().getFullYear()} SGHaus. Estimates, not financial advice.</p>
+          <p>&copy; {new Date().getFullYear()} SGHaus.</p>
           <p>Always do your own due diligence before you offer.</p>
         </div>
       </div>
