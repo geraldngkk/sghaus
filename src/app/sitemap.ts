@@ -2,9 +2,13 @@ import type { MetadataRoute } from "next";
 import { HDB_TOWNS } from "@/lib/constants";
 import { getValidTownFlatCombos } from "@/lib/town-data";
 
-// Stable timestamp: bumped intentionally on meaningful content changes, not on
+// Stable timestamps: bumped intentionally on meaningful content changes, not on
 // every crawl. A moving "now" date erodes crawler trust in lastModified.
+// LAST_UPDATED = the P0/P1 SEO launch. SEO_UPDATED = pages whose content changed
+// in the 2026-07-09 keyword + Dataset-schema pass (/buy, /insights, town pages),
+// so engines recrawl exactly those and pick up the new titles/schema.
 const LAST_UPDATED = new Date("2026-07-03");
+const SEO_UPDATED = new Date("2026-07-09");
 
 function townToSlug(town: string): string {
   return town.toLowerCase().replace(/[\s/]+/g, "-");
@@ -15,12 +19,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const combos = await getValidTownFlatCombos();
   return [
     { url: base, lastModified: LAST_UPDATED, changeFrequency: "weekly", priority: 1 },
-    { url: `${base}/buy`, lastModified: LAST_UPDATED, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${base}/buy`, lastModified: SEO_UPDATED, changeFrequency: "weekly", priority: 0.9 },
     { url: `${base}/sell`, lastModified: LAST_UPDATED, changeFrequency: "weekly", priority: 0.9 },
     { url: `${base}/about`, lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.3 },
     { url: `${base}/contact`, lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.3 },
     { url: `${base}/towns`, lastModified: LAST_UPDATED, changeFrequency: "weekly", priority: 0.7 },
-    { url: `${base}/insights`, lastModified: LAST_UPDATED, changeFrequency: "weekly", priority: 0.7 },
+    { url: `${base}/insights`, lastModified: SEO_UPDATED, changeFrequency: "weekly", priority: 0.7 },
     { url: `${base}/guides`, lastModified: LAST_UPDATED, changeFrequency: "monthly", priority: 0.6 },
     {
       url: `${base}/guides/how-much-to-offer-for-an-hdb-resale-flat`,
@@ -42,7 +46,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     ...HDB_TOWNS.map((town) => ({
       url: `${base}/towns/${townToSlug(town)}`,
-      lastModified: LAST_UPDATED,
+      lastModified: SEO_UPDATED,
       changeFrequency: "weekly" as const,
       priority: 0.7,
     })),
