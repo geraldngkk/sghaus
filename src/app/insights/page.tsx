@@ -16,18 +16,18 @@ const SITE = "https://sghaus.com";
 const CONTENT_MODIFIED = "2026-07-03";
 
 export const metadata: Metadata = {
-  title: "Singapore Resale Price Index by Town (2026) - SGHaus",
+  title: "HDB Price Trends by Town: Singapore Resale Index 2026 - SGHaus",
   description:
-    "Median resale flat prices and price per square foot for every town in Singapore, ranked, with the cheapest and priciest towns and the cheapest town for each flat type. Updated from recent sales.",
+    "HDB price trends by town: median resale prices and price per square foot for every town in Singapore, ranked, with 12-month movement and the cheapest and priciest towns. Updated from recent sales.",
   alternates: { canonical: "/insights" },
   openGraph: {
-    title: "Singapore Resale Price Index by Town (2026) - SGHaus",
+    title: "HDB Price Trends by Town: Singapore Resale Index 2026 - SGHaus",
     description:
-      "Median resale prices and psf for every Singapore town, ranked, plus the cheapest and priciest towns and the cheapest town for each flat type.",
+      "HDB price trends and median psf for every Singapore town, ranked, with 12-month movement and the cheapest and priciest towns.",
     url: `${SITE}/insights`,
     type: "article",
   },
-  twitter: { card: "summary_large_image", title: "Singapore Resale Price Index by Town (2026)" },
+  twitter: { card: "summary_large_image", title: "HDB Price Trends by Town: Singapore Resale Index 2026" },
 };
 
 function formatPrice(n: number): string {
@@ -128,12 +128,38 @@ export default async function InsightsPage() {
       acceptedAnswer: { "@type": "Answer", text: e.answer },
     })),
   };
+  const datasetJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Dataset",
+    name: "Singapore HDB resale price trends by town",
+    description: `Median resale prices, price per square foot, and 12-month price trends for ${towns.length} Singapore towns, compiled from ${totalTx.toLocaleString()} recent resale transactions.`,
+    url: `${SITE}/insights`,
+    keywords: [
+      "HDB price trends",
+      "HDB resale prices",
+      "Singapore resale price index",
+      "price per square foot",
+      "resale flat prices by town",
+    ],
+    creator: { "@type": "Organization", name: "SGHaus", url: SITE },
+    temporalCoverage: "P12M",
+    spatialCoverage: { "@type": "Place", name: "Singapore" },
+    variableMeasured: [
+      "Median resale price",
+      "Median price per square foot",
+      "12-month price trend",
+      "Transaction count",
+    ],
+    dateModified: CONTENT_MODIFIED,
+    isAccessibleForFree: true,
+  };
 
   return (
     <div className="flex min-h-screen flex-col bg-fog">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(datasetJsonLd) }} />
       <Header />
 
       <main className="mx-auto w-full max-w-[1200px] flex-1 px-5 py-8 sm:px-10">
@@ -145,12 +171,14 @@ export default async function InsightsPage() {
 
         <div className="mb-8">
           <h1 className="font-display text-3xl text-charcoal sm:text-4xl">
-            Singapore Resale Price Index by Town
+            Singapore HDB Price Trends by Town
           </h1>
           <p className="mt-2 text-sm text-slate">
             Updated {new Date(CONTENT_MODIFIED).toLocaleDateString("en-SG", { day: "numeric", month: "long", year: "numeric" })} &middot; {totalTx.toLocaleString()} recent sales
           </p>
           <p className="mt-4 max-w-2xl text-lg leading-relaxed text-charcoal">
+            Compare HDB price trends across every Singapore town below: median
+            price per square foot, 12-month movement, and how each town ranks.
             Across {towns.length} towns, resale flats sold from about{" "}
             <span className="font-semibold text-forest">${cheapest?.overallMedianPsf} psf</span> in {titleCase(cheapest?.town ?? "")} to{" "}
             <span className="font-semibold text-forest">${priciest?.overallMedianPsf} psf</span> in {titleCase(priciest?.town ?? "")} over the last 12 months, with the median town around ${medianTownPsf} psf.

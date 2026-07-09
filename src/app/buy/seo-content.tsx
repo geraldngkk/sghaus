@@ -13,7 +13,7 @@ interface Step {
 }
 
 const INTRO =
-  "SGHaus is a free offer calculator for HDB resale buyers. Enter a listing and you get three numbers grounded in real resale transactions: an opening bid to start from, a target price that reflects fair value, and a hard ceiling you should not cross. It is built for first-time buyers and anyone who would rather negotiate from data than from the asking price.";
+  "SGHaus is a free HDB price checker and offer calculator for resale buyers. Enter a listing and you get three numbers grounded in real resale transactions: an opening bid to start from, a target price that reflects fair value, and a hard ceiling you should not cross. It is built for first-time buyers and anyone who would rather negotiate from data than from the asking price.";
 
 const FAQS: Faq[] = [
   {

@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "What to Offer on a Singapore House | SGHaus",
+  title: "HDB Price Checker: What to Offer on a Resale Flat | SGHaus",
   description:
-    "Free HDB resale offer calculator. Get your opening bid, target price, and hard ceiling from real resale transactions, so you negotiate from data, not the asking price.",
+    "Free HDB price checker and resale offer calculator. Get your opening bid, target price, and hard ceiling from real resale transactions, so you negotiate from data, not the asking price.",
   alternates: { canonical: "/buy" },
   openGraph: {
-    title: "What to Offer on a Singapore House | SGHaus",
+    title: "HDB Price Checker: What to Offer on a Resale Flat | SGHaus",
     description:
-      "Get your opening bid, target price, and hard ceiling from real resale transactions.",
+      "Check what a resale flat is worth and get your opening bid, target price, and hard ceiling from real resale transactions.",
     url: "https://sghaus.com/buy",
   },
 };

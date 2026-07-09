@@ -4,7 +4,7 @@
 
 ## What is SGHaus?
 
-SGHaus is a free property intelligence tool for Singapore homebuyers and sellers. It turns real HDB resale transaction history into clear offer prices, based on what flats like yours actually sold for.
+SGHaus is a free HDB price checker for Singapore homebuyers and sellers. It turns real HDB resale transaction history into clear offer prices and HDB price trends by town, based on what flats like yours actually sold for.
 
 ## What does it do?
 

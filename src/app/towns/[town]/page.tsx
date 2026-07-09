@@ -200,6 +200,32 @@ export default async function TownPage({
     },
   };
 
+  const datasetJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Dataset",
+    name: `${townDisplay} HDB resale prices and price trends`,
+    description: articleDescription,
+    url: townUrl,
+    keywords: [
+      `${townDisplay} resale prices`,
+      `${townDisplay} HDB price trends`,
+      "HDB price checker",
+      "price per square foot",
+      "resale flat prices by flat type",
+    ],
+    creator: { "@type": "Organization", name: "SGHaus", url: SITE },
+    temporalCoverage: "P12M",
+    spatialCoverage: { "@type": "Place", name: `${townDisplay}, Singapore` },
+    variableMeasured: [
+      "Median resale price",
+      "Median price per square foot",
+      "12-month price trend",
+      "Transaction count",
+    ],
+    dateModified: CONTENT_MODIFIED,
+    isAccessibleForFree: true,
+  };
+
   return (
     <div className="flex min-h-screen flex-col bg-fog">
       <script
@@ -213,6 +239,10 @@ export default async function TownPage({
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(datasetJsonLd) }}
       />
       <Header />
 
