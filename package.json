@@ -12,7 +12,9 @@
     "generate-bto": "tsx scripts/generate-bto-campaign.mts",
     "generate-mop": "tsx scripts/generate-mop-outreach.mts",
     "generate-reply": "tsx scripts/generate-reply.mts",
-    "generate-video": "tsx scripts/generate-video-script.mts"
+    "generate-video": "tsx scripts/generate-video-script.mts",
+    "test": "vitest run",
+    "check:static": "tsx scripts/check-static-routes.mts"
   },
   "dependencies": {
     "@next/third-parties": "16.1.6",
@@ -30,6 +32,7 @@
     "eslint-config-next": "16.1.6",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "3.2.4"
   }
 }
