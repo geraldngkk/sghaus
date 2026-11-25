@@ -1,6 +1,7 @@
 "use server";
 
-const GOOGLE_SCRIPT_URL = process.env.GOOGLE_SCRIPT_URL;
+import { isValidEmail } from "@/lib/form-safety";
+import { postToSheet } from "@/lib/sheets";
 
 interface SubscribeResult {
   success: boolean;
@@ -11,42 +12,21 @@ export async function subscribeEmail(
   email: string,
   utm?: { utm_source?: string; utm_medium?: string; utm_campaign?: string; utm_content?: string },
 ): Promise<SubscribeResult> {
-  // Validate email
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
+  const address = email.trim();
+  if (!isValidEmail(address)) {
     return { success: false, error: "Please enter a valid email address." };
   }
 
-  // POST to Google Apps Script web app
-  if (!GOOGLE_SCRIPT_URL) {
-    console.log("[subscribe] GOOGLE_SCRIPT_URL not set. Email captured:", email);
-    return { success: true };
-  }
+  const { success } = await postToSheet("subscribe", {
+    email: address,
+    source: utm?.utm_source || "direct",
+    medium: utm?.utm_medium || "",
+    campaign: utm?.utm_campaign || "",
+    content: utm?.utm_content || "",
+    timestamp: new Date().toISOString(),
+  });
 
-  try {
-    const res = await fetch(GOOGLE_SCRIPT_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email,
-        source: utm?.utm_source || "direct",
-        medium: utm?.utm_medium || "",
-        campaign: utm?.utm_campaign || "",
-        content: utm?.utm_content || "",
-        timestamp: new Date().toISOString(),
-      }),
-    });
-
-    if (!res.ok) {
-      console.log("[subscribe] Google Script returned:", res.status);
-      // Still count as success — we don't want to block the user
-      return { success: true };
-    }
-
-    return { success: true };
-  } catch (err) {
-    console.log("[subscribe] Failed to POST to Google Script:", err);
-    // Still return success — email was validated, we just couldn't store it
-    return { success: true };
-  }
+  return success
+    ? { success: true }
+    : { success: false, error: "We couldn't save that just now. Please try again in a minute." };
 }

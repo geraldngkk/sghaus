@@ -1,8 +1,7 @@
 "use server";
 
 import type { AnalysisResult } from "@/types";
-
-const GOOGLE_SCRIPT_URL = process.env.GOOGLE_SCRIPT_URL;
+import { postToSheet } from "@/lib/sheets";
 
 /**
  * Log a completed analysis to Google Sheets (fire-and-forget).
@@ -13,21 +12,12 @@ export async function logAnalysis(
   result: AnalysisResult,
   utm?: { utm_source?: string; utm_medium?: string; utm_campaign?: string; utm_content?: string },
 ): Promise<void> {
-  if (!GOOGLE_SCRIPT_URL) {
-    console.log("[log-analysis] GOOGLE_SCRIPT_URL not set, skipping.");
-    return;
-  }
-
   try {
     const reno = result.renovation;
     const offer = result.offerWithReno ?? result.offer;
     const mrt = result.mrtProximity;
 
-    await fetch(GOOGLE_SCRIPT_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        type: "analysis",
+    await postToSheet("analysis", {
         timestamp: result.generatedAt,
         // Property details
         town: result.input.town,
@@ -67,19 +57,18 @@ export async function logAnalysis(
           ? (reno.priceAdjustmentPercent * 100).toFixed(1)
           : "",
         // UTM tracking
-        utmSource: utm?.utm_source || "",
-        utmMedium: utm?.utm_medium || "",
-        utmCampaign: utm?.utm_campaign || "",
+        utmSource: (utm?.utm_source || "").slice(0, 60),
+        utmMedium: (utm?.utm_medium || "").slice(0, 60),
+        utmCampaign: (utm?.utm_campaign || "").slice(0, 100),
         // Risk summary
         riskCount: result.risks.length,
         highRisks: result.risks
           .filter((r) => r.severity === "high" || r.severity === "critical")
           .map((r) => r.title)
           .join("; "),
-      }),
     });
   } catch (err) {
-    // Never fail the analysis — logging is best-effort
-    console.log("[log-analysis] Failed to log:", err);
+    // Never fail the analysis: logging is best-effort, and postToSheet already logs failures.
+    console.error("[log-analysis] Failed to build the log row:", err instanceof Error ? err.message : "unknown error");
   }
 }

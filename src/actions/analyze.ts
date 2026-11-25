@@ -65,7 +65,7 @@ async function resolveLeaseYear(input: PropertyInput): Promise<number> {
   if (details.leaseCommenceDate) return details.leaseCommenceDate;
 
   throw new Error(
-    "Could not determine lease commence year from HDB data for block " +
+    "Could not find the lease start year for block " +
     `${input.block} on ${input.streetName}. Please verify the block number.`,
   );
 }
@@ -77,6 +77,7 @@ async function resolveLeaseYear(input: PropertyInput): Promise<number> {
 export async function analyzeProperty(
   rawInput: PropertyInput,
   renovationAnswers?: RenovationAnswer[],
+  utm?: { utm_source?: string; utm_medium?: string; utm_campaign?: string; utm_content?: string },
 ): Promise<AnalysisResult> {
   // 1. Resolve lease year from HDB data if not provided, then validate
   const leaseCommenceDate = await resolveLeaseYear(rawInput);
@@ -336,7 +337,9 @@ export async function analyzeProperty(
   };
 
   // Fire-and-forget: log to Google Sheets (never blocks the response)
-  logAnalysis(analysisResult).catch(() => {});
+  logAnalysis(analysisResult, utm).catch((err) =>
+    console.error("[analyze] logAnalysis failed:", err instanceof Error ? err.message : "unknown error"),
+  );
 
   return analysisResult;
 }

@@ -5,6 +5,7 @@ import type { AnalysisResult, PropertyInput } from "@/types";
 import type { DataSourceInfo } from "@/types/fallback";
 import { HDB_TOWNS, FLAT_TYPES, STOREY_RANGES, SQM_TO_SQFT } from "@/lib/constants";
 import { analyzeProperty } from "@/actions/analyze";
+import { getUtmParams } from "@/lib/utm";
 import { getStreetNames } from "@/actions/streets";
 import { getBlocks, getBlockDetails } from "@/actions/block-info";
 import RenovationForm from "@/components/renovation-form";
@@ -167,6 +168,7 @@ export default function PropertyForm({ onResult, onError, onAnalyzing, mode = "b
         const result = await analyzeProperty(
           input,
           renovationAnswers ?? undefined,
+          getUtmParams(),
         );
         onResult(result);
       } catch (err) {

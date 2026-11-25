@@ -1,5 +1,7 @@
 "use server";
 
+import { postToSheet } from "@/lib/sheets";
+
 interface OutcomeResult {
   success: boolean;
   error?: string;
@@ -8,7 +10,6 @@ interface OutcomeResult {
 /**
  * Submit a user's outcome to Google Sheets.
  * Supports both buyer (offer) and seller (sale) outcomes.
- * Fire-and-forget pattern: never blocks the UI on failure.
  */
 export async function submitOutcome(data: {
   mode: "buy" | "sell";
@@ -28,7 +29,6 @@ export async function submitOutcome(data: {
   email: string;
   comments: string;
 }): Promise<OutcomeResult> {
-  // Basic validation
   if (data.mode === "sell" && !data.listed) {
     return { success: false, error: "Please answer whether you've listed or sold." };
   }
@@ -36,51 +36,32 @@ export async function submitOutcome(data: {
     return { success: false, error: "Please answer whether you made an offer." };
   }
 
-  const scriptUrl = process.env.GOOGLE_SCRIPT_URL;
-  if (!scriptUrl) {
-    console.log("[submit-outcome] GOOGLE_SCRIPT_URL not set. Logging locally:", data);
-    return { success: true };
-  }
+  const shared = {
+    block: data.block.slice(0, 10),
+    street: data.street.slice(0, 80),
+    useful: data.useful.slice(0, 40),
+    email: data.email.trim().slice(0, 254),
+    comments: data.comments.slice(0, 2000),
+    timestamp: new Date().toISOString(),
+  };
 
-  try {
-    const payload =
-      data.mode === "sell"
-        ? {
-            type: "seller_outcome",
-            block: data.block,
-            street: data.street,
-            listed: data.listed,
-            sold: data.sold,
-            salePrice: data.salePrice,
-            timeToSell: data.timeToSell,
-            useful: data.useful,
-            email: data.email,
-            comments: data.comments,
-            timestamp: new Date().toISOString(),
-          }
-        : {
-            type: "outcome",
-            block: data.block,
-            street: data.street,
-            madeOffer: data.madeOffer,
-            accepted: data.accepted,
-            finalPrice: data.finalPrice,
-            useful: data.useful,
-            email: data.email,
-            comments: data.comments,
-            timestamp: new Date().toISOString(),
-          };
+  const { success } =
+    data.mode === "sell"
+      ? await postToSheet("seller_outcome", {
+          ...shared,
+          listed: data.listed,
+          sold: data.sold,
+          salePrice: data.salePrice.slice(0, 20),
+          timeToSell: data.timeToSell.slice(0, 40),
+        })
+      : await postToSheet("outcome", {
+          ...shared,
+          madeOffer: data.madeOffer,
+          accepted: data.accepted,
+          finalPrice: data.finalPrice.slice(0, 20),
+        });
 
-    await fetch(scriptUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    console.log(`[submit-outcome] ${data.mode} outcome submitted for Blk ${data.block} ${data.street}`);
-    return { success: true };
-  } catch (err) {
-    console.error("[submit-outcome] Failed:", err);
-    return { success: true }; // Never fail the user-facing response
-  }
+  return success
+    ? { success: true }
+    : { success: false, error: "We couldn't save your answers just now. Please try again in a minute." };
 }

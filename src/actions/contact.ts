@@ -1,6 +1,7 @@
 "use server";
 
-const GOOGLE_SCRIPT_URL = process.env.GOOGLE_SCRIPT_URL;
+import { isHoneypotTripped, isValidEmail, validateFields } from "@/lib/form-safety";
+import { postToSheet } from "@/lib/sheets";
 
 interface ContactResult {
   success: boolean;
@@ -11,46 +12,33 @@ export async function submitContactForm(
   name: string,
   email: string,
   message: string,
+  website?: string,
 ): Promise<ContactResult> {
-  // Validate
-  if (!name.trim()) {
+  // Bots fill the hidden "website" field; pretend success so they move on.
+  if (isHoneypotTripped(website)) return { success: true };
+
+  const checked = validateFields({ name, message }, { name: 80, message: 2000 });
+  if (!checked.ok) {
+    return { success: false, error: checked.field === "name" ? "Please keep your name shorter." : "Please keep your message under 2,000 characters." };
+  }
+  if (!checked.values.name) {
     return { success: false, error: "Please enter your name." };
   }
-
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
+  if (!isValidEmail(email.trim())) {
     return { success: false, error: "Please enter a valid email address." };
   }
-
-  if (!message.trim() || message.trim().length < 10) {
+  if (checked.values.message.length < 10) {
     return { success: false, error: "Please enter a message (at least 10 characters)." };
   }
 
-  if (!GOOGLE_SCRIPT_URL) {
-    console.log("[contact] GOOGLE_SCRIPT_URL not set. Message from:", name, email, message);
-    return { success: true };
-  }
+  const { success } = await postToSheet("contact", {
+    name: checked.values.name,
+    email: email.trim(),
+    message: checked.values.message,
+    timestamp: new Date().toISOString(),
+  });
 
-  try {
-    const res = await fetch(GOOGLE_SCRIPT_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        type: "contact",
-        name: name.trim(),
-        email: email.trim(),
-        message: message.trim(),
-        timestamp: new Date().toISOString(),
-      }),
-    });
-
-    if (!res.ok) {
-      console.log("[contact] Google Script returned:", res.status);
-    }
-
-    return { success: true };
-  } catch (err) {
-    console.log("[contact] Failed to POST to Google Script:", err);
-    return { success: true };
-  }
+  return success
+    ? { success: true }
+    : { success: false, error: "We couldn't send your message just now. Please try again, or email hello@sghaus.com." };
 }
