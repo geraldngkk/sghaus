@@ -18,6 +18,8 @@
   },
   "dependencies": {
     "@next/third-parties": "16.1.6",
+    "@vercel/functions": "3.11.0",
+    "botid": "1.5.12",
     "next": "16.1.6",
     "react": "19.2.3",
     "react-dom": "19.2.3",

@@ -2,6 +2,7 @@
 
 import { isHoneypotTripped, isValidEmail, validateFields } from "@/lib/form-safety";
 import { postToSheet } from "@/lib/sheets";
+import { checkBotId } from "botid/server";
 
 interface ContactResult {
   success: boolean;
@@ -29,6 +30,16 @@ export async function submitContactForm(
   }
   if (checked.values.message.length < 10) {
     return { success: false, error: "Please enter a message (at least 10 characters)." };
+  }
+
+  // Every saved message also emails Gerald, so bots must not reach the sheet.
+  try {
+    if ((await checkBotId()).isBot) {
+      return { success: false, error: "We couldn't verify this request. Please refresh the page and try again." };
+    }
+  } catch (err) {
+    console.error("[contact] bot check failed:", err instanceof Error ? err.message : "unknown error");
+    return { success: false, error: "We couldn't verify this request. Please refresh the page and try again." };
   }
 
   const { success } = await postToSheet("contact", {

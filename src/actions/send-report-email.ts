@@ -6,6 +6,10 @@ import { analyzeProperty } from "@/actions/analyze";
 import { getResendClient, EMAIL_FROM } from "@/lib/resend";
 import { buildImmediateEmail, buildSellerImmediateEmail } from "@/lib/emails";
 import { isHoneypotTripped, isValidEmail } from "@/lib/form-safety";
+import { reserveReportSend } from "@/lib/send-limits";
+import { checkBotId } from "botid/server";
+import { getCache, ipAddress } from "@vercel/functions";
+import { headers } from "next/headers";
 
 interface SendReportResult {
   success: boolean;
@@ -35,6 +39,28 @@ export async function sendReportEmail(request: SendReportRequest): Promise<SendR
   const email = request.email.trim();
   if (!isValidEmail(email)) {
     return { success: false, error: "Please enter a valid email address." };
+  }
+
+  // BotID runs an invisible browser check; the page must list this path in instrumentation-client.ts.
+  try {
+    const verification = await checkBotId();
+    if (verification.isBot) {
+      return { success: false, error: "We couldn't verify this request. Please refresh the page and try again." };
+    }
+  } catch (err) {
+    console.error("[send-report-email] bot check failed:", err instanceof Error ? err.message : "unknown error");
+    return { success: false, error: "We couldn't verify this request. Please refresh the page and try again." };
+  }
+
+  const decision = await reserveReportSend({ email, ip: ipAddress(await headers()) }, getCache({ namespace: "report-email" }));
+  if (!decision.allowed) {
+    return {
+      success: false,
+      error:
+        decision.reason === "address"
+          ? "We’ve already sent this report to that address a few times today. Please check your inbox, or try again tomorrow."
+          : "We’ve sent a lot of reports in a short time. Please try again in an hour.",
+    };
   }
 
   const resend = getResendClient();

@@ -11,6 +11,13 @@ vi.mock("@/lib/resend", () => ({
 }));
 vi.mock("@/actions/analyze", () => ({ analyzeProperty }));
 
+const checkBotId = vi.fn();
+const reserveReportSend = vi.fn();
+vi.mock("botid/server", () => ({ checkBotId }));
+vi.mock("next/headers", () => ({ headers: async () => new Headers({ "x-real-ip": "8.8.8.8" }) }));
+vi.mock("@vercel/functions", () => ({ getCache: () => ({}), ipAddress: () => "8.8.8.8" }));
+vi.mock("@/lib/send-limits", () => ({ reserveReportSend }));
+
 const { sendReportEmail } = await import("./send-report-email");
 
 const input = {
@@ -34,6 +41,10 @@ function serverResult(streetName = "TAMPINES ST 45"): AnalysisResult {
 }
 
 beforeEach(() => {
+  checkBotId.mockReset();
+  checkBotId.mockResolvedValue({ isBot: false });
+  reserveReportSend.mockReset();
+  reserveReportSend.mockResolvedValue({ allowed: true });
   send.mockResolvedValue({ error: null });
   analyzeProperty.mockResolvedValue(serverResult());
 });
@@ -82,6 +93,37 @@ describe("sendReportEmail", () => {
     const result = await sendReportEmail({ email: "bot@example.com", input, mode: "buy", website: "spam" });
     expect(result).toEqual({ success: true });
     expect(send).not.toHaveBeenCalled();
+  });
+
+  it("refuses a request BotID marks as a bot, before analysing or sending", async () => {
+    checkBotId.mockResolvedValue({ isBot: true });
+    const result = await sendReportEmail({ email: "mei@example.com", input, mode: "buy" });
+    expect(result.success).toBe(false);
+    expect(analyzeProperty).not.toHaveBeenCalled();
+    expect(send).not.toHaveBeenCalled();
+  });
+
+  it("refuses when the bot check itself fails", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    checkBotId.mockRejectedValue(new Error("not configured"));
+    const result = await sendReportEmail({ email: "mei@example.com", input, mode: "buy" });
+    expect(result.success).toBe(false);
+    expect(send).not.toHaveBeenCalled();
+  });
+
+  it("tells the person when this address has had enough copies today", async () => {
+    reserveReportSend.mockResolvedValue({ allowed: false, reason: "address" });
+    const result = await sendReportEmail({ email: "mei@example.com", input, mode: "buy" });
+    expect(result).toEqual({
+      success: false,
+      error: "We’ve already sent this report to that address a few times today. Please check your inbox, or try again tomorrow.",
+    });
+    expect(send).not.toHaveBeenCalled();
+  });
+
+  it("counts the send against the address and the caller IP", async () => {
+    await sendReportEmail({ email: " Mei@example.com ", input, mode: "buy" });
+    expect(reserveReportSend).toHaveBeenCalledWith({ email: "Mei@example.com", ip: "8.8.8.8" }, expect.anything());
   });
 
   it("returns an error when the analysis fails", async () => {

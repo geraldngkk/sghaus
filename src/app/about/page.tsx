@@ -47,6 +47,13 @@ export default function AboutPage() {
             for every Singaporean.
           </p>
 
+          <h2 className="font-display text-xl text-charcoal pt-4">Who runs it</h2>
+          <p>
+            Gerald Ng and Bernard Sim run SGHaus as volunteers. They&apos;re starting a free
+            monthly online clinic where you can bring a flat you&apos;re weighing up and go
+            through the numbers together.
+          </p>
+
           <h2 className="font-display text-xl text-charcoal pt-4">How it works</h2>
           <ol className="space-y-3 pl-5 list-decimal marker:text-forest marker:font-semibold">
             <li>
