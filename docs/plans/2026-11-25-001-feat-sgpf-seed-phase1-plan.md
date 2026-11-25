@@ -142,7 +142,7 @@ flowchart TB
 
 ## Implementation Units
 
-- [ ] **Unit 1: Test harness and clean-up**
+- [x] **Unit 1: Test harness and clean-up**
 
 **Goal:** Add a test runner and remove exposed and dead code before reviewers look.
 
@@ -167,7 +167,7 @@ flowchart TB
 **Verification:**
 - Tests and `check:static` pass on the unchanged app; the three API routes return 404.
 
-- [ ] **Unit 2: Apps Script and form plumbing**
+- [ ] **Unit 2: Apps Script and form plumbing** (app side done 25 Nov; Gerald still to redeploy the script and add the secret)
 
 **Goal:** Switch off lead scoring, add the clinic record type, make the script the trust boundary, stop silent failures and get UTM into the log.
 
@@ -200,7 +200,7 @@ flowchart TB
 **Verification:**
 - A test clinic sign-up lands only in the separate sheet; the subscriber tab and Lead Scores are untouched; lead scoring no longer runs; an analysis from a `utm_source=kit` link shows `kit` in the Searches row.
 
-- [ ] **Unit 3: Positioning, copy and access without barriers**
+- [x] **Unit 3: Positioning, copy and access without barriers**
 
 **Goal:** Remove the gate and the sales push, close the email relay, and land the new English copy.
 
