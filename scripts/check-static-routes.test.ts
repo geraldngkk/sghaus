@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { findRegressions, parseRouteTable } from "./check-static-routes.mts";
+import { findRegressions, parseRouteTable } from "./check-static-routes";
 
 const table = [
   "Route (app)                         Revalidate  Expire",

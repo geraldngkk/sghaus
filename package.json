@@ -14,7 +14,7 @@
     "generate-reply": "tsx scripts/generate-reply.mts",
     "generate-video": "tsx scripts/generate-video-script.mts",
     "test": "vitest run",
-    "check:static": "tsx scripts/check-static-routes.mts"
+    "check:static": "tsx scripts/check-static-routes.ts"
   },
   "dependencies": {
     "@next/third-parties": "16.1.6",
