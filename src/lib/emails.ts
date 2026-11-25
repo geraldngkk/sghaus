@@ -139,7 +139,7 @@ export function buildImmediateEmail(result: AnalysisResult): {
     result.comps.tier2.length +
     result.comps.tier3.length;
 
-  const subject = singleLine(`Your SGHaus Offer Report - Blk ${input.block} ${input.streetName}`);
+  const subject = singleLine(`Your SGHaus offer report: ${input.flatType} in ${input.town}`);
 
   const html = layout(`
 <h1 style="font-family:${FONT_DISPLAY};font-size:24px;margin:0 0 4px;color:${BRAND.charcoal};">
@@ -246,7 +246,7 @@ export function buildSellerImmediateEmail(result: AnalysisResult): {
   const legalFees = 1000;
   const netAtTarget = offer.mid - agentCommission - legalFees;
 
-  const subject = singleLine(`Your SGHaus Pricing Report - Blk ${input.block} ${input.streetName}`);
+  const subject = singleLine(`Your SGHaus pricing report: ${input.flatType} in ${input.town}`);
 
   const html = layout(`
 <h1 style="font-family:${FONT_DISPLAY};font-size:24px;margin:0 0 4px;color:${BRAND.charcoal};">

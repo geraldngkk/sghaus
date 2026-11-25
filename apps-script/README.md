@@ -9,7 +9,9 @@ until Gerald redeploys from this file.
 The live site must send the secret before the script starts demanding it, or every form on
 sghaus.com fails. The current live script ignores the extra `secret` field, so the app goes first.
 
-1. In Vercel (project `app`, Production only) add `SHEETS_SHARED_SECRET`: a long random string.
+1. In Vercel (project `app`, Production only) add `SHEETS_SHARED_SECRET`, a long random string,
+   and `SHEETS_ACCEPT_LEGACY_REPLY=1`. The second one makes the app accept the old script's reply,
+   whose format nobody recorded, so forms don't show errors in the gap.
 2. Merge and deploy the phase 1 app changes. Forms keep working against the current script.
 3. Open the live script and compare it with `Code.gs`. If the live one calls `updateLeadScore` or
    writes a `Lead Scores` tab, that's the lead scoring this change turns off.
@@ -20,6 +22,8 @@ sghaus.com fails. The current live script ignores the extra `secret` field, so t
    then add a time-driven trigger for it (day timer).
 7. Deploy > Manage deployments > pencil > Version: New version > Deploy. The URL stays the same.
 8. Submit the contact form once on sghaus.com and check the row lands in the Contact tab.
+9. Remove `SHEETS_ACCEPT_LEGACY_REPLY` in Vercel and redeploy. From then on, any reply that
+   isn't `{"status":"ok"}` shows the visitor an error. Submit the contact form once more to confirm.
 
 ## Data handling
 

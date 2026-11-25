@@ -36,7 +36,7 @@ export function saveAnalysis(
   label?: string
 ): SavedAnalysis {
   const existing = getSavedAnalyses();
-  const defaultLabel = `${result.input.flatType} — ${result.input.streetName}, ${result.input.town}`;
+  const defaultLabel = `${result.input.flatType}, ${result.input.streetName}, ${result.input.town}`;
   const saved: SavedAnalysis = {
     id: generateId(),
     label: label || defaultLabel,

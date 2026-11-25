@@ -32,6 +32,14 @@ describe("postToSheet", () => {
     });
   });
 
+  it("never lets a row key replace the type or the secret", async () => {
+    fetchMock.mockResolvedValue(ok({ status: "ok" }));
+    await postToSheet("contact", { type: "subscribe", secret: "guess", email: "a@b.co" });
+    const sent = JSON.parse(fetchMock.mock.calls[0][1].body);
+    expect(sent.type).toBe("contact");
+    expect(sent.secret).toBe("s3cret");
+  });
+
   it("fails when the script answers 200 with status error", async () => {
     fetchMock.mockResolvedValue(ok({ status: "error", message: "bad secret" }));
     expect(await postToSheet("subscribe", { email: "a@b.co" })).toEqual({ success: false });
@@ -50,6 +58,35 @@ describe("postToSheet", () => {
   it("fails on a network error", async () => {
     fetchMock.mockRejectedValue(new Error("offline"));
     expect(await postToSheet("subscribe", { email: "a@b.co" })).toEqual({ success: false });
+  });
+
+  describe("while the old script is still live (SHEETS_ACCEPT_LEGACY_REPLY=1)", () => {
+    beforeEach(() => vi.stubEnv("SHEETS_ACCEPT_LEGACY_REPLY", "1"));
+
+    it("treats a 2xx reply without a status field as saved", async () => {
+      fetchMock.mockResolvedValue(ok({ result: "success" }));
+      expect(await postToSheet("contact", { email: "a@b.co" })).toEqual({ success: true });
+    });
+
+    it("treats a 2xx non-JSON reply as saved", async () => {
+      fetchMock.mockResolvedValue({ ok: true, json: async () => { throw new Error("text"); } });
+      expect(await postToSheet("contact", { email: "a@b.co" })).toEqual({ success: true });
+    });
+
+    it("still fails when the new script reports an error", async () => {
+      fetchMock.mockResolvedValue(ok({ status: "error" }));
+      expect(await postToSheet("contact", { email: "a@b.co" })).toEqual({ success: false });
+    });
+
+    it("still fails on a non-2xx response", async () => {
+      fetchMock.mockResolvedValue({ ok: false, status: 500, json: async () => ({}) });
+      expect(await postToSheet("contact", { email: "a@b.co" })).toEqual({ success: false });
+    });
+  });
+
+  it("fails on a reply without a status field once legacy mode is off", async () => {
+    fetchMock.mockResolvedValue(ok({ result: "success" }));
+    expect(await postToSheet("contact", { email: "a@b.co" })).toEqual({ success: false });
   });
 
   it("fails without calling fetch when the script URL is missing", async () => {

@@ -3,9 +3,10 @@ import type { AnalysisResult, PropertyInput } from "@/types";
 
 const send = vi.fn();
 const analyzeProperty = vi.fn();
+const resendConfigured = { value: true };
 
 vi.mock("@/lib/resend", () => ({
-  getResendClient: () => ({ emails: { send } }),
+  getResendClient: () => (resendConfigured.value ? { emails: { send } } : null),
   EMAIL_FROM: "SGHaus <hello@sghaus.com>",
 }));
 vi.mock("@/actions/analyze", () => ({ analyzeProperty }));
@@ -64,6 +65,12 @@ describe("sendReportEmail", () => {
     expect(subject).not.toMatch(/[\r\n]/);
   });
 
+  it("keeps the street and block out of the subject line", async () => {
+    analyzeProperty.mockResolvedValue(serverResult("YOUR ACCOUNT IS LOCKED VERIFY AT EVIL DOT COM"));
+    await sendReportEmail({ email: "mei@example.com", input, mode: "buy" });
+    expect(send.mock.calls[0][0].subject).toBe("Your SGHaus offer report: 4 ROOM in TAMPINES");
+  });
+
   it("rejects a malformed address without analysing or sending", async () => {
     const result = await sendReportEmail({ email: "not-an-email", input, mode: "buy" });
     expect(result.success).toBe(false);
@@ -82,6 +89,19 @@ describe("sendReportEmail", () => {
     const result = await sendReportEmail({ email: "mei@example.com", input, mode: "buy" });
     expect(result.success).toBe(false);
     expect(send).not.toHaveBeenCalled();
+  });
+
+  it("returns an error without sending when Resend is not configured", async () => {
+    resendConfigured.value = false;
+    const result = await sendReportEmail({ email: "mei@example.com", input, mode: "buy" });
+    resendConfigured.value = true;
+    expect(result.success).toBe(false);
+    expect(send).not.toHaveBeenCalled();
+  });
+
+  it("sends the seller template in sell mode", async () => {
+    await sendReportEmail({ email: "mei@example.com", input, mode: "sell" });
+    expect(send.mock.calls[0][0].subject).toMatch(/pricing report/);
   });
 
   it("returns an error when Resend rejects the email", async () => {

@@ -45,7 +45,7 @@ function append_(sheet, values) {
 }
 
 function isEmail_(value) {
-  return typeof value === "string" && value.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value);
+  return typeof value === "string" && value.length <= 254 && /^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/.test(value);
 }
 
 function doPost(e) {
@@ -97,6 +97,8 @@ function doPost(e) {
     if (data.type === "clinic_signup") {
       if (!isEmail_(data.email)) return reply_("error");
       if (data.listingTown && data.consent !== "yes") return reply_("error");
+      // The purge needs a date it can read, so only ISO dates (2026-12-12) are stored.
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(String(data.clinicDate))) return reply_("error");
       var clinic = SpreadsheetApp.openById(prop_("CLINIC_SHEET_ID"));
       var signups = sheet_(clinic, "Sign-ups", ["Timestamp","Clinic Date","Name","Email","Language","Listing Town","Listing Flat Type","Listing Block","Asking Price","Question","Consent To Show"]);
       append_(signups, [data.timestamp || now,data.clinicDate,data.name,data.email,data.locale,data.listingTown,data.listingFlatType,data.listingBlock,data.askingPrice,data.question,data.consent]);
@@ -106,13 +108,20 @@ function doPost(e) {
     // Unknown types are rejected; they never fall through to the subscriber list.
     return reply_("error");
   } catch (err) {
+    console.error("doPost failed: " + (err && err.message));
     return reply_("error");
   }
 }
 
+// A failed notification must not turn a saved row into an error reply, or the visitor
+// retries and the sheet gets a duplicate row.
 function notify_(subject, body) {
-  var to = prop_("NOTIFY_EMAIL");
-  if (to) MailApp.sendEmail({ to: to, subject: subject, body: body });
+  try {
+    var to = prop_("NOTIFY_EMAIL");
+    if (to) MailApp.sendEmail({ to: to, subject: subject, body: body });
+  } catch (err) {
+    console.error("notify_ failed: " + (err && err.message));
+  }
 }
 
 // Run daily from a time-driven trigger (Triggers > Add trigger > purgeOldClinicRows, Day timer).

@@ -19,7 +19,8 @@ export function neutraliseRow(row: Record<string, unknown>): Record<string, Cell
   return out;
 }
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+// Plain addresses only: no commas, quotes, angle brackets or spaces, so one value is one recipient.
+const EMAIL_PATTERN = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
 
 export function isValidEmail(email: string): boolean {
   return email.length <= 254 && EMAIL_PATTERN.test(email);

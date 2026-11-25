@@ -44,11 +44,19 @@ export default function EmailReport({ result, mode }: EmailReportProps) {
     }
   }
 
+  // The server rebuilds the report from the inputs. A report saved before renovation
+  // answers were stored would come back without the renovation adjustment shown here.
+  const cannotRebuild = Boolean(result.renovation) && !result.renovation?.answers;
+
   return (
     <div className="rounded-xl border border-border bg-white p-5">
       <h3 className="text-base font-semibold text-charcoal">Email me this report</h3>
 
-      {status === "sent" ? (
+      {cannotRebuild ? (
+        <p className="mt-2 text-base text-slate">
+          This saved report was made with an older version of SGHaus. Run the analysis again to email it.
+        </p>
+      ) : status === "sent" ? (
         <p className="mt-2 text-base text-slate" role="status">
           Sent to <strong className="text-charcoal">{sentTo}</strong>. Check your inbox in a minute or two.
         </p>

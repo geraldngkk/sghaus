@@ -270,19 +270,11 @@ export async function analyzeProperty(
   let renovation: AnalysisResult["renovation"];
   let offerWithReno: AnalysisResult["offerWithReno"];
 
-  console.log("[RENO DEBUG] renovationAnswers received:", renovationAnswers ? `${renovationAnswers.length} answers` : "NONE (null/undefined)");
 
   if (renovationAnswers && renovationAnswers.length > 0) {
     const renoResult = assessRenovation(renovationAnswers, input.flatType);
     renovation = { ...renoResult, answers: renovationAnswers };
 
-    console.log("[RENO DEBUG] Assessment result:", {
-      condition: renoResult.condition,
-      overallScore: renoResult.overallScore,
-      estimatedCost: renoResult.estimatedCost,
-      priceAdjustmentPercent: renoResult.priceAdjustmentPercent,
-      priceAdjustmentDollar: renoResult.priceAdjustmentDollar,
-    });
 
     if (renoResult.priceAdjustmentPercent !== 0) {
       const adjustPsf = (psf: number) =>
@@ -294,11 +286,6 @@ export async function analyzeProperty(
       const renoMid = offer.mid + Math.round(offer.mid * renoResult.priceAdjustmentPercent / 1000) * 1000;
       const renoMax = offer.max + Math.round(offer.max * renoResult.priceAdjustmentPercent / 1000) * 1000;
 
-      console.log("[RENO DEBUG] Offer adjustment:", {
-        baseOffers: { low: offer.low, mid: offer.mid, max: offer.max },
-        adjustedOffers: { low: renoLow, mid: renoMid, max: renoMax },
-        adjustmentPercent: `${(renoResult.priceAdjustmentPercent * 100).toFixed(2)}%`,
-      });
 
       offerWithReno = {
         low: renoLow,

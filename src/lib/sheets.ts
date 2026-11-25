@@ -26,16 +26,34 @@ export async function postToSheet(
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
+        ...neutraliseRow(row),
         type,
         secret: process.env.SHEETS_SHARED_SECRET ?? "",
-        ...neutraliseRow(row),
       }),
     });
     if (!res.ok) {
       console.error(`[sheets] ${type}: HTTP ${res.status}`);
       return { success: false };
     }
-    const body = (await res.json()) as { status?: string };
+    // Until the new script is deployed, the old one answers in an unknown format. With
+    // SHEETS_ACCEPT_LEGACY_REPLY=1 a 2xx reply that carries no status counts as saved,
+    // as it always did. Remove the variable once the new script is live.
+    const legacy = process.env.SHEETS_ACCEPT_LEGACY_REPLY === "1";
+    let body: { status?: string } | null = null;
+    try {
+      body = (await res.json()) as { status?: string };
+    } catch {
+      if (legacy) {
+        console.warn(`[sheets] ${type}: legacy script reply accepted (not JSON)`);
+        return { success: true };
+      }
+      console.error(`[sheets] ${type}: script reply was not JSON`);
+      return { success: false };
+    }
+    if (legacy && (body === null || typeof body !== "object" || !("status" in body))) {
+      console.warn(`[sheets] ${type}: legacy script reply accepted (no status)`);
+      return { success: true };
+    }
     if (body?.status !== "ok") {
       console.error(`[sheets] ${type}: script reported ${body?.status ?? "no status"}`);
       return { success: false };

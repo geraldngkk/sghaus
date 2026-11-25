@@ -42,6 +42,10 @@ describe("isValidEmail", () => {
     expect(isValidEmail("not-an-email")).toBe(false);
     expect(isValidEmail("a@b")).toBe(false);
     expect(isValidEmail(`${"x".repeat(250)}@example.com`)).toBe(false);
+    expect(isValidEmail("a@x.com,b@y.com")).toBe(false);
+    expect(isValidEmail("a<b@x.com>")).toBe(false);
+    expect(isValidEmail('"a"@x.com')).toBe(false);
+    expect(isValidEmail("first.last+sghaus@mail.example.sg")).toBe(true);
   });
 });
 

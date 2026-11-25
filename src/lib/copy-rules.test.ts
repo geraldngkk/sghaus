@@ -19,6 +19,7 @@ export const CLEAN_FILES = [
   "src/actions/subscribe.ts",
   "src/actions/contact.ts",
   "src/actions/submit-outcome.ts",
+  "src/actions/streets.ts",
 ];
 
 describe("copy rules on cleaned files", () => {
