@@ -107,7 +107,7 @@ export default async function OgImage() {
               lineHeight: 1.4,
             }}
           >
-            The biggest decision of your life. Don't wing it.
+            Know what a flat is worth before you agree a price.
           </div>
 
           {/* Subtitle */}
@@ -119,7 +119,7 @@ export default async function OgImage() {
               marginTop: 14,
             }}
           >
-            Data-backed offer strategies for buyers and pricing tools for sellers
+            Free for every Singaporean
           </div>
         </div>
       </div>

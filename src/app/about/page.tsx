@@ -5,7 +5,7 @@ import Footer from "@/components/footer";
 export const metadata: Metadata = {
   title: "About - SGHaus",
   description:
-    "SGHaus helps Singapore homebuyers make data-driven offers on HDB resale flats using official transaction records and market intelligence.",
+    "SGHaus is a free community tool that helps Singapore homeowners and their families check what an HDB flat is worth before they agree a price.",
 };
 
 export default function AboutPage() {
@@ -24,40 +24,49 @@ export default function AboutPage() {
 
         <div className="mt-10 space-y-6 text-base text-slate leading-relaxed" style={{ maxWidth: "60ch" }}>
           <p>
-            SGHaus was built with one belief: buying a home shouldn&apos;t be a guessing game.
-            Too many first-time buyers walk into viewings without knowing what a fair price
-            looks like, or go into negotiations armed with nothing but a listing agent&apos;s
-            asking price.
+            SGHaus started at home. We&apos;re Singaporeans in our thirties, and we watched
+            our elderly parents take an agent&apos;s word on price at face value.
           </p>
 
           <p>
-            We collect data from various data sources and analyse them with our
-            unique calculation formula to generate personalised offer strategies.
-            For every property you&apos;re considering, SGHaus gives you three
-            numbers: an opening bid, a target price, and a hard ceiling you
-            should never cross.
+            An agent who wants to close quickly doesn&apos;t always give the best advice on
+            price. Our parents had no easy way to check whether the number they heard was
+            fair, and they risked losing money because of it.
+          </p>
+
+          <p>
+            So we built a free tool that does the checking. It looks at real resale
+            transactions for similar flats nearby and turns them into three numbers: where
+            to start, what&apos;s fair and when to walk away.
+          </p>
+
+          <h2 className="font-display text-xl text-charcoal pt-4">Who it&apos;s for</h2>
+          <p>
+            SGHaus is for first-time buyers, for older owners who are selling or moving to a
+            smaller flat, and for the sons and daughters who help them decide. It&apos;s free
+            for every Singaporean.
           </p>
 
           <h2 className="font-display text-xl text-charcoal pt-4">How it works</h2>
           <ol className="space-y-3 pl-5 list-decimal marker:text-forest marker:font-semibold">
             <li>
-              <strong className="text-charcoal">Comparable sales analysis</strong> :
+              <strong className="text-charcoal">Comparable sales analysis</strong>:
               We find recent transactions for similar flats on the same street, in the same
               area, and town-wide, then tier them by relevance.
             </li>
             <li>
-              <strong className="text-charcoal">Price adjustments</strong> :
+              <strong className="text-charcoal">Price adjustments</strong>:
               Each comparable is adjusted for storey height, remaining lease, and floor
               area differences so you&apos;re comparing like for like.
             </li>
             <li>
-              <strong className="text-charcoal">3-tier offer strategy</strong> :
+              <strong className="text-charcoal">3-tier offer strategy</strong>:
               Your opening bid (data-backed anchor), target price (fair market value),
               and hard ceiling (walk away above this) are calculated from the adjusted
               comparables.
             </li>
             <li>
-              <strong className="text-charcoal">Risk assessment</strong> :
+              <strong className="text-charcoal">Risk assessment</strong>:
               Flags for lease decay, low liquidity, price trends, and upcoming BTO
               supply help you see what the numbers don&apos;t.
             </li>
@@ -74,7 +83,7 @@ export default function AboutPage() {
           <div className="mt-8 rounded-xl border border-border bg-white p-5">
             <p className="text-xs text-slate leading-relaxed">
               <strong className="text-charcoal">Disclaimer:</strong> SGHaus provides
-              estimates based on official transaction records. This is not
+              estimates based on real resale transactions. This is not
               financial advice. Always conduct your own due diligence and consider
               consulting a licensed property agent before making purchase decisions.
             </p>

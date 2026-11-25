@@ -26,16 +26,23 @@ export default function LandingPage() {
                   letterSpacing: "-0.01em",
                 }}
               >
-                The biggest decision of your life.{" "}
-                <span className="text-mist">Don&rsquo;t wing it.</span>
+                Know what a flat is worth{" "}
+                <span className="text-mist">before you agree a price.</span>
               </h1>
 
               <p
                 className="rise mt-6 max-w-xl text-pretty text-lg leading-relaxed text-mist/85 sm:text-xl"
                 style={{ "--rise-delay": "80ms" } as React.CSSProperties}
               >
-                Real resale transactions, turned into three numbers you can act
-                on. Where to start, what to pay, and exactly when to walk away.
+                We turn real resale transactions into three numbers you can act
+                on: where to start, what&rsquo;s fair and when to walk away.
+              </p>
+
+              <p
+                className="rise mt-4 text-base font-semibold text-white"
+                style={{ "--rise-delay": "120ms" } as React.CSSProperties}
+              >
+                Free for every Singaporean.
               </p>
             </div>
 

@@ -11,6 +11,7 @@ export default function ContactPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const [website, setWebsite] = useState("");
   const [state, setState] = useState<FormState>("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -19,7 +20,7 @@ export default function ContactPage() {
     setState("submitting");
     setErrorMsg("");
 
-    const result = await submitContactForm(name, email, message);
+    const result = await submitContactForm(name, email, message, website);
 
     if (result.success) {
       setState("success");
@@ -112,9 +113,26 @@ export default function ContactPage() {
                 />
               </div>
 
+              {/* Honeypot: hidden from people, often filled by bots. */}
+              <input
+                type="text"
+                name="website"
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                value={website}
+                onChange={(e) => setWebsite(e.target.value)}
+                className="absolute -left-[9999px] h-px w-px opacity-0"
+              />
+
               {state === "error" && errorMsg && (
-                <p className="text-sm text-[#EF4444]">{errorMsg}</p>
+                <p className="text-sm text-[#EF4444]" role="alert">{errorMsg}</p>
               )}
+
+              <p className="text-sm text-slate">
+                We use your details only to reply to you. To have them deleted, write to
+                hello@sghaus.com.
+              </p>
 
               <button
                 type="submit"

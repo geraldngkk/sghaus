@@ -129,6 +129,8 @@ export interface MarketContext {
 
 /** Renovation condition assessment result */
 export interface RenovationResult {
+  /** The answers that produced this assessment, so a report can be rebuilt on the server. */
+  answers?: { questionId: string; selectedScore: number; selectedCostLow: number; selectedCostHigh: number }[];
   overallScore: number;
   condition: "move-in ready" | "light refresh" | "partial renovation" | "full renovation";
   estimatedCost: { low: number; high: number };

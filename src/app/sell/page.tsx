@@ -1,19 +1,19 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import type { AnalysisResult } from "@/types";
 import PropertyForm from "@/components/property-form";
 import MarketContextDisplay from "@/components/market-context";
 import RiskFlagsDisplay from "@/components/risk-flags";
 import AnalysisSkeleton from "@/components/analysis-skeleton";
-import EmailCapture from "@/components/email-capture";
+import EmailReport from "@/components/email-report";
 import ShareReport from "@/components/share-report";
 import TierPreview from "@/components/tier-preview";
 import CountUp from "@/components/count-up";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import SellSeoContent from "./seo-content";
-import { captureUtmParams, type UtmParams } from "@/lib/utm";
+import { captureUtmParams } from "@/lib/utm";
 
 // ---------------------------------------------------------------------------
 // Seller pricing derived from buyer analysis
@@ -289,8 +289,7 @@ export default function SellPage() {
   const [error, setError] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [view, setView] = useState<"home" | "results">("home");
-  const utmRef = useRef<UtmParams>({});
-  useEffect(() => { utmRef.current = captureUtmParams(); }, []);
+  useEffect(() => { captureUtmParams(); }, []);
 
   function handleResult(data: AnalysisResult) {
     setResult(data);
@@ -407,7 +406,6 @@ export default function SellPage() {
         {result && pricing && view === "results" && (
           <section id="seller-results">
             {/* Email capture popup:same logic as buyer page */}
-            <EmailCapture delayMs={12000} result={result} mode="sell" utm={utmRef.current} />
 
             {/* Fallback data banner */}
             {result.dataSource?.type === "fallback" && (
@@ -541,12 +539,14 @@ export default function SellPage() {
                 {/* Risk Flags */}
                 <RiskFlagsDisplay risks={result.risks} />
 
+                <EmailReport result={result} mode="sell" />
+
                 {/* Disclaimer */}
                 <div className="rounded-xl border border-border bg-white p-5">
                   <p className="text-xs text-slate leading-relaxed">
                     <strong className="text-charcoal">Disclaimer:</strong> This
-                    tool provides estimates based on official HDB resale
-                    transaction records. It is not financial advice.
+                    tool provides estimates based on real resale
+                    transactions. It is not financial advice.
                     Actual prices depend on many factors not captured here,
                     including unit condition, renovation, facing, view, and
                     negotiation dynamics. Agent commission is estimated at 2% and

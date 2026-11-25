@@ -276,8 +276,9 @@ function SharedFields({
           placeholder="you@example.com"
           className="mt-1.5 w-full rounded-lg border border-border bg-white px-4 py-2.5 text-sm text-charcoal placeholder:text-slate/50 outline-none transition-colors focus:border-forest focus:ring-1 focus:ring-forest/20"
         />
-        <p className="mt-1 text-xs text-slate/60">
-          Only if you&apos;d like us to follow up
+        <p className="mt-1 text-sm text-slate">
+          Only if you&apos;d like us to follow up. We use it for nothing else, and you can
+          ask hello@sghaus.com to delete it.
         </p>
       </div>
 

@@ -78,6 +78,7 @@ export async function analyzeProperty(
   rawInput: PropertyInput,
   renovationAnswers?: RenovationAnswer[],
   utm?: { utm_source?: string; utm_medium?: string; utm_campaign?: string; utm_content?: string },
+  options: { log?: boolean } = {},
 ): Promise<AnalysisResult> {
   // 1. Resolve lease year from HDB data if not provided, then validate
   const leaseCommenceDate = await resolveLeaseYear(rawInput);
@@ -273,7 +274,7 @@ export async function analyzeProperty(
 
   if (renovationAnswers && renovationAnswers.length > 0) {
     const renoResult = assessRenovation(renovationAnswers, input.flatType);
-    renovation = renoResult;
+    renovation = { ...renoResult, answers: renovationAnswers };
 
     console.log("[RENO DEBUG] Assessment result:", {
       condition: renoResult.condition,
@@ -337,7 +338,7 @@ export async function analyzeProperty(
   };
 
   // Fire-and-forget: log to Google Sheets (never blocks the response)
-  logAnalysis(analysisResult, utm).catch((err) =>
+  if (options.log !== false) logAnalysis(analysisResult, utm).catch((err) =>
     console.error("[analyze] logAnalysis failed:", err instanceof Error ? err.message : "unknown error"),
   );
 

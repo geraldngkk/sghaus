@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect } from "react";
 import type { AnalysisResult } from "@/types";
 import PropertyForm from "@/components/property-form";
 import OfferStrategyDisplay from "@/components/offer-strategy";
@@ -13,13 +13,13 @@ import PropertyComparison from "@/components/property-comparison";
 import ShareReport from "@/components/share-report";
 import AnalysisSkeleton from "@/components/analysis-skeleton";
 import NegotiationPanel from "@/components/negotiation-panel";
-import EmailCapture from "@/components/email-capture";
+import EmailReport from "@/components/email-report";
 import TierPreview from "@/components/tier-preview";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import BuySeoContent from "./seo-content";
 import { saveAnalysis, getAnalysis, type SavedAnalysis } from "@/lib/storage";
-import { captureUtmParams, type UtmParams } from "@/lib/utm";
+import { captureUtmParams } from "@/lib/utm";
 
 type View = "home" | "results" | "comparison";
 
@@ -31,8 +31,7 @@ export default function BuyPage() {
   const [saveRefreshKey, setSaveRefreshKey] = useState(0);
   const [view, setView] = useState<View>("home");
   const [comparisonAnalyses, setComparisonAnalyses] = useState<SavedAnalysis[]>([]);
-  const utmRef = useRef<UtmParams>({});
-  useEffect(() => { utmRef.current = captureUtmParams(); }, []);
+  useEffect(() => { captureUtmParams(); }, []);
 
   function handleResult(data: AnalysisResult) {
     setResult(data);
@@ -201,9 +200,6 @@ export default function BuyPage() {
         {/* Results */}
         {result && view === "results" && (
           <section id="results">
-            {/* Email capture popup:triggers on scroll to analysis or 8s timer */}
-            <EmailCapture delayMs={12000} result={result} utm={utmRef.current} />
-
             {/* Fallback data banner */}
             {result.dataSource?.type === "fallback" && (
               <div className="border-b border-amber-200 bg-amber-50">
@@ -312,11 +308,13 @@ export default function BuyPage() {
                 <RiskFlagsDisplay risks={result.risks} />
                 <DecisionChecklist checklist={result.checklist} />
 
+                <EmailReport result={result} mode="buy" />
+
                 <div className="rounded-xl border border-border bg-white p-5">
                   <p className="text-xs text-slate leading-relaxed">
                     <strong className="text-charcoal">Disclaimer:</strong> This
-                    tool provides estimates based on official HDB resale
-                    transaction records. It is not financial advice.
+                    tool provides estimates based on real resale
+                    transactions. It is not financial advice.
                     Actual prices depend on many factors not captured here,
                     including unit condition, renovation, facing, view, and
                     negotiation dynamics. Always conduct your own due diligence and

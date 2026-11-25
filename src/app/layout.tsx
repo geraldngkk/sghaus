@@ -44,7 +44,7 @@ const hanken = Hanken_Grotesk({
 export const metadata: Metadata = {
   title: "SGHaus - Know Exactly What Your Flat Is Worth",
   description:
-    "This is probably the biggest decision of your life. Don't wing it. Data-backed offer strategies for buyers and pricing tools for sellers.",
+    "A free community tool that helps Singapore homeowners and their families check what an HDB flat is worth before they agree a price. Based on real resale transactions.",
   metadataBase: new URL("https://sghaus.com"),
   alternates: { canonical: "/" },
   verification: {
@@ -53,7 +53,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "SGHaus - Know Exactly What Your Flat Is Worth",
     description:
-      "Data-backed offer strategies for buyers and pricing tools for sellers.",
+      "A free tool that helps Singapore homeowners check what a flat is worth before they agree a price.",
     siteName: "SGHaus",
     type: "website",
     url: "https://sghaus.com",
@@ -62,7 +62,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "SGHaus - Know Exactly What Your Flat Is Worth",
     description:
-      "Data-backed offer strategies for buyers and pricing tools for sellers.",
+      "A free tool that helps Singapore homeowners check what a flat is worth before they agree a price.",
   },
   icons: {
     icon: "/favicon.svg",
